@@ -8,6 +8,9 @@ import { clientTypeSchema, type ClientType } from "../modules/auth/auth.schemas.
 import { type Role, verifyAccessToken } from "../modules/auth/tokens.js";
 import * as presenceRepo from "../modules/presence/presence.repository.js";
 import { afterSessionClosed, broadcastPresence, setPresenceIo } from "../modules/presence/presence.service.js";
+import { activeMembership } from "../modules/tours/tours.repository.js";
+import { announceOnline, tourRoom, updatePosition } from "../modules/tours/tours.service.js";
+import { setHubIo } from "./hub.js";
 
 interface SocketData {
   userId: number;
@@ -92,8 +95,9 @@ export function initRealtime(httpServer: HttpServer): Server {
       await socket.join(`user:${data.userId}`);
       // Chỉ socket mở từ Web Admin mới nhận sự kiện quản trị.
       if (data.role === "admin" && data.clientType === "admin") await socket.join("admins");
-      socket.emit("presence.session", { sessionId: data.sessionId });
-      await broadcastPresence({ userId: data.userId, type: "online" });
+      // Thành viên nhóm tham quan vào phòng tour:{id} để nhận vị trí (điểm đang nghe) của cả nhóm.
+      const membership = await activeMembership(data.userId);
+      if (membership) await socket.join(tourRoom(membership.tour_id));
     } catch (err) {
       logger.error({ err }, "Không mở được phiên presence");
       socket.disconnect(true);
@@ -123,16 +127,48 @@ export function initRealtime(httpServer: HttpServer): Server {
       }
     });
 
+    // Khách trong nhóm bắt đầu nghe một điểm: { placeId }; ack { ok, tourId }.
+    socket.on("tour.position", async (payload: unknown, ack?: unknown) => {
+      const placeId = (payload as { placeId?: unknown } | null)?.placeId;
+      try {
+        if (typeof placeId !== "number" || !Number.isInteger(placeId) || placeId <= 0) {
+          if (typeof ack === "function") ack({ ok: false, code: "VALIDATION_ERROR" });
+          return;
+        }
+        const tourId = await updatePosition(data.userId, placeId);
+        if (typeof ack === "function") ack({ ok: tourId !== undefined, tourId: tourId ?? null });
+      } catch (err) {
+        logger.error({ err }, "Lỗi xử lý tour.position");
+        if (typeof ack === "function") ack({ ok: false });
+      }
+    });
+
     socket.on("disconnect", async () => {
       try {
         await presenceRepo.closeSession(data.sessionId);
         await afterSessionClosed(data.userId);
+        await announceOnline(data.userId);
       } catch (err) {
         logger.error({ err }, "Lỗi đóng phiên presence");
       }
     });
+
+    // Client ngắt kết nối trong lúc đang mở phiên → "disconnect" đã phát trước khi kịp đăng ký ở trên.
+    if (!socket.connected) {
+      await presenceRepo.closeSession(data.sessionId).catch((err: unknown) => logger.error({ err }, "Lỗi đóng phiên presence"));
+      return;
+    }
+    // Chỉ báo "đã sẵn sàng" sau khi đăng ký xong mọi bộ xử lý sự kiện, để sự kiện client gửi ngay sau đó không bị mất.
+    socket.emit("presence.session", { sessionId: data.sessionId });
+    try {
+      await broadcastPresence({ userId: data.userId, type: "online" });
+      await announceOnline(data.userId);
+    } catch (err) {
+      logger.error({ err }, "Lỗi phát trạng thái trực tuyến");
+    }
   });
 
   setPresenceIo(io);
+  setHubIo(io);
   return io;
 }

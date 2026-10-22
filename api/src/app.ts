@@ -13,6 +13,10 @@ import { authRouter } from "./modules/auth/auth.routes.js";
 import { healthRouter } from "./modules/health/health.routes.js";
 import { presenceRouter } from "./modules/presence/presence.routes.js";
 import { meRouter } from "./modules/users/me.routes.js";
+import { contentRouter } from "./modules/content/content.routes.js";
+import { toursRouter } from "./modules/tours/tours.routes.js";
+import { visitsRouter } from "./modules/visits/visits.routes.js";
+import { mediaRoot } from "./lib/media.js";
 
 export interface AppOptions {
   loginRateLimitMax?: number; // test dùng giá trị nhỏ để kiểm tra 429
@@ -34,8 +38,25 @@ export function createApp(opts: AppOptions = {}) {
 
   app.use(healthRouter);
   app.use(docsRouter);
-  app.use("/api/v1", authRouter({ loginRateLimitMax: opts.loginRateLimitMax }), meRouter, presenceRouter, adminRouter);
-  // Các module tiếp theo gắn dưới /api/v1: uploads, jobs…
+  // Tệp âm thanh/ảnh: hỗ trợ HTTP Range (tua), cho phép Web/Mobile ở origin khác phát trực tiếp.
+  app.use(
+    "/media",
+    express.static(mediaRoot, {
+      maxAge: "1d",
+      fallthrough: true,
+      setHeaders: (res) => res.setHeader("Cross-Origin-Resource-Policy", "cross-origin"),
+    }),
+  );
+  app.use(
+    "/api/v1",
+    authRouter({ loginRateLimitMax: opts.loginRateLimitMax }),
+    meRouter,
+    presenceRouter,
+    contentRouter,
+    visitsRouter,
+    toursRouter,
+    adminRouter,
+  );
 
   app.use(notFound);
   app.use(errorHandler);

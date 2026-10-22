@@ -1,3 +1,5 @@
+import os from "node:os";
+import path from "node:path";
 import { defineConfig } from "vitest/config";
 
 // Test dùng CSDL riêng DinhDocLapDB_test để không đụng dữ liệu dev.
@@ -16,6 +18,9 @@ export default defineConfig({
       JWT_ACCESS_SECRET: "test-secret-chi-dung-cho-kiem-thu-0123456789",
       LOGIN_RATE_LIMIT_MAX: "1000",
       PRESENCE_CLEANUP_INTERVAL_SEC: "30",
+      // Tệp tải lên trong test ghi vào thư mục tạm; giới hạn 1 MB để kiểm tra lỗi 413.
+      MEDIA_DIR: path.join(os.tmpdir(), "dinhdoclap-media-test"),
+      MAX_AUDIO_MB: "1",
     },
   },
 });

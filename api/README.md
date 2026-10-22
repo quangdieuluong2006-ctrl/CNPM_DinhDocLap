@@ -38,7 +38,21 @@ PowerShell báo "running scripts is disabled": chạy một lần `Set-Execution
 ## Tài liệu API (Swagger)
 
 Mở **http://localhost:3000/api/docs**: `POST /api/v1/auth/login` → Try it out → sao chép `accessToken` → **Authorize** → gọi các API cần đăng nhập.
-Thêm/sửa route thì cập nhật `src/docs/openapi.ts`; test `tests/openapi.test.ts` báo lỗi nếu tài liệu lệch với route thật.
+Thêm/sửa route thì cập nhật `src/docs/openapi.ts` (hoặc `openapi.content.ts`); test `tests/openapi.test.ts` báo lỗi nếu tài liệu lệch với route thật.
+
+## Các nhóm API (`/api/v1`)
+
+| Nhóm | Endpoint chính | Quyền |
+|---|---|---|
+| Nội dung | `GET /languages`, `GET /places?lang=&zone=&q=`, `GET /places/{code}?lang=`, `GET /content/bundle?lang=` (ETag → 304), `GET /content/version` | Công khai |
+| Lượt ghé | `POST /visits`, `POST /visits/batch` (bỏ trùng theo `clientId`), `GET /me/visits` | Khách / đăng nhập |
+| Nhóm tham quan | `POST /tours`, `GET /me/tour`, `GET /tours/{code}`, `POST /tours/{code}/join`, `POST /tours/{id}/leave`, `GET /tours/{id}/members`, `POST /tours/{id}/end` | Đăng nhập; tạo nhóm: guide/admin |
+| Quản trị nội dung | `/admin/places` (CRUD), `PUT /admin/places/{id}/contents/{lang}`, `POST …/audio` (multipart), `POST /admin/places/{id}/image`, `/admin/languages` + `/catalog` | admin |
+| Quản trị người dùng | `/admin/users` (lọc, khóa/mở, đổi vai trò), `/admin/tours`, `/admin/activity-logs`, `/admin/stats`, `/admin/presence` | admin |
+
+- Bài hiển thị cho khách: `approved` và `pending` (kèm nhãn); `draft` ẩn. Thiếu bài ngôn ngữ đã chọn → dự phòng `en` → `vi` (`isFallback: true`).
+- Mọi thay đổi ở API quản trị nội dung tăng phiên bản (`content_releases`) → ETag gói offline đổi → ứng dụng tải lại.
+- Tệp tải lên lưu ở `MEDIA_DIR` (mặc định `storage/media`, đã gitignore), phục vụ tại `/media/...` có hỗ trợ HTTP Range.
 
 ## Cơ sở dữ liệu
 

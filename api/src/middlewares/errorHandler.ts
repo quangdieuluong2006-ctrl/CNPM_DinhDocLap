@@ -1,4 +1,5 @@
 import type { ErrorRequestHandler, RequestHandler } from "express";
+import multer from "multer";
 import sql from "mssql";
 import { ZodError } from "zod";
 import { ApiError } from "../lib/apiError.js";
@@ -19,6 +20,18 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   if (err instanceof ZodError) {
     res.status(400).json({
       error: { code: "VALIDATION_ERROR", message: "Dữ liệu không hợp lệ", details: { fields: err.issues }, requestId },
+    });
+    return;
+  }
+  // Lỗi tải tệp của multer: quá dung lượng → 413, sai trường form → 400.
+  if (err instanceof multer.MulterError) {
+    const tooLarge = err.code === "LIMIT_FILE_SIZE";
+    res.status(tooLarge ? 413 : 400).json({
+      error: {
+        code: tooLarge ? "FILE_TOO_LARGE" : "VALIDATION_ERROR",
+        message: tooLarge ? "Tệp vượt quá dung lượng cho phép" : `Tệp tải lên không hợp lệ (${err.code})`,
+        requestId,
+      },
     });
     return;
   }
