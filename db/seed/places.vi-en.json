@@ -1,0 +1,173 @@
+{
+  "_note": "Dữ liệu mẫu – nội dung lịch sử là BẢN NHÁP, phải đối chiếu nguồn chính thức của Di tích Dinh Độc Lập trước khi trình bày (PRD mục 18.4). Tọa độ ước lượng, cần đo lại tại chỗ.",
+  "places": [
+    {
+      "code": "001", "slug": "cong-chinh", "internalName": "Cổng chính – đại lộ Lê Duẩn", "trigger": "gps", "zone": "outdoor",
+      "lat": 10.778350, "lng": 106.696700, "radiusM": 30, "sortOrder": 1, "priority": 0,
+      "vi": {
+        "title": "Cổng chính",
+        "summary": "Nơi bắt đầu hành trình, gắn với lịch sử khu đất từ dinh Norodom đến thời khắc trưa 30/4/1975.",
+        "body": "Chào mừng bạn đến Dinh Độc Lập. Trước mặt bạn là cổng chính, nhìn ra đại lộ Lê Duẩn. Khu đất này từng là nơi đặt dinh thự của Thống đốc Nam Kỳ thời Pháp thuộc, được xây dựng từ năm 1868 đến năm 1873, thường được gọi là dinh Norodom. Năm 1962, sau khi dinh cũ bị hư hại nặng trong một vụ ném bom, công trình mới được xây dựng theo thiết kế của kiến trúc sư Ngô Viết Thụ và khánh thành ngày 31 tháng 10 năm 1966. Trưa ngày 30 tháng 4 năm 1975, xe tăng Quân Giải phóng tiến qua cánh cổng này – thời khắc đánh dấu sự kết thúc của chiến tranh và mở ra thời kỳ thống nhất đất nước."
+      },
+      "en": {
+        "title": "Main Gate",
+        "summary": "Where the journey begins – from the Norodom Palace to the historic noon of 30 April 1975.",
+        "body": "Welcome to the Independence Palace. In front of you is the main gate, facing Le Duan Boulevard. This site was once home to the residence of the French Governor of Cochinchina, built between 1868 and 1873 and commonly known as the Norodom Palace. In 1962, after the old palace was badly damaged in a bombing, a new building designed by architect Ngo Viet Thu was constructed and inaugurated on 31 October 1966. At noon on 30 April 1975, Liberation Army tanks rolled through this gate – the moment that marked the end of the war and the reunification of Vietnam."
+      }
+    },
+    {
+      "code": "002", "slug": "xe-tang-390-843", "internalName": "Hai xe tăng 390 và 843", "trigger": "gps", "zone": "outdoor",
+      "lat": 10.777900, "lng": 106.696400, "radiusM": 25, "sortOrder": 2, "priority": 1,
+      "vi": {
+        "title": "Hai xe tăng 390 và 843",
+        "summary": "Gợi lại thời khắc xe tăng tiến vào Dinh trưa ngày 30 tháng 4 năm 1975.",
+        "body": "Hai chiếc xe tăng mang số hiệu 390 và 843 trong khuôn viên gợi lại thời khắc lịch sử trưa ngày 30 tháng 4 năm 1975. Theo các tư liệu lịch sử, xe tăng 843 húc vào cổng phụ, còn xe tăng 390 húc đổ cổng chính và tiến vào sân Dinh. Ít phút sau, lá cờ của Quân Giải phóng được cắm trên nóc Dinh. Hình ảnh xe tăng húc đổ cánh cổng đã trở thành một trong những biểu tượng quen thuộc nhất của ngày thống nhất đất nước."
+      },
+      "en": {
+        "title": "Tanks 390 and 843",
+        "summary": "Recalling the moment tanks entered the palace at noon on 30 April 1975.",
+        "body": "The two tanks numbered 390 and 843 recall the historic moment at noon on 30 April 1975. According to historical records, tank 843 rammed the side gate, while tank 390 crashed through the main gate and drove into the palace grounds. Minutes later, the Liberation Army flag was raised on the roof of the palace. The image of a tank breaking through the gate has become one of the most familiar symbols of Vietnam's reunification."
+      }
+    },
+    {
+      "code": "003", "slug": "bai-co-dai-phun-nuoc", "internalName": "Bãi cỏ và đài phun nước", "trigger": "gps", "zone": "outdoor",
+      "lat": 10.777550, "lng": 106.696050, "radiusM": 30, "sortOrder": 3, "priority": 0,
+      "vi": {
+        "title": "Bãi cỏ và đài phun nước",
+        "summary": "Không gian mở trên trục chính từ cổng vào tòa nhà.",
+        "body": "Bạn đang đứng trên bãi cỏ rộng phía trước tòa nhà. Bãi cỏ và đài phun nước nằm trên trục chính nối cổng với lối vào Dinh, tạo nên một khoảng không gian mở, cân đối và trang nghiêm. Khoảng sân rộng này từng là nơi tổ chức các nghi lễ đón tiếp. Từ đây, bạn có thể ngắm trọn mặt tiền của công trình – hãy tiến lại gần hơn để khám phá những chi tiết kiến trúc đặc biệt."
+      },
+      "en": {
+        "title": "Lawn and Fountain",
+        "summary": "An open space on the main axis from the gate to the building.",
+        "body": "You are standing on the wide lawn in front of the building. The lawn and fountain lie on the main axis linking the gate with the palace entrance, creating an open, balanced and solemn space. This broad courtyard was once used for welcoming ceremonies. From here you can see the entire facade of the building – walk closer to discover its distinctive architectural details."
+      }
+    },
+    {
+      "code": "004", "slug": "mat-tien", "internalName": "Mặt tiền tòa nhà", "trigger": "gps", "zone": "outdoor",
+      "lat": 10.777250, "lng": 106.695650, "radiusM": 25, "sortOrder": 4, "priority": 0,
+      "vi": {
+        "title": "Mặt tiền tòa nhà",
+        "summary": "Kiến trúc của Ngô Viết Thụ: hiện đại nhưng đậm tinh thần Á Đông.",
+        "body": "Công trình được thiết kế bởi kiến trúc sư Ngô Viết Thụ, người Việt Nam đầu tiên đạt giải Khôi nguyên La Mã năm 1955. Điểm nổi bật của mặt tiền là hệ \"rèm hoa đá\" – những ô bê tông lấy cảm hứng từ hình đốt trúc, vừa trang trí vừa che nắng và thông gió. Toàn bộ công trình là sự kết hợp hài hòa giữa kiến trúc hiện đại và tinh thần văn hóa Á Đông, phù hợp với khí hậu nhiệt đới của Sài Gòn."
+      },
+      "en": {
+        "title": "The Facade",
+        "summary": "Ngo Viet Thu's architecture: modern, yet deeply rooted in Eastern culture.",
+        "body": "The building was designed by architect Ngo Viet Thu, the first Vietnamese to win the Grand Prix de Rome, in 1955. The highlight of the facade is its 'stone curtain' – concrete panels inspired by bamboo segments that decorate the building while shading it from the sun and letting air flow through. The whole design blends modern architecture with an Eastern spirit, well suited to Saigon's tropical climate."
+      }
+    },
+    {
+      "code": "005", "slug": "khuon-vien-phia-sau", "internalName": "Khuôn viên phía sau", "trigger": "gps", "zone": "outdoor",
+      "lat": 10.776400, "lng": 106.694800, "radiusM": 30, "sortOrder": 12, "priority": 0,
+      "vi": {
+        "title": "Khuôn viên phía sau",
+        "summary": "Khu vườn nhiều cây xanh lâu năm phía sau tòa nhà.",
+        "body": "Phía sau tòa nhà là khu vườn với nhiều cây xanh lâu năm, tạo bóng mát và sự yên tĩnh giữa trung tâm thành phố. Khuôn viên rộng lớn của Dinh được quy hoạch với nhiều mảng xanh bao quanh công trình chính. Đây là nơi lý tưởng để bạn nghỉ chân sau khi tham quan các tầng bên trong và chiêm ngưỡng tòa nhà từ một góc nhìn khác."
+      },
+      "en": {
+        "title": "Rear Gardens",
+        "summary": "Gardens with mature trees behind the building.",
+        "body": "Behind the building lie gardens with many mature trees, offering shade and calm in the heart of the city. The palace's large grounds were planned with green spaces surrounding the main building. It is a pleasant place to rest after visiting the floors inside and to admire the building from a different angle."
+      }
+    },
+    {
+      "code": "101", "slug": "hoi-truong-thong-nhat", "internalName": "Hội trường Thống Nhất", "trigger": "indoor", "zone": "ground",
+      "lat": 10.777000, "lng": 106.695400, "radiusM": 25, "sortOrder": 5, "priority": 0,
+      "vi": {
+        "title": "Hội trường Thống Nhất",
+        "summary": "Nơi diễn ra Hội nghị Hiệp thương chính trị thống nhất đất nước tháng 11 năm 1975.",
+        "body": "Bạn đang ở hội trường lớn tại tầng trệt. Trước năm 1975, đây là nơi tổ chức các cuộc họp và sự kiện quan trọng. Tháng 11 năm 1975, Hội nghị Hiệp thương chính trị thống nhất đất nước đã diễn ra tại đây, đặt nền móng cho việc thống nhất nước Việt Nam về mặt nhà nước. Vì ý nghĩa đó, hội trường mang tên Hội trường Thống Nhất."
+      },
+      "en": {
+        "title": "Reunification Hall",
+        "summary": "Venue of the Political Consultative Conference on national reunification in November 1975.",
+        "body": "You are in the great hall on the ground floor. Before 1975, important meetings and events were held here. In November 1975, the Political Consultative Conference on national reunification took place in this hall, laying the foundation for unifying Vietnam as one state. Because of this significance, it is known as the Reunification Hall."
+      }
+    },
+    {
+      "code": "102", "slug": "phong-hop-noi-cac", "internalName": "Phòng họp Nội các", "trigger": "indoor", "zone": "ground",
+      "lat": 10.777050, "lng": 106.695250, "radiusM": 25, "sortOrder": 6, "priority": 0,
+      "vi": {
+        "title": "Phòng họp Nội các",
+        "summary": "Nơi diễn ra các cuộc họp nội các trước năm 1975.",
+        "body": "Đây là phòng họp nội các, nơi người đứng đầu chính quyền Sài Gòn họp với các bộ trưởng để bàn những vấn đề quan trọng. Căn phòng được giữ gìn cách bài trí bàn ghế của các cuộc họp trước năm 1975. Hãy để ý cách sắp xếp vị trí chỗ ngồi – mỗi chi tiết đều phản ánh tính nghi thức của bộ máy chính quyền thời bấy giờ."
+      },
+      "en": {
+        "title": "Cabinet Room",
+        "summary": "Where cabinet meetings were held before 1975.",
+        "body": "This is the cabinet room, where the head of the Saigon government met with ministers to discuss important matters. The room preserves the arrangement of tables and chairs used for meetings before 1975. Notice how the seats are arranged – every detail reflects the formality of the government of that time."
+      }
+    },
+    {
+      "code": "103", "slug": "phong-khanh-tiet", "internalName": "Phòng Khánh tiết", "trigger": "indoor", "zone": "ground",
+      "lat": 10.776950, "lng": 106.695550, "radiusM": 25, "sortOrder": 7, "priority": 0,
+      "vi": {
+        "title": "Phòng Khánh tiết",
+        "summary": "Nơi tổ chức tiệc chiêu đãi và tiếp đón khách quan trọng.",
+        "body": "Phòng Khánh tiết được dùng để tổ chức các buổi tiệc chiêu đãi và tiếp đón khách quan trọng trong và ngoài nước. Không gian rộng, trần cao và cách trang trí trang trọng cho thấy vai trò đối ngoại của tòa nhà. Hãy quan sát các vật dụng và tác phẩm trang trí – chúng phản ánh thẩm mỹ nội thất của thập niên 1960."
+      },
+      "en": {
+        "title": "Banquet Room",
+        "summary": "Used for banquets and receptions of distinguished guests.",
+        "body": "The banquet room was used for banquets and receptions of distinguished guests from Vietnam and abroad. Its spacious layout, high ceiling and formal decoration show the building's diplomatic role. Take a look at the furnishings and decorative works – they reflect the interior style of the 1960s."
+      }
+    },
+    {
+      "code": "201", "slug": "phong-trinh-quoc-thu", "internalName": "Phòng Trình Quốc thư", "trigger": "indoor", "zone": "floor1",
+      "lat": 10.777000, "lng": 106.695350, "radiusM": 25, "sortOrder": 8, "priority": 0,
+      "vi": {
+        "title": "Phòng Trình Quốc thư",
+        "summary": "Nơi đại sứ các nước trình Quốc thư lên người đứng đầu nhà nước.",
+        "body": "Bạn đang ở phòng Trình Quốc thư, nơi đại sứ các nước đến trình Quốc thư – văn kiện chính thức công nhận vai trò đại diện ngoại giao. Nghi lễ này luôn được tổ chức trang trọng nên căn phòng được bài trí công phu. Nổi bật trên tường là một bức tranh sơn mài khổ lớn, thể hiện nét đặc sắc của nghệ thuật sơn mài Việt Nam."
+      },
+      "en": {
+        "title": "Credentials Presentation Room",
+        "summary": "Where foreign ambassadors presented their credentials to the head of state.",
+        "body": "You are in the Credentials Presentation Room, where ambassadors presented their letters of credence – the official documents recognising their diplomatic role. Because this ceremony was always formal, the room was elaborately decorated. On the wall hangs a large lacquer painting, showcasing the distinctive art of Vietnamese lacquer."
+      }
+    },
+    {
+      "code": "202", "slug": "phong-lam-viec-tong-thong", "internalName": "Phòng làm việc Tổng thống", "trigger": "indoor", "zone": "floor1",
+      "lat": 10.776950, "lng": 106.695200, "radiusM": 25, "sortOrder": 9, "priority": 0,
+      "vi": {
+        "title": "Phòng làm việc Tổng thống",
+        "summary": "Không gian làm việc của người đứng đầu chính quyền Sài Gòn.",
+        "body": "Đây là phòng làm việc của người đứng đầu chính quyền Sài Gòn. Bàn làm việc, ghế và các vật dụng được giữ gìn gần như nguyên trạng. Từ căn phòng này, nhiều quyết định quan trọng đã được đưa ra trong giai đoạn trước năm 1975. Hãy hình dung không khí làm việc của một phòng điều hành ở trung tâm quyền lực thời bấy giờ."
+      },
+      "en": {
+        "title": "President's Office",
+        "summary": "The working space of the head of the Saigon government.",
+        "body": "This is the office of the head of the Saigon government. The desk, chairs and furnishings have been kept almost as they were. Many important decisions were made in this room in the years before 1975. Imagine the atmosphere of an office at the centre of power at that time."
+      }
+    },
+    {
+      "code": "401", "slug": "san-thuong-truc-thang", "internalName": "Sân thượng – trực thăng", "trigger": "indoor", "zone": "rooftop",
+      "lat": 10.777000, "lng": 106.695300, "radiusM": 25, "sortOrder": 10, "priority": 0,
+      "vi": {
+        "title": "Sân thượng – trực thăng",
+        "summary": "Trực thăng UH-1 và những vòng tròn đỏ đánh dấu vị trí bom rơi ngày 8/4/1975.",
+        "body": "Bạn đang ở sân thượng của Dinh. Chiếc trực thăng trưng bày ở đây là loại UH-1. Hãy chú ý những vòng tròn sơn đỏ trên sàn: chúng đánh dấu vị trí bom rơi trong trận ném bom Dinh ngày 8 tháng 4 năm 1975 do phi công Nguyễn Thành Trung thực hiện. Từ sân thượng, bạn có thể ngắm nhìn trung tâm thành phố và đại lộ Lê Duẩn trải dài phía trước."
+      },
+      "en": {
+        "title": "Rooftop and Helicopter",
+        "summary": "A UH-1 helicopter and red circles marking where bombs struck on 8 April 1975.",
+        "body": "You are on the rooftop of the palace. The helicopter displayed here is a UH-1. Notice the red circles painted on the floor: they mark where bombs struck during the bombing of the palace on 8 April 1975, carried out by pilot Nguyen Thanh Trung. From the rooftop you can view the city centre and Le Duan Boulevard stretching out in front of you."
+      }
+    },
+    {
+      "code": "901", "slug": "tang-ham", "internalName": "Tầng hầm – hầm chỉ huy", "trigger": "indoor", "zone": "basement",
+      "lat": 10.777000, "lng": 106.695450, "radiusM": 25, "sortOrder": 11, "priority": 0,
+      "vi": {
+        "title": "Tầng hầm – hầm chỉ huy",
+        "summary": "Hệ thống hầm kiên cố với phòng tác chiến và trung tâm viễn thông.",
+        "body": "Bên dưới tòa nhà là hệ thống hầm kiên cố, được xây dựng để bảo đảm an toàn và duy trì việc chỉ huy trong chiến tranh. Tại đây có phòng tác chiến với bản đồ quân sự, trung tâm viễn thông với các máy móc liên lạc và nhiều phòng chức năng khác. Các hành lang hẹp, tường dày và thiết bị còn được lưu giữ giúp bạn hình dung không khí khẩn trương của những năm tháng chiến tranh."
+      },
+      "en": {
+        "title": "Basement Command Bunker",
+        "summary": "A fortified bunker with a war room and a telecommunications centre.",
+        "body": "Beneath the building lies a fortified bunker, built to keep command operations safe and running during the war. It contains a war room with military maps, a telecommunications centre with communication equipment and several other functional rooms. The narrow corridors, thick walls and preserved equipment help you imagine the tense atmosphere of the war years."
+      }
+    }
+  ]
+}
