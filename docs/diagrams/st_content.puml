@@ -1,0 +1,10 @@
+@startuml
+!include skin.iuml
+hide empty description
+[*] --> draft : tạo bài
+draft --> pending : gửi duyệt /\nnhập bản dịch máy
+pending --> approved : biên tập viên duyệt
+pending --> draft : trả lại
+approved --> pending : sửa nội dung lớn
+approved --> draft : gỡ xuất bản
+@enduml

@@ -1,0 +1,23 @@
+@startuml
+!include skin.iuml
+actor "Biên tập viên" as A
+participant "Web Admin" as WA
+participant "API" as API
+database "SQL Server" as DB
+participant "Mobile App" as M
+A -> WA : sửa bài tiếng Anh điểm 002,\ntải tệp âm thanh, Đã duyệt
+WA -> API : PUT /admin/places/2/contents/en
+API -> DB : UPDATE place_contents
+WA -> API : POST /admin/places/2/contents/en/audio
+API -> API : kiểm tra MIME, dung lượng, đo thời lượng
+API -> DB : audio_url, audio_duration_sec
+API -> DB : EXEC sp_publish_content → version 43
+API --> WA : 200 {version: 43}
+API --> WA : admin.content.published {43}
+== Khách mở ứng dụng (có mạng) ==
+M -> API : GET /content/bundle?lang=en\nIf-None-Match: "42"
+API -> DB : đọc điểm + bài đã xuất bản
+API --> M : 200, ETag "43", gói mới
+M -> API : GET /media/audio/en/002.m4a
+M -> M : lưu gói + tệp, cập nhật GeofenceEngine
+@enduml

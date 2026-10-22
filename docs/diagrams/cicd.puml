@@ -1,0 +1,24 @@
+@startuml
+!include skin.iuml
+left to right direction
+rectangle "Nhánh feature/*" as F
+rectangle "Pull Request\nvào develop" as PR
+rectangle "CI\nlint · typecheck · test · build\n(api + SQL Server, web, admin, mobile)" as CI
+rectangle "Review\n≥ 1 Approve" as RV
+rectangle "develop" as DV
+rectangle "PR develop → main" as PM
+rectangle "main" as MN
+cloud "Vercel\nWeb User, Web Admin" as VC
+cloud "EAS Build\nAPK (tag v*)" as EAS
+rectangle "GitHub Release" as GR
+F --> PR
+PR --> CI
+CI --> RV
+RV --> DV
+DV --> PM
+PM --> MN
+MN --> VC : cd-web / cd-admin
+MN --> EAS : cd-mobile
+EAS --> GR
+PR ..> VC : bản xem trước
+@enduml

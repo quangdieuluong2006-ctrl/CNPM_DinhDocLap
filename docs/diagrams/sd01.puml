@@ -1,0 +1,32 @@
+@startuml
+!include skin.iuml
+actor Khách
+participant "LocationProvider" as LP
+participant "GeofenceEngine" as GE
+participant "NarrationController" as NC
+participant "Player / TTS" as PL
+participant "SyncQueue" as SQ
+participant "API" as API
+database "SQL Server" as DB
+Khách -> LP : đi bộ trong khuôn viên
+loop mỗi 2 giây
+  LP -> GE : fix {lat, lng, accuracy}
+  GE -> GE : lọc mẫu, Haversine,\ncập nhật trạng thái điểm
+end
+GE -> NC : request(place 002, source = gps)
+alt trình phát rảnh và không cooldown
+  NC -> PL : play(audio đã tải / TTS en-US)
+  PL --> Khách : âm thanh + rung + thẻ điểm
+else đang phát bài khác
+  NC --> Khách : thẻ "Nghe ngay" (xếp hàng đợi)
+end
+PL -> NC : ended(listenedSec)
+NC -> SQ : visit {clientId, placeId, trigger: gps, completed}
+alt có mạng
+  SQ -> API : POST /visits/batch
+  API -> DB : INSERT visits (bỏ trùng clientId)
+  API --> SQ : accepted
+else offline
+  SQ -> SQ : giữ trong AsyncStorage, gửi sau
+end
+@enduml

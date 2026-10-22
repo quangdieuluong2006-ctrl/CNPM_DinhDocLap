@@ -1,0 +1,20 @@
+@startuml
+!include skin.iuml
+actor Khách
+participant "Màn Quét mã" as SC
+participant "ContentStore" as CS
+participant "NarrationController" as NC
+participant "Player / TTS" as PL
+Khách -> SC : bấm "Quét mã", hướng camera vào biển
+SC -> SC : đọc QR https://<web>/p/201
+SC -> CS : findByCode("201")
+alt tìm thấy, đã xuất bản
+  CS --> SC : place 201 + nội dung ngôn ngữ đã chọn
+  SC -> NC : request(place 201, source = qr)
+  NC -> PL : dừng bài cũ (nếu có), phát bài 201
+  PL --> Khách : thuyết minh phòng Trình Quốc thư
+else không có / bị ẩn
+  CS --> SC : null
+  SC --> Khách : "Không tìm thấy điểm 201"
+end
+@enduml

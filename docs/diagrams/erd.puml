@@ -1,0 +1,127 @@
+@startuml
+!include skin.iuml
+hide circle
+skinparam linetype ortho
+skinparam nodesep 40
+skinparam ranksep 60
+top to bottom direction
+entity users {
+  *id : INT
+  --
+  email : NVARCHAR(255) UQ
+  password_hash
+  full_name
+  role : user|guide|admin
+  status : active|locked
+  locked_reason
+  ui_locale
+  narration_lang FK
+  created_at, updated_at
+}
+entity refresh_tokens {
+  *id
+  --
+  user_id FK
+  token_hash CHAR(64) UQ
+  expires_at, revoked_at
+}
+entity user_sessions {
+  *id : BIGINT
+  --
+  user_id FK
+  client_type
+  socket_id, ip_address
+  connected_at
+  last_seen_at
+  disconnected_at
+}
+entity activity_logs {
+  *id : BIGINT
+  --
+  user_id FK NULL
+  action, entity_type, entity_id
+  ip_address, detail JSON
+  created_at
+}
+entity languages {
+  *code : VARCHAR(10)
+  --
+  name_vi, name_en, name_native
+  tts_locale
+  is_enabled, sort_order
+}
+entity places {
+  *id
+  --
+  code CHAR(3) UQ
+  slug, internal_name
+  trigger : gps|indoor
+  zone
+  lat, lng DECIMAL(9,6)
+  radius_m, priority, sort_order
+  image_url
+  status
+}
+entity place_contents {
+  *id
+  --
+  place_id FK
+  language_code FK
+  title, summary, body
+  audio_url, audio_duration_sec
+  status : draft|pending|approved
+  source : human|machine
+  updated_by FK, updated_at
+}
+entity content_releases {
+  *version : INT
+  --
+  published_by FK
+  published_at, note
+}
+entity tours {
+  *id
+  --
+  code CHAR(6) UQ
+  name
+  guide_id FK
+  status : active|ended
+  max_members
+  created_at, ended_at
+}
+entity tour_members {
+  *tour_id FK
+  *user_id FK
+  --
+  joined_at, left_at
+  current_place_id FK NULL
+  current_place_at
+}
+entity visits {
+  *id : BIGINT
+  --
+  client_id UQ
+  user_id FK NULL
+  place_id FK
+  language_code FK
+  trigger
+  listened_sec, completed
+  started_at, created_at
+}
+refresh_tokens -[hidden]down- user_sessions
+activity_logs -[hidden]down- content_releases
+languages -[hidden]down- place_contents
+users ||--o{ refresh_tokens
+users ||--o{ user_sessions
+users |o--o{ activity_logs
+users ||--o{ tours : hướng dẫn
+users ||--o{ tour_members
+tours ||--o{ tour_members
+places |o--o{ tour_members : điểm hiện tại
+users |o--o{ visits
+places ||--o{ visits
+places ||--o{ place_contents
+languages ||--o{ place_contents
+languages ||--o{ visits
+users |o--o{ content_releases
+@enduml

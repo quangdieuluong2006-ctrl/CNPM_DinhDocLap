@@ -1,0 +1,44 @@
+@startuml
+!include skin.iuml
+package "Mobile App (Expo)" {
+  [Màn hình\n(Expo Router)] as MS
+  [LocationProvider\nthật / mô phỏng] as LP
+  [GeofenceEngine\n(Haversine, dwell,\nhysteresis)] as GE
+  [NarrationController\n+ Player / TTS] as NC
+  [ContentStore\n(bundle offline)] as CS
+  [SyncQueue\n(lượt ghé)] as SQ
+  [Realtime client] as RT
+}
+package "Web User (React)" {
+  [Trang điểm,\ntrình phát web] as WUp
+}
+package "Web Admin (React)" {
+  [Dashboard, người dùng,\nđiểm, nội dung, ngôn ngữ] as WAp
+}
+package "Backend API (Node.js)" {
+  [REST /api/v1] as REST
+  [Socket.IO\npresence, tour] as SIO
+  [Media\n/media (Range)] as MED
+  [Swagger /api/docs] as SW
+}
+database "SQL Server" as DB
+folder "storage/\naudio, images" as FS
+LP --> GE
+GE --> NC
+CS --> GE
+CS --> NC
+NC --> SQ
+MS --> NC
+SQ --> REST
+CS --> REST : bundle
+RT --> SIO
+NC --> MED
+WUp --> REST
+WUp --> MED
+WAp --> REST
+WAp --> SIO
+REST --> DB
+SIO --> DB
+MED --> FS
+REST --> FS
+@enduml

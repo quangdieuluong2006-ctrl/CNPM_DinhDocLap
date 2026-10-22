@@ -1,0 +1,16 @@
+@startuml
+!include skin.iuml
+actor "Quản trị viên" as A
+participant "Web Admin" as WA
+participant "API" as API
+database "SQL Server" as DB
+participant "Mobile (người bị khóa)" as M
+A -> WA : Khóa tài khoản, nhập lý do
+WA -> API : PATCH /admin/users/5 {status: locked, reason}
+API -> DB : UPDATE users; thu hồi refresh_tokens
+API -> DB : INSERT activity_logs (admin.user.lock)
+API --> M : session.revoked {reason: ACCOUNT_LOCKED}
+M -> M : xóa token, đóng socket, về màn đăng nhập
+API -> DB : đóng user_sessions
+API --> WA : 200 + presence.update
+@enduml

@@ -1,0 +1,25 @@
+@startuml
+!include skin.iuml
+actor "Hướng dẫn viên" as G
+actor "Khách" as K
+participant "Mobile (HDV)" as MG
+participant "Mobile (khách)" as MK
+participant "API + Socket.IO" as API
+database "SQL Server" as DB
+participant "Web Admin" as WA
+G -> MG : Tạo nhóm "Đoàn sáng"
+MG -> API : POST /tours
+API -> DB : INSERT tours (code K7Q2MX)
+API --> MG : {id, code}
+MG --> G : hiện mã + QR
+K -> MK : quét QR nhóm
+MK -> API : POST /tours/K7Q2MX/join
+API -> DB : INSERT tour_members
+API -> API : socket khách vào phòng tour:{id}
+API --> MG : tour.member.joined
+API --> WA : presence.update / nhóm 4 thành viên
+K -> MK : nghe điểm 002
+MK -> API : socket tour.position {placeId: 2}
+API -> DB : UPDATE tour_members.current_place_id
+API --> MG : tour.member.updated {userId, currentPlaceId: 2}
+@enduml

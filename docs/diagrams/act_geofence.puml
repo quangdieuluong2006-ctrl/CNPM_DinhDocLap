@@ -1,0 +1,30 @@
+@startuml
+!include skin.iuml
+start
+:Nhận mẫu vị trí (2 giây/lần);
+if (sai số > 35 m hoặc mẫu cũ\nhoặc tốc độ > 15 m/s?) then (có)
+  :Bỏ mẫu;
+  stop
+endif
+:Tính khoảng cách tới từng điểm gps (Haversine);
+:Cập nhật máy trạng thái từng điểm\n(dwell, hysteresis);
+if (có điểm vừa chuyển sang INSIDE?) then (không)
+  stop
+endif
+:Chọn điểm: priority cao nhất,\nbằng nhau thì gần nhất;
+if (điểm trong cooldown hoặc\nđã nghe hết hôm nay?) then (có)
+  :Hiện thẻ gợi ý;
+  stop
+endif
+if (tự động phát đang bật?) then (không)
+  :Rung + thẻ gợi ý;
+  stop
+endif
+if (trình phát đang phát bài khác?) then (có)
+  :Thẻ "Nghe ngay" + xếp hàng đợi;
+else (không)
+  :Rung nhẹ, mở thẻ điểm;
+  :Phát tệp âm thanh / giọng tổng hợp;
+endif
+stop
+@enduml

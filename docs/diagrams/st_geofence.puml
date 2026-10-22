@@ -1,0 +1,10 @@
+@startuml
+!include skin.iuml
+hide empty description
+[*] --> OUTSIDE
+OUTSIDE --> ENTERING : khoảng cách ≤ radiusM
+ENTERING --> OUTSIDE : mẫu tiếp theo ngoài vùng
+ENTERING --> INSIDE : ≥ 2 mẫu trong vùng\nvà ≥ 3 giây
+INSIDE : khi vào: gửi yêu cầu phát\n(nếu không trong cooldown)
+INSIDE --> OUTSIDE : khoảng cách > radiusM + 10 m\n/ bắt đầu cooldown 10 phút
+@enduml
