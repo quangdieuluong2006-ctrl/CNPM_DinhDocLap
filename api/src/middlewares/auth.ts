@@ -40,3 +40,13 @@ export function currentUser(locals: { auth?: AccessTokenPayload }): AccessTokenP
   if (!locals.auth) throw new ApiError(401, "AUTH_REQUIRED", "Bạn cần đăng nhập");
   return locals.auth;
 }
+
+// Cho phép khách không đăng nhập (ví dụ ghi lượt ghé). Có header Authorization thì phải hợp lệ,
+// để client biết làm mới token thay vì âm thầm ghi thành khách.
+export const optionalAuth: RequestHandler = (req, res, next) => {
+  if (!req.get("authorization")) {
+    next();
+    return;
+  }
+  requireAuth(req, res, next);
+};

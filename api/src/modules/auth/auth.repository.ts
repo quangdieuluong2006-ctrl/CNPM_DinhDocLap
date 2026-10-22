@@ -109,3 +109,27 @@ export async function revokeAllRefreshTokens(userId: number): Promise<void> {
     UPDATE dbo.refresh_tokens SET revoked_at = SYSUTCDATETIME()
     WHERE user_id = @user AND revoked_at IS NULL;`);
 }
+
+// Cập nhật hồ sơ: chỉ các trường được gửi. narration_lang phải là ngôn ngữ đang bật, nếu không giữ nguyên và trả false.
+export async function updateProfile(
+  id: number,
+  input: { fullName?: string; uiLocale?: "vi" | "en"; narrationLang?: string },
+): Promise<boolean> {
+  const pool = await getPool();
+  const r = await pool
+    .request()
+    .input("id", sql.Int, id)
+    .input("name", sql.NVarChar(100), input.fullName ?? null)
+    .input("locale", sql.VarChar(5), input.uiLocale ?? null)
+    .input("lang", sql.VarChar(10), input.narrationLang ?? null).query<{ ok: number }>(`
+      IF @lang IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.languages WHERE code = @lang AND is_enabled = 1)
+        SELECT 0 AS ok;
+      ELSE
+      BEGIN
+        UPDATE dbo.users SET full_name = COALESCE(@name, full_name), ui_locale = COALESCE(@locale, ui_locale),
+               narration_lang = COALESCE(@lang, narration_lang), updated_at = SYSUTCDATETIME()
+        WHERE id = @id;
+        SELECT 1 AS ok;
+      END`);
+  return r.recordset[0]!.ok === 1;
+}

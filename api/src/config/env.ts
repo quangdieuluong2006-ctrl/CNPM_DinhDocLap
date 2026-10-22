@@ -25,6 +25,10 @@ const schema = z.object({
   // Link mời tham gia (mã QR trên Web Admin): cổng Web User, hoặc địa chỉ công khai nếu đã triển khai.
   WEB_USER_PORT: z.coerce.number().int().positive().default(5173),
   WEB_USER_PUBLIC_URL: z.url().optional(),
+  // Tệp âm thanh/ảnh do Web Admin tải lên, phục vụ tại /media (PRD v1.0, mục 11.1).
+  MEDIA_DIR: z.string().min(1).default("storage/media"),
+  MAX_AUDIO_MB: z.coerce.number().int().positive().default(20),
+  MAX_IMAGE_MB: z.coerce.number().int().positive().default(5),
   CORS_ORIGINS: z
     .string()
     .default("http://localhost:5173,http://localhost:5174")

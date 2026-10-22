@@ -5,10 +5,13 @@ import { clientTypeSchema } from "../auth/auth.schemas.js";
 import * as presenceRepo from "../presence/presence.repository.js";
 import * as adminRepo from "./admin.repository.js";
 import { joinLinks } from "./joinLink.js";
+import { adminManagementRouter } from "./management.routes.js";
+import { adminPlacesRouter } from "./places.routes.js";
 
 // Mọi route /admin/* yêu cầu đăng nhập và vai trò admin (PRD v1.0, mục 15.1).
 export const adminRouter = Router();
 adminRouter.use("/admin", requireAuth, requireRole("admin"));
+adminRouter.use(adminPlacesRouter, adminManagementRouter);
 
 // FE-17: 6 thẻ thống kê + lượt tham quan 7 ngày + điểm nghe nhiều + ngôn ngữ được chọn.
 adminRouter.get("/admin/stats", async (_req, res) => {

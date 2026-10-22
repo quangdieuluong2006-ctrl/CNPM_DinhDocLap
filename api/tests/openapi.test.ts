@@ -4,6 +4,11 @@ import { describe, expect, it } from "vitest";
 import { createApp } from "../src/app.js";
 import { openApiSpec } from "../src/docs/openapi.js";
 import { adminRouter } from "../src/modules/admin/admin.routes.js";
+import { adminManagementRouter } from "../src/modules/admin/management.routes.js";
+import { adminPlacesRouter } from "../src/modules/admin/places.routes.js";
+import { contentRouter } from "../src/modules/content/content.routes.js";
+import { toursRouter } from "../src/modules/tours/tours.routes.js";
+import { visitsRouter } from "../src/modules/visits/visits.routes.js";
 import { authRouter } from "../src/modules/auth/auth.routes.js";
 import { healthRouter } from "../src/modules/health/health.routes.js";
 import { presenceRouter } from "../src/modules/presence/presence.routes.js";
@@ -14,15 +19,16 @@ interface RouteLayer {
 }
 
 // Liệt kê "METHOD /đường-dẫn" của các router nghiệp vụ, đúng tiền tố như trong app.ts.
+// Tham số Express ":code" được đổi sang dạng OpenAPI "{code}".
 function routesOf(router: Router, prefix: string): string[] {
   return (router.stack as RouteLayer[]).flatMap((layer) =>
-    layer.route ? Object.keys(layer.route.methods).map((m) => `${m.toUpperCase()} ${prefix}${layer.route!.path}`) : [],
+    layer.route ? Object.keys(layer.route.methods).map((m) => `${m.toUpperCase()} ${prefix}${layer.route!.path.replace(/:(\w+)/g, "{$1}")}`) : [],
   );
 }
 
 const actual = [
   ...routesOf(healthRouter, ""),
-  ...[authRouter(), meRouter, presenceRouter, adminRouter].flatMap((r) => routesOf(r, "/api/v1")),
+  ...[authRouter(), meRouter, presenceRouter, contentRouter, visitsRouter, toursRouter, adminRouter, adminPlacesRouter, adminManagementRouter].flatMap((r) => routesOf(r, "/api/v1")),
 ].sort();
 
 const documented = Object.entries(openApiSpec.paths)

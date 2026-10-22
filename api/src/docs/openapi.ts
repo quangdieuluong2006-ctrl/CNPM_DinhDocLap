@@ -1,5 +1,7 @@
 // Đặc tả OpenAPI 3.1 của API – nguồn cho trang Swagger UI tại /api/docs.
-// Khi thêm/sửa route, cập nhật file này; test tests/openapi.test.ts báo lỗi nếu tài liệu lệch với route thật.
+import { contentPaths, contentSchemas, contentTags } from "./openapi.content.js";
+
+// Khi thêm/sửa route, cập nhật file này (hoặc openapi.content.ts); test tests/openapi.test.ts báo lỗi nếu tài liệu lệch với route thật.
 
 const errorResponse = (description: string, code: string, message: string) => ({
   description,
@@ -44,6 +46,13 @@ Kết nối: \`io(API_URL, { auth: { token: accessToken }, query: { clientType: 
 | Server → Client | \`presence.session\` | \`{ sessionId }\` – đã ghi phiên vào \`user_sessions\` |
 | Client → Server | \`presence.ping\` | \`{}\` mỗi 30 giây; ack \`{ ok, sessionId }\` |
 | Server → phòng \`admins\` | \`presence.update\` | \`{ activeUsers, activeUsersAll, changed: { userId, type }, ts }\` – \`type\` là \`online\` hoặc \`offline\` |
+| Client → Server | \`tour.position\` | \`{ placeId }\` khi bắt đầu nghe một điểm (đang ở nhóm); ack \`{ ok, tourId }\` |
+| Server → phòng \`tour:{id}\` | \`tour.member.joined\` / \`tour.member.left\` | \`{ tourId, member }\` / \`{ tourId, userId }\` |
+| Server → phòng \`tour:{id}\` | \`tour.member.updated\` | \`{ tourId, userId, online, currentPlaceId?, at }\` – chỉ điểm đang nghe, không có tọa độ |
+| Server → phòng \`tour:{id}\` | \`tour.ended\` | \`{ tourId, endedBy }\` |
+| Server → phòng \`admins\` | \`admin.visit.created\` | \`{ placeId, lang, trigger }\` |
+| Server → phòng \`admins\` | \`admin.content.published\` | \`{ version }\` |
+| Server → \`user:{id}\` | \`session.revoked\` | \`{ reason: "ACCOUNT_LOCKED" }\` → client đăng xuất |
 | Lỗi bắt tay | \`connect_error\` | \`err.data.code\`: \`AUTH_REQUIRED\`, \`AUTH_TOKEN_EXPIRED\`, \`ACCOUNT_LOCKED\`, \`FORBIDDEN\` |
 
 **"Người dùng đang hoạt động"** = có phiên \`user_sessions\` chưa đóng và nhịp tim trong 60 giây gần nhất; đếm \`DISTINCT user_id\` (view \`dbo.v_active_users\`).
@@ -69,6 +78,7 @@ ${SOCKET_DOC}`,
     { name: "Người dùng", description: "Thông tin tài khoản đang đăng nhập" },
     { name: "Presence", description: "Theo dõi người dùng đang hoạt động (PRD mục 4.7)" },
     { name: "Quản trị", description: "FE-17, FE-19 – chỉ vai trò admin" },
+    ...contentTags,
   ],
   components: {
     securitySchemes: {
@@ -197,6 +207,7 @@ ${SOCKET_DOC}`,
           },
         },
       },
+      ...contentSchemas,
     },
   },
   paths: {
@@ -290,8 +301,9 @@ ${SOCKET_DOC}`,
         tags: ["Người dùng"],
         summary: "Hồ sơ người đang đăng nhập",
         security: [{ bearerAuth: [] }],
-        responses: { 200: { description: "Hồ sơ + gói", content: json("User", demoUser) }, 401: E.authRequired, 403: E.locked },
+        responses: { 200: { description: "Hồ sơ", content: json("User", demoUser) }, 401: E.authRequired, 403: E.locked },
       },
+      ...contentPaths["/api/v1/me"],
     },
     "/api/v1/presence/heartbeat": {
       post: {
@@ -367,5 +379,6 @@ ${SOCKET_DOC}`,
         },
       },
     },
+    ...Object.fromEntries(Object.entries(contentPaths).filter(([path]) => path !== "/api/v1/me")),
   },
 } as const;
