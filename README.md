@@ -16,7 +16,7 @@ tham quan theo nhóm. Ban quản lý cập nhật điểm, tọa độ, nội du
 
 | Thư mục | Thành phần | Công nghệ |
 |---|---|---|
-| `mobile/` | Ứng dụng của khách (phần quan trọng nhất) | React Native, Expo SDK 57, TypeScript |
+| `mobile/` | Ứng dụng của khách (phần quan trọng nhất) | React Native, Expo SDK 58, TypeScript (xem `mobile/README.md`) |
 | `web/` | Web User: xem điểm, nghe thuyết minh | React 19, Vite, TypeScript |
 | `admin/` | Web Admin: nội dung, người dùng, thống kê | React 19, Vite, TypeScript |
 | `api/` | Backend REST + Socket.IO | Node.js 22, Express 5, TypeScript |
