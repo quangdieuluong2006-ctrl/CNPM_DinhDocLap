@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+/* Cùng bảng màu với ứng dụng Mobile: xanh lục sẫm của mái Dinh và vàng đồng của chi tiết trang trí */
+@theme {
+  --color-brand-50: #eef6f2;
+  --color-brand-100: #d6ebe1;
+  --color-brand-600: #2c7a62;
+  --color-brand-700: #1f5c4a;
+  --color-brand-800: #17473a;
+  --color-brand-900: #0f2f27;
+  --color-gold-500: #c99a3e;
+  --color-gold-600: #b8862f;
+  --color-paper: #f6f5f1;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-stone-200);
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-stone-900);
+  }
+}
