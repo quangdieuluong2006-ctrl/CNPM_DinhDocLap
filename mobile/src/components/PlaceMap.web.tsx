@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useColors } from "../theme";
-import type { PlaceMapProps } from "./PlaceMap.types";
+import { indoorCluster, type PlaceMapProps } from "./PlaceMap.types";
 
 // Bản xem trên trình duyệt (react-native-maps không chạy trên web): sơ đồ phẳng chiếu kinh/vĩ độ lên khung,
 // đủ để xem trước giao diện và thử chế độ mô phỏng bằng cách chạm.
@@ -12,6 +12,7 @@ export function PlaceMap(props: PlaceMapProps) {
     left: `${((lng - BOUNDS.minLng) / (BOUNDS.maxLng - BOUNDS.minLng)) * 100}%` as const,
     top: `${((BOUNDS.maxLat - lat) / (BOUNDS.maxLat - BOUNDS.minLat)) * 100}%` as const,
   });
+  const building = indoorCluster(props.places);
   const colorOf = (id: number) =>
     id === props.playingId ? c.markerPlaying : props.completed.includes(id) ? c.markerDone : c.marker;
   return (
@@ -29,7 +30,14 @@ export function PlaceMap(props: PlaceMapProps) {
       }}
     >
       <View style={[styles.building, pos(10.77725, 106.69505)]} />
-      {props.places.map((p) => (
+      {building && (
+        <Pressable onPress={() => props.onSelectBuilding?.()} style={[styles.markerWrap, pos(building.lat, building.lng)]}>
+          <View style={[styles.marker, { backgroundColor: c.accent, borderWidth: 1.5 }]}>
+            <Text style={styles.markerText}>🏛 {building.count}</Text>
+          </View>
+        </Pressable>
+      )}
+      {props.places.filter((p) => p.trigger === "gps").map((p) => (
         <Pressable key={p.id} onPress={() => props.onSelect(p)} style={[styles.markerWrap, pos(p.lat, p.lng)]}>
           <View style={[styles.marker, { backgroundColor: colorOf(p.id), borderWidth: props.selectedId === p.id ? 3 : 1.5 }]}>
             <Text style={styles.markerText}>{p.code}</Text>

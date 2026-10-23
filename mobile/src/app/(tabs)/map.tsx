@@ -47,6 +47,7 @@ export default function MapScreen() {
         onSelect={setSelected}
         onMapPress={simulate ? (p) => store.sim.teleport(p) : undefined}
         recenterKey={recenter}
+        onSelectBuilding={() => router.push("/places")}
       />
 
       <SafeAreaView edges={["top"]} style={styles.top} pointerEvents="box-none">
