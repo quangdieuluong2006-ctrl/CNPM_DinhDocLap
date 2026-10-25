@@ -62,10 +62,35 @@ export interface VisitPayload {
   startedAt: string;
 }
 
+export interface User {
+  id: number;
+  email: string;
+  fullName: string;
+  role: "user" | "guide" | "admin";
+  status: "active" | "locked";
+  uiLocale: "vi" | "en";
+  narrationLang: string | null;
+  createdAt: string;
+}
+
+// Mobile nhận refresh token trong body (không dùng cookie như web) – lưu trong expo-secure-store (PRD v1.0, mục 11.1).
+export interface MobileSession {
+  accessToken: string;
+  expiresIn: number;
+  refreshToken: string;
+  user: User;
+}
+
 const TIMEOUT_MS = 8000;
 
-export function createApi(getBaseUrl: () => string, getToken: () => string | null = () => null) {
-  async function request<T>(path: string, init: RequestInit = {}): Promise<{ status: number; body: T; etag: string | null }> {
+// onExpired: được gọi khi access token hết hạn (401 AUTH_TOKEN_EXPIRED); trả true nếu đã làm mới được,
+// request sẽ được gửi lại một lần với token mới.
+export function createApi(
+  getBaseUrl: () => string,
+  getToken: () => string | null = () => null,
+  onExpired: () => Promise<boolean> = async () => false,
+) {
+  async function request<T>(path: string, init: RequestInit = {}, retried = false): Promise<{ status: number; body: T; etag: string | null }> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
     const headers: Record<string, string> = { Accept: "application/json", ...(init.headers as Record<string, string>) };
@@ -83,12 +108,19 @@ export function createApi(getBaseUrl: () => string, getToken: () => string | nul
       }
       return { status: res.status, body: body as T, etag: res.headers.get("etag") };
     } catch (err) {
-      if (err instanceof ApiError) throw err;
+      if (err instanceof ApiError) {
+        if (!retried && token && err.status === 401 && err.code === "AUTH_TOKEN_EXPIRED" && (await onExpired())) {
+          return request<T>(path, init, true);
+        }
+        throw err;
+      }
       throw new ApiError(0, "NETWORK_ERROR", "Không kết nối được máy chủ");
     } finally {
       clearTimeout(timer);
     }
   }
+
+  const postJson = <T,>(path: string, body: unknown) => request<T>(path, { method: "POST", body: JSON.stringify(body) });
 
   return {
     baseUrl: getBaseUrl,
@@ -101,6 +133,16 @@ export function createApi(getBaseUrl: () => string, getToken: () => string | nul
       const r = await request<ContentBundle>(`/content/bundle?lang=${lang}`, { headers: etag ? { "If-None-Match": etag } : {} });
       return r.status === 304 ? null : { bundle: r.body, etag: r.etag };
     },
+    login: async (email: string, password: string) =>
+      (await postJson<MobileSession>("/auth/login", { email, password, clientType: "mobile" })).body,
+    register: async (input: { email: string; password: string; fullName: string; locale: "vi" | "en"; narrationLang?: string }) =>
+      (await postJson<MobileSession>("/auth/register", { ...input, clientType: "mobile" })).body,
+    refresh: async (refreshToken: string) =>
+      (await postJson<MobileSession>("/auth/refresh", { clientType: "mobile", refreshToken })).body,
+    logout: async (refreshToken: string) => {
+      await postJson<void>("/auth/logout", { clientType: "mobile", refreshToken });
+    },
+    me: async () => (await request<User>("/me")).body,
     sendVisits: async (visits: VisitPayload[]) =>
       (await request<{ accepted: number; duplicates: number; rejected: number }>("/visits/batch", {
         method: "POST",

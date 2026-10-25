@@ -3,11 +3,14 @@ import { getLocales } from "expo-localization";
 import { distanceM, type LatLng } from "../core/geo";
 import { type Fix, GeofenceEngine, type GeoPlace } from "../core/geofence";
 import { NarrationController, type NarrationItem, type Trigger } from "../core/narration";
-import { createApi, type Language, type Place } from "../services/api";
+import { singleFlight } from "../core/singleFlight";
+import { ApiError, createApi, type Language, type MobileSession, type Place, type User } from "../services/api";
 import { defaultApiUrl, FAR_FROM_PALACE_M, PALACE_CENTER } from "../services/config";
 import { type LocationProvider, RealLocationProvider, SimulatedLocationProvider } from "../services/location";
 import { configureAudio, createEngine } from "../services/playback";
 import { downloadAudio, getJson, loadBundle, saveBundle, setJson, type StoredBundle } from "../services/storage";
+import { Realtime } from "../services/realtime";
+import { clearRefreshToken, readRefreshToken, saveRefreshToken } from "../services/session";
 import { enqueueVisit, flushVisits, pendingVisits } from "../services/visits";
 import type { UiLocale } from "../i18n";
 
@@ -17,7 +20,10 @@ export interface Settings {
   autoPlay: boolean;
   simulate: boolean;
   apiUrl: string | null; // null = tự suy ra (services/config.ts)
+  welcomed: boolean; // đã qua màn Chào mừng (chọn dùng thử hoặc đăng nhập)
 }
+
+export type AuthStatus = "loading" | "guest" | "authenticated";
 
 export interface AppState {
   ready: boolean;
@@ -33,6 +39,10 @@ export interface AppState {
   completed: number[]; // id điểm đã nghe hết (tiến độ FE-09)
   pendingVisits: number;
   download: { done: number; total: number } | null;
+  authStatus: AuthStatus;
+  user: User | null;
+  realtimeConnected: boolean;
+  authNotice: string | null; // lý do bị đăng xuất (khóa tài khoản…) để hiện thông báo
 }
 
 const deviceLocale = getLocales()[0]?.languageCode ?? "vi";
@@ -42,6 +52,7 @@ const DEFAULT_SETTINGS: Settings = {
   autoPlay: true,
   simulate: false,
   apiUrl: null,
+  welcomed: false,
 };
 
 // Toàn bộ trạng thái ứng dụng trong một store (không phụ thuộc React) + hook useApp() để màn hình đọc.
@@ -49,9 +60,23 @@ class AppStore {
   state: AppState = {
     ready: false, settings: DEFAULT_SETTINGS, languages: [], stored: null, loadingBundle: false, online: true,
     error: null, fix: null, locationError: null, weakGps: false, completed: [], pendingVisits: 0, download: null,
+    authStatus: "loading", user: null, realtimeConnected: false, authNotice: null,
   };
   private listeners = new Set<() => void>();
-  readonly api = createApi(() => this.state.settings.apiUrl ?? defaultApiUrl());
+  // Access token chỉ giữ trong bộ nhớ; refresh token trong expo-secure-store.
+  private accessToken: string | null = null;
+  private refreshToken: string | null = null;
+  readonly api = createApi(
+    () => this.state.settings.apiUrl ?? defaultApiUrl(),
+    () => this.accessToken,
+    () => this.refreshAccess(),
+  );
+  readonly realtime = new Realtime({
+    getToken: () => this.accessToken,
+    onTokenExpired: () => this.refreshAccess(),
+    onRevoked: (reason) => void this.endSession(reason),
+    onStatus: (connected) => this.set({ realtimeConnected: connected }),
+  });
   private geofence = new GeofenceEngine([]);
   private provider: LocationProvider | null = null;
   readonly sim = new SimulatedLocationProvider(PALACE_CENTER);
@@ -86,8 +111,85 @@ class AppStore {
     void configureAudio().catch(() => undefined);
     void this.refreshLanguages();
     if (settings.narrationLang) void this.refreshBundle();
-    void this.syncVisits();
+    void this.restoreSession();
     await this.startLocation();
+  }
+
+  // ---- Tài khoản (PRD v1.0, FE-01) ----
+
+  // Mở app: có refresh token đã lưu → làm mới phiên. Mất mạng thì vẫn hiện tài khoản đã lưu và thử lại sau.
+  private async restoreSession(): Promise<void> {
+    this.refreshToken = await readRefreshToken();
+    if (!this.refreshToken) {
+      this.set({ authStatus: "guest" });
+      void this.syncVisits();
+      return;
+    }
+    const cached = await getJson<User | null>("auth.user", null);
+    if (cached) this.set({ authStatus: "authenticated", user: cached });
+    const ok = await this.refreshAccess();
+    if (!ok && !this.refreshToken) this.set({ authStatus: "guest", user: null });
+    void this.syncVisits();
+  }
+
+  // Làm mới access token (single-flight). Refresh token hỏng/bị thu hồi → về chế độ khách.
+  private refreshAccess = singleFlight(async (): Promise<boolean> => {
+    if (!this.refreshToken) return false;
+    try {
+      await this.applySession(await this.api.refresh(this.refreshToken));
+      return true;
+    } catch (err) {
+      if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+        await this.endSession(err.code === "ACCOUNT_LOCKED" ? "ACCOUNT_LOCKED" : null);
+      }
+      return false;
+    }
+  });
+
+  private async applySession(s: MobileSession): Promise<void> {
+    const firstConnect = !this.accessToken;
+    this.accessToken = s.accessToken;
+    this.refreshToken = s.refreshToken;
+    await saveRefreshToken(s.refreshToken);
+    await setJson("auth.user", s.user);
+    this.set({ authStatus: "authenticated", user: s.user, authNotice: null });
+    // Kết nối realtime một lần; các lần làm mới sau, Socket.IO tự lấy token mới khi kết nối lại.
+    if (firstConnect || !this.realtime.current) this.realtime.start(this.api.baseUrl());
+  }
+
+  async login(email: string, password: string): Promise<void> {
+    await this.applySession(await this.api.login(email, password));
+    // Máy chưa chọn ngôn ngữ thuyết minh → dùng ngôn ngữ đã lưu trong tài khoản
+    const saved = this.state.user?.narrationLang;
+    if (!this.state.settings.narrationLang && saved) void this.setLanguage(saved);
+    // Lượt nghe lúc dùng thử (chưa gửi) được gửi kèm tài khoản (PRD v1.0, FE-01)
+    void this.syncVisits();
+  }
+
+  async register(input: { email: string; password: string; fullName: string }): Promise<void> {
+    const { uiLocale, narrationLang } = this.state.settings;
+    await this.applySession(await this.api.register({ ...input, locale: uiLocale, narrationLang: narrationLang ?? undefined }));
+    void this.syncVisits();
+  }
+
+  async logout(): Promise<void> {
+    const rt = this.refreshToken;
+    await this.endSession(null);
+    if (rt) await this.api.logout(rt).catch(() => undefined);
+  }
+
+  // Kết thúc phiên trên máy: đóng realtime, xóa token. Dữ liệu offline (gói nội dung, tiến độ) vẫn giữ.
+  private async endSession(notice: string | null): Promise<void> {
+    this.realtime.stop();
+    this.accessToken = null;
+    this.refreshToken = null;
+    await clearRefreshToken();
+    await setJson("auth.user", null);
+    this.set({ authStatus: "guest", user: null, authNotice: notice });
+  }
+
+  clearAuthNotice(): void {
+    this.set({ authNotice: null });
   }
 
   async updateSettings(patch: Partial<Settings>): Promise<void> {
@@ -247,6 +349,9 @@ class AppStore {
   }
 
   async syncVisits(): Promise<void> {
+    // Đã đăng nhập nhưng chưa có access token (mở app lúc mất mạng) → chờ làm mới được rồi mới gửi,
+    // để lượt nghe không bị ghi thành của khách.
+    if (this.refreshToken && !this.accessToken && !(await this.refreshAccess())) return;
     await flushVisits(this.api);
     this.set({ pendingVisits: await pendingVisits() });
   }
