@@ -33,6 +33,35 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView style={{ backgroundColor: c.bg }} contentContainerStyle={styles.root}>
+      {/* FE-01: tài khoản – đăng nhập để lưu lịch sử, tham gia nhóm và hiện "đang hoạt động" trên Web Admin */}
+      <View style={[styles.card, styles.account, { backgroundColor: c.card, borderColor: c.border }]}>
+        {app.authStatus === "authenticated" && app.user ? (
+          <>
+            <View style={[styles.avatar, { backgroundColor: c.primary }]}>
+              <Text style={styles.avatarText}>{app.user.fullName.trim().charAt(0).toUpperCase()}</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ color: c.text, fontWeight: "700", fontSize: 16 }}>{app.user.fullName}</Text>
+              <Text style={{ color: c.muted, fontSize: 13 }}>{app.user.email}</Text>
+              <Text style={{ color: app.realtimeConnected ? c.done : c.muted, fontSize: 12, marginTop: 2 }}>
+                ● {app.realtimeConnected ? t("online") : t("offline")}
+              </Text>
+            </View>
+            <Pressable onPress={() => void store.logout()} hitSlop={8}>
+              <Text style={{ color: c.warn, fontWeight: "700" }}>{t("logout")}</Text>
+            </Pressable>
+          </>
+        ) : (
+          <>
+            <View style={{ flex: 1 }}>
+              <Text style={{ color: c.text, fontWeight: "700" }}>{t("guestMode")}</Text>
+              <Text style={{ color: c.muted, fontSize: 13 }}>{t("accountHint")}</Text>
+            </View>
+            <Button title={t("login")} onPress={() => router.push("/login")} />
+          </>
+        )}
+      </View>
+
       <View style={[styles.card, { backgroundColor: c.card, borderColor: c.border }]}>
         <Row label={t("settingsLanguage")}>
           <Pressable onPress={() => router.push("/language")}>
@@ -112,6 +141,9 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   root: { padding: 16, gap: 10, paddingBottom: 40 },
   card: { borderWidth: 1, borderRadius: 14, overflow: "hidden" },
+  account: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14 },
+  avatar: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" },
+  avatarText: { color: "#fff", fontWeight: "800", fontSize: 18 },
   row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth },
   label: { fontSize: 15, flex: 1 },
   seg: { borderWidth: 1.5, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 4 },

@@ -28,6 +28,16 @@ Xem nhanh trên trình duyệt (không có bản đồ thật, GPS dùng chế �
   Mỗi điểm phát đúng 1 lần, đúng thứ tự; đang nghe mà đi vào vùng khác thì hiện thẻ "Bạn đang ở gần … – Nghe ngay".
 - Lượt nghe ghi `trigger = simulated`, không tính vào thống kê Dashboard.
 
+## Tài khoản (FE-01)
+
+- Lần đầu mở: màn **Chào mừng** – "Bắt đầu tham quan" (chế độ khách, dùng đủ chức năng nghe) hoặc "Đăng nhập / Đăng ký".
+- Đăng nhập (`clientType: "mobile"`): refresh token lưu trong **expo-secure-store** (Keychain/Keystore), access token chỉ trong bộ nhớ;
+  hết hạn thì tự làm mới một lần (single-flight). Mở lại app vẫn đăng nhập.
+- Sau khi đăng nhập app mở **Socket.IO** và gửi nhịp tim 30 giây → người dùng hiện trong "Đang hoạt động" của Web Admin;
+  app xuống nền quá 60 giây thì đóng kết nối. Admin khóa tài khoản → app nhận `session.revoked`, đăng xuất và báo cho người dùng.
+- Lượt nghe lúc dùng thử chưa gửi được gửi kèm tài khoản sau khi đăng nhập.
+- Thử nhanh: Cài đặt → Đăng nhập `user1@demo.vn` / `Demo@12345` → mở Web Admin → **Đang hoạt động** thấy người này với nhãn Mobile.
+
 ## Cấu trúc
 
 | Thư mục | Nội dung |
