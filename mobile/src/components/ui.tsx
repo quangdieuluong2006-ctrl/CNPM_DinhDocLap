@@ -2,7 +2,15 @@ import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View, type ViewStyle } from "react-native";
 import { useColors } from "../theme";
 
-export function Button(props: { title: string; onPress: () => void; variant?: "primary" | "ghost"; icon?: ReactNode; style?: ViewStyle; disabled?: boolean }) {
+export function Button(props: {
+  title: string;
+  onPress: () => void;
+  variant?: "primary" | "ghost";
+  icon?: ReactNode;
+  style?: ViewStyle;
+  textColor?: string;
+  disabled?: boolean;
+}) {
   const c = useColors();
   const primary = (props.variant ?? "primary") === "primary";
   return (
@@ -17,7 +25,7 @@ export function Button(props: { title: string; onPress: () => void; variant?: "p
       ]}
     >
       {props.icon}
-      <Text style={[styles.btnText, { color: primary ? c.primaryText : c.primary }]}>{props.title}</Text>
+      <Text style={[styles.btnText, { color: props.textColor ?? (primary ? c.primaryText : c.primary) }]}>{props.title}</Text>
     </Pressable>
   );
 }
