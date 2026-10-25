@@ -33,7 +33,9 @@ export default function LanguageScreen() {
   };
 
   return (
-    <SafeAreaView edges={["bottom"]} style={[styles.root, { backgroundColor: c.bg }]}>
+    // edges top: khi mở lần đầu (không có thanh tiêu đề) tiêu đề không bị đè lên giờ/pin của điện thoại;
+    // khi có thanh tiêu đề, SafeAreaView tự tính khoảng trống = 0 nên không bị thừa.
+    <SafeAreaView edges={["top", "bottom"]} style={[styles.root, { backgroundColor: c.bg }]}>
       <Text style={[styles.h1, { color: c.text }]}>{t("chooseLanguage")}</Text>
       <TextInput
         value={q}

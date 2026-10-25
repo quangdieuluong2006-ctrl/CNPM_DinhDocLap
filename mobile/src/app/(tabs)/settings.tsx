@@ -132,7 +132,30 @@ export default function SettingsScreen() {
           style={[styles.input, { color: c.text, borderColor: c.border }]}
         />
         <Text style={{ color: app.online ? c.done : c.warn, fontSize: 13 }}>{app.online ? "● Online" : "● Offline"}</Text>
-        <Button title={t("save")} onPress={() => void store.updateSettings({ apiUrl: apiUrl.trim().replace(/\/$/, "") || null })} />
+        <Text style={{ color: c.muted, fontSize: 12 }}>
+          {t("apiAuto")}: {defaultApiUrl()}
+          {s.apiUrl ? "" : ` (${t("inUse")})`}
+        </Text>
+        <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+          <Button
+            title={t("save")}
+            onPress={() => {
+              // Chỉ lưu khi khác địa chỉ tự động: nếu lưu cố định, lần sau máy tính đổi mạng (đổi IP) app sẽ gọi sai địa chỉ
+              const url = apiUrl.trim().replace(/\/$/, "");
+              void store.updateSettings({ apiUrl: url && url !== defaultApiUrl() ? url : null });
+            }}
+          />
+          {s.apiUrl && (
+            <Button
+              title={t("useAuto")}
+              variant="ghost"
+              onPress={() => {
+                setApiUrl(defaultApiUrl());
+                void store.updateSettings({ apiUrl: null });
+              }}
+            />
+          )}
+        </View>
       </View>
     </ScrollView>
   );
