@@ -73,6 +73,25 @@ export interface User {
   createdAt: string;
 }
 
+export interface Tour {
+  id: number;
+  code: string;
+  name: string;
+  guide: { id: number; fullName: string };
+  status: "active" | "ended";
+  maxMembers: number;
+  memberCount: number;
+}
+
+export interface TourMember {
+  userId: number;
+  fullName: string;
+  isGuide: boolean;
+  online: boolean;
+  currentPlaceId: number | null;
+  currentPlaceCode: string | null;
+}
+
 // Mobile nhận refresh token trong body (không dùng cookie như web) – lưu trong expo-secure-store (PRD v1.0, mục 11.1).
 export interface MobileSession {
   accessToken: string;
@@ -143,6 +162,17 @@ export function createApi(
       await postJson<void>("/auth/logout", { clientType: "mobile", refreshToken });
     },
     me: async () => (await request<User>("/me")).body,
+    // Nhóm tham quan (PRD v1.0, FE-10)
+    myTour: async () => (await request<{ tour: Tour | null }>("/me/tour")).body.tour,
+    joinTour: async (code: string) => (await postJson<{ result: string; tour: Tour }>(`/tours/${encodeURIComponent(code)}/join`, {})).body.tour,
+    leaveTour: async (id: number) => {
+      await postJson<void>(`/tours/${id}/leave`, {});
+    },
+    createTour: async (name: string, maxMembers: number) => (await postJson<Tour>("/tours", { name, maxMembers })).body,
+    endTour: async (id: number) => {
+      await postJson<void>(`/tours/${id}/end`, {});
+    },
+    tourMembers: async (id: number) => (await request<{ tour: Tour; members: TourMember[] }>(`/tours/${id}/members`)).body,
     sendVisits: async (visits: VisitPayload[]) =>
       (await request<{ accepted: number; duplicates: number; rejected: number }>("/visits/batch", {
         method: "POST",

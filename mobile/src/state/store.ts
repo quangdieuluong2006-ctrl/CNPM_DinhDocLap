@@ -85,6 +85,9 @@ class AppStore {
     onVisit: (v) => void this.recordVisit(v),
     onStart: (item, trigger) => {
       if (trigger === "gps" || trigger === "simulated") this.geofence.markAutoPlayed(item.placeId);
+      // Đang ở nhóm tham quan: báo cho cả nhóm điểm mình đang nghe – chỉ placeId, không gửi tọa độ (PRD mục 4.7).
+      // Không ở nhóm thì máy chủ bỏ qua.
+      this.realtime.current?.emit("tour.position", { placeId: item.placeId });
     },
     isStillInside: (placeId) => this.geofence.isInside(placeId),
   });
@@ -186,6 +189,12 @@ class AppStore {
     await clearRefreshToken();
     await setJson("auth.user", null);
     this.set({ authStatus: "guest", user: null, authNotice: notice });
+  }
+
+  // Gọi trước các API cần đăng nhập: mở app xong phiên có thể chưa làm mới kịp (mới có refresh token đã lưu).
+  async ensureSession(): Promise<boolean> {
+    if (this.accessToken) return true;
+    return this.refreshToken ? this.refreshAccess() : false;
   }
 
   clearAuthNotice(): void {

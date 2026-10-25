@@ -38,6 +38,12 @@ Xem nhanh trên trình duyệt (không có bản đồ thật, GPS dùng chế �
 - Lượt nghe lúc dùng thử chưa gửi được gửi kèm tài khoản sau khi đăng nhập.
 - Thử nhanh: Cài đặt → Đăng nhập `user1@demo.vn` / `Demo@12345` → mở Web Admin → **Đang hoạt động** thấy người này với nhãn Mobile.
 
+## Nhóm tham quan (FE-10)
+
+Tab **Nhóm** (cần đăng nhập): khách nhập mã 6 ký tự để tham gia; hướng dẫn viên (`guide1@demo.vn`, `guide2@demo.vn`) tạo nhóm,
+chia sẻ mã và kết thúc nhóm. Danh sách thành viên cập nhật theo sự kiện Socket.IO `tour.*`: ai đang trực tuyến, đang nghe điểm nào.
+Khi bắt đầu nghe một điểm, app gửi `tour.position { placeId }` – **chỉ số điểm, không gửi tọa độ GPS**.
+
 ## Cấu trúc
 
 | Thư mục | Nội dung |
