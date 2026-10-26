@@ -20,10 +20,12 @@ Vite chuyển tiếp `/api`, `/socket.io`, `/media` sang API nên không cần c
 
 Link `http://<IP máy>:5173` chỉ mở được khi điện thoại **cùng Wi-Fi**. Muốn khách dùng 4G vẫn quét QR vào được (laptop vẫn phải bật):
 
-1. Cài một lần: `winget install --id Cloudflare.cloudflared` (mở lại terminal, kiểm tra `cloudflared --version`).
-2. Chạy API và Web User như bình thường, rồi mở terminal mới: `cloudflared tunnel --url http://localhost:5173`
+1. Cài một lần: `winget install --id Cloudflare.cloudflared`.
+2. **Cách nhanh:** `cd api` → `npm run dev` – chạy luôn API, Web User, Web Admin và tunnel, mã QR tự dùng link công khai
+   (xem `api/README.md`). Các bước dưới đây là cách làm tay.
+3. Chạy API và Web User như bình thường, rồi mở terminal mới: `cloudflared tunnel --url http://localhost:5173`
    → in ra địa chỉ dạng `https://ten-ngau-nhien.trycloudflare.com`. Vite đã cho phép tên miền `*.trycloudflare.com` (`vite.config.ts`).
-3. Đặt `WEB_USER_PUBLIC_URL=<địa chỉ đó>` trong `api/.env`, khởi động lại API → mã QR "Mời tham gia" trên Web Admin dùng địa chỉ công khai.
+4. Đặt `WEB_USER_PUBLIC_URL=<địa chỉ đó>` trong `api/.env`, khởi động lại API → mã QR "Mời tham gia" trên Web Admin dùng địa chỉ công khai.
 
 Chỉ cần tunnel cổng 5173: Vite chuyển tiếp `/api`, `/socket.io`, `/media` sang API nên khách không truy cập thẳng cổng 3000.
 Quick tunnel miễn phí, không cần tài khoản nhưng **đổi địa chỉ mỗi lần chạy** – chỉ dùng để demo; chạy thật thì triển khai lên máy chủ.
