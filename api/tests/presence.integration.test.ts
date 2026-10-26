@@ -180,10 +180,10 @@ describe.skipIf(!runDbTests)("Presence – người dùng đang hoạt động (
     expect((await presence(adminToken)).users.map((u) => u.email)).toEqual(["user6@demo.vn"]);
   });
 
-  it("GET /admin/join-link trả link /register của Web User", async () => {
+  it("GET /admin/join-link trả link trang chủ Web User (khách dùng ngay, không đăng ký)", async () => {
     const res = await request(app).get("/api/v1/admin/join-link").set("Authorization", `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
-    for (const l of res.body.links as { url: string }[]) expect(l.url).toMatch(/^http:\/\/[\d.]+:5173\/register$/);
+    for (const l of res.body.links as { url: string }[]) expect(l.url).toMatch(/^http:\/\/[\d.]+:5173\/$/);
   });
 
   it("GET /admin/stats trả 6 số liệu + 7 ngày; user thường gọi /admin/* bị 403 (TC-41)", async () => {

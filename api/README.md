@@ -44,9 +44,10 @@ Thêm/sửa route thì cập nhật `src/docs/openapi.ts` (hoặc `openapi.conte
 
 | Nhóm | Endpoint chính | Quyền |
 |---|---|---|
+| Khách ẩn danh | `POST /auth/guest` – Web User / Mobile gọi khi mở lần đầu: tạo khách `Khách #A1B2` (không email, không mật khẩu, `isGuest: true`) và cấp phiên; sau đó chỉ dùng `/auth/refresh` | Công khai (300 lần / 15 phút / IP) |
 | Nội dung | `GET /languages`, `GET /places?lang=&zone=&q=`, `GET /places/{code}?lang=`, `GET /content/bundle?lang=` (ETag → 304), `GET /content/version` | Công khai |
 | Lượt ghé | `POST /visits`, `POST /visits/batch` (bỏ trùng theo `clientId`), `GET /me/visits` | Khách / đăng nhập |
-| Nhóm tham quan | `POST /tours`, `GET /me/tour`, `GET /tours/{code}`, `POST /tours/{code}/join`, `POST /tours/{id}/leave`, `GET /tours/{id}/members`, `POST /tours/{id}/end` | Đăng nhập; tạo nhóm: guide/admin |
+| Nhóm tham quan (giao diện đã ẩn – giảng viên không yêu cầu) | `POST /tours`, `GET /me/tour`, `GET /tours/{code}`, `POST /tours/{code}/join`, `POST /tours/{id}/leave`, `GET /tours/{id}/members`, `POST /tours/{id}/end` | Đăng nhập; tạo nhóm: guide/admin |
 | Quản trị nội dung | `/admin/places` (CRUD), `PUT /admin/places/{id}/contents/{lang}`, `POST …/audio` (multipart), `POST /admin/places/{id}/image`, `/admin/languages` + `/catalog` | admin |
 | Quản trị người dùng | `/admin/users` (lọc, khóa/mở, đổi vai trò), `/admin/tours`, `/admin/activity-logs`, `/admin/stats`, `/admin/presence` | admin |
 

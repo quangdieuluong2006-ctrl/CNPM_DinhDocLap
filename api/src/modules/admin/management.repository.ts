@@ -57,6 +57,7 @@ export interface AdminUserRow {
   locked_reason: string | null;
   ui_locale: string;
   narration_lang: string | null;
+  is_guest: boolean;
   created_at: Date;
   last_seen_at: Date | null;
   online: number;
@@ -71,7 +72,7 @@ export interface AdminUserRow {
 }
 
 const USER_SELECT = `
-  SELECT u.id, u.email, u.full_name, u.role, u.status, u.locked_reason, u.ui_locale, u.narration_lang, u.created_at,
+  SELECT u.id, u.email, u.full_name, u.role, u.status, u.locked_reason, u.ui_locale, u.narration_lang, u.is_guest, u.created_at,
          ls.last_seen_at, CASE WHEN a.user_id IS NULL THEN 0 ELSE 1 END AS online, a.on_web, a.on_mobile, a.on_admin,
          t.id AS tour_id, t.code AS tour_code, t.name AS tour_name,
          (SELECT COUNT(*) FROM dbo.visits v WHERE v.user_id = u.id) AS visits,
@@ -83,7 +84,7 @@ const USER_SELECT = `
   LEFT JOIN dbo.tours t ON t.id = m.tour_id`;
 
 export async function listUsers(f: {
-  q?: string; role?: string; status?: string; online?: boolean; offset: number; limit: number;
+  q?: string; role?: string; status?: string; online?: boolean; guest?: boolean; offset: number; limit: number;
 }): Promise<{ rows: AdminUserRow[]; total: number }> {
   const pool = await getPool();
   const req = pool.request().input("off", sql.Int, f.offset).input("lim", sql.Int, f.limit);
@@ -101,6 +102,7 @@ export async function listUsers(f: {
     where.push("u.status = @status");
   }
   if (f.online !== undefined) where.push(f.online ? "a.user_id IS NOT NULL" : "a.user_id IS NULL");
+  if (f.guest !== undefined) where.push(f.guest ? "u.is_guest = 1" : "u.is_guest = 0");
   const r = await req.query<AdminUserRow>(`
     ${USER_SELECT} ${where.length ? `WHERE ${where.join(" AND ")}` : ""}
     ORDER BY CASE WHEN a.user_id IS NULL THEN 1 ELSE 0 END, ls.last_seen_at DESC, u.id

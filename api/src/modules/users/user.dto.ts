@@ -10,6 +10,7 @@ export function toUserDto(u: UserRow) {
     status: u.status,
     uiLocale: u.ui_locale,
     narrationLang: u.narration_lang,
+    isGuest: u.is_guest === true,
     createdAt: u.created_at,
   };
 }

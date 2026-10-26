@@ -102,9 +102,9 @@ describe.skipIf(!runDbTests)("SQL Server – lược đồ, dữ liệu mẫu, p
     expect(stats.recordset[0]).toMatchObject({ total_users: 8, active_users: 4, published_places: 12, pending_contents: 96 });
   });
 
-  it("GET /health/ready báo đã kết nối CSDL và 2 migration", async () => {
+  it("GET /health/ready báo đã kết nối CSDL và 3 migration", async () => {
     const res = await request(createApp()).get("/health/ready");
     expect(res.status).toBe(200);
-    expect(res.body).toMatchObject({ status: "ready", database: "ok", migrations: 2 });
+    expect(res.body).toMatchObject({ status: "ready", database: "ok", migrations: 3 });
   });
 });

@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { getPool, sql } from "../../db/pool.js";
 import type { Role } from "./tokens.js";
 
@@ -10,11 +11,12 @@ export interface UserRow {
   status: "active" | "locked";
   ui_locale: "vi" | "en";
   narration_lang: string | null;
+  is_guest: boolean;
   created_at: Date;
 }
 
 const USER_SELECT = `
-  SELECT u.id, u.email, u.password_hash, u.full_name, u.role, u.status, u.ui_locale, u.narration_lang, u.created_at
+  SELECT u.id, u.email, u.password_hash, u.full_name, u.role, u.status, u.ui_locale, u.narration_lang, u.is_guest, u.created_at
   FROM dbo.users u`;
 
 export async function findUserByEmail(email: string): Promise<UserRow | undefined> {
@@ -28,6 +30,22 @@ export async function findUserById(id: number): Promise<UserRow | undefined> {
   const pool = await getPool();
   const r = await pool.request().input("id", sql.Int, id).query<UserRow>(`${USER_SELECT} WHERE u.id = @id`);
   return r.recordset[0];
+}
+
+// Khách ẩn danh: không email thật, không mật khẩu. Tên hiển thị "Khách #A1B2" để Admin phân biệt trong danh sách.
+export async function insertGuest(input: { locale: "vi" | "en"; narrationLang?: string }): Promise<number> {
+  const uuid = randomUUID();
+  const pool = await getPool();
+  const r = await pool
+    .request()
+    .input("email", sql.NVarChar(255), `guest-${uuid}@guest.local`)
+    .input("name", sql.NVarChar(100), `Khách #${uuid.slice(0, 4).toUpperCase()}`)
+    .input("locale", sql.VarChar(5), input.locale)
+    .input("lang", sql.VarChar(10), input.narrationLang ?? null).query<{ id: number }>(`
+      INSERT INTO dbo.users (email, password_hash, full_name, ui_locale, narration_lang, is_guest)
+      OUTPUT INSERTED.id
+      SELECT @email, NULL, @name, @locale, (SELECT code FROM dbo.languages WHERE code = @lang), 1;`);
+  return r.recordset[0]!.id;
 }
 
 // Trả về undefined nếu email đã tồn tại (vi phạm UQ_users_email).

@@ -96,6 +96,7 @@ function toAdminUserDto(u: repo.AdminUserRow) {
     lockedReason: u.locked_reason,
     uiLocale: u.ui_locale,
     narrationLang: u.narration_lang,
+    isGuest: u.is_guest === true,
     createdAt: u.created_at,
     online: u.online === 1,
     clientTypes: (["web", "mobile", "admin"] as const).filter((c) => u[`on_${c}`] === 1),
@@ -110,6 +111,7 @@ const usersQuery = pageQuery.extend({
   role: z.enum(["user", "guide", "admin"]).optional(),
   status: z.enum(["active", "locked"]).optional(),
   online: z.enum(["true", "false"]).transform((v) => v === "true").optional(),
+  guest: z.enum(["true", "false"]).transform((v) => v === "true").optional(), // khách ẩn danh / tài khoản thật
 });
 
 adminManagementRouter.get("/admin/users", async (req, res) => {
