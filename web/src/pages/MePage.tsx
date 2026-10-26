@@ -35,7 +35,7 @@ export function MePage() {
     getNextPageParam: (last) => (last.page * PAGE_SIZE < last.total ? last.page + 1 : undefined),
   });
   const myTour = useQuery({ queryKey: ["me", "tour"], queryFn: () => authRequest<{ tour: { code: string; name: string } | null }>("/me/tour") });
-  const fmt = new Intl.DateTimeFormat(ui === "vi" ? "vi-VN" : "en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh" });
+  const fmt = new Intl.DateTimeFormat(ui === "en" ? "en-GB" : ui, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh" });
   const items = visits.data?.pages.flatMap((p) => p.items) ?? [];
   if (!user) return null;
 

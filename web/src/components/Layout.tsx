@@ -7,7 +7,7 @@ import { useLanguages } from "../lib/queries";
 import { LanguagePicker } from "./LanguagePicker";
 
 export function Layout() {
-  const { lang, ui, setUi, t } = usePrefs();
+  const { lang, t } = usePrefs();
   const { status, user } = useAuth();
   const languages = useLanguages();
   const [picking, setPicking] = useState(false);
@@ -60,13 +60,6 @@ export function Layout() {
               {t("login")}
             </Link>
           )}
-          <button
-            onClick={() => setUi(ui === "vi" ? "en" : "vi")}
-            title="Ngôn ngữ giao diện / App language"
-            className="rounded-lg px-2 py-1.5 text-xs font-semibold text-stone-500 hover:bg-stone-100"
-          >
-            {ui === "vi" ? "EN" : "VI"}
-          </button>
         </div>
       </header>
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">

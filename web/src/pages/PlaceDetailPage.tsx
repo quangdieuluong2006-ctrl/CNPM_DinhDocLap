@@ -75,7 +75,11 @@ export function PlaceDetailPage() {
           <ZoneThumb zone={p!.zone} iconSize={72} className="h-full w-full animate-fade-in" />
         )}
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 to-transparent" />
-        {photo?.credit && <span className="absolute bottom-2 right-3 text-[11px] text-white/80">{t("photoBy")}: {photo.credit}</span>}
+        {photo && photo.credit !== "" && (
+          <span className="absolute bottom-2 right-3 text-[11px] text-white/80">
+            {t("photoBy")}: {photo.credit ?? t("photoCollected")}
+          </span>
+        )}
         <span className="absolute bottom-4 left-4 rounded-full ring-4 ring-white/80">
           <CodeBadge code={p!.code} size="lg" />
         </span>

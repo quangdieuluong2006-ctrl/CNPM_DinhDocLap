@@ -64,7 +64,7 @@ export function HomePage() {
             <div className="absolute -inset-2 rotate-2 rounded-3xl bg-gold-500/30" />
             <img src={HERO_PHOTO.src} alt="Dinh Độc Lập" className="relative aspect-[3/2] w-full rounded-2xl object-cover shadow-2xl ring-4 ring-white/20" />
             <figcaption className="relative mt-2 text-right text-[11px] text-white/60">
-              {t("photoBy")}: {HERO_PHOTO.credit}
+              {t("photoBy")}: {HERO_PHOTO.credit ?? t("photoCollected")}
             </figcaption>
           </figure>
         </div>
