@@ -1,5 +1,6 @@
+import { Headphones, Home, List, Map as MapIcon, Users } from "lucide-react";
 import { useState } from "react";
-import { Link, NavLink, Outlet } from "react-router";
+import { Link, NavLink, Outlet, useLocation } from "react-router";
 import { useAuth } from "../features/auth";
 import { usePrefs } from "../lib/prefs";
 import { useLanguages } from "../lib/queries";
@@ -10,12 +11,13 @@ export function Layout() {
   const { status, user } = useAuth();
   const languages = useLanguages();
   const [picking, setPicking] = useState(false);
+  const location = useLocation();
   const current = languages.data?.find((l) => l.code === lang);
   const nav = [
-    { to: "/", label: t("navHome"), end: true },
-    { to: "/places", label: t("navPlaces"), end: false },
-    { to: "/map", label: t("navMap"), end: false },
-    { to: "/tour", label: t("navTour"), end: false },
+    { to: "/", label: t("navHome"), end: true, icon: Home },
+    { to: "/places", label: t("navPlaces"), end: false, icon: List },
+    { to: "/map", label: t("navMap"), end: false, icon: MapIcon },
+    { to: "/tour", label: t("navTour"), end: false, icon: Users },
   ];
 
   return (
@@ -28,14 +30,16 @@ export function Layout() {
           </Link>
           {/* Điện thoại: menu xuống dòng riêng bên dưới để không tràn màn hình 360 px */}
           <nav className="order-last -mx-1 flex w-full gap-1 overflow-x-auto text-sm sm:order-none sm:mx-0 sm:w-auto">
-            {nav.map((n) => (
+            {nav.map(({ to, end, label, icon: Icon }) => (
               <NavLink
-                key={n.to}
-                to={n.to}
-                end={n.end}
-                className={({ isActive }) => `whitespace-nowrap rounded-lg px-2.5 py-1.5 sm:px-3 ${isActive ? "bg-brand-50 font-medium text-brand-800" : "text-stone-600 hover:bg-stone-100"}`}
+                key={to}
+                to={to}
+                end={end}
+                className={({ isActive }) =>
+                  `inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 transition-colors sm:px-3 ${isActive ? "bg-brand-50 font-medium text-brand-800" : "text-stone-600 hover:bg-stone-100"}`
+                }
               >
-                {n.label}
+                <Icon size={15} className="hidden sm:inline" /> {label}
               </NavLink>
             ))}
           </nav>
@@ -44,7 +48,7 @@ export function Layout() {
             title={t("narration")}
             className="whitespace-nowrap rounded-lg border px-2.5 py-1.5 text-sm font-medium hover:bg-stone-50"
           >
-            🎧 <span className="sm:hidden">{lang.toUpperCase()}</span>
+            <Headphones size={15} className="inline align-[-2px]" /> <span className="sm:hidden">{lang.toUpperCase()}</span>
             <span className="hidden sm:inline">{current?.nameNative ?? lang.toUpperCase()}</span>
           </button>
           {status === "authenticated" ? (
@@ -66,7 +70,10 @@ export function Layout() {
         </div>
       </header>
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
-        <Outlet />
+        {/* key theo đường dẫn → mỗi lần chuyển trang, nội dung hiện dần lên */}
+        <div key={location.pathname} className="animate-fade-up">
+          <Outlet />
+        </div>
       </main>
       <footer className="border-t py-6 text-center text-xs text-stone-500">{t("brand")} · Dinh Độc Lập, 135 Nam Kỳ Khởi Nghĩa, TP.HCM</footer>
       {picking && <LanguagePicker onClose={() => setPicking(false)} />}

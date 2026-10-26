@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Flag, KeyRound, PlusCircle, Search, Users } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { ErrorState } from "../components/ui";
@@ -30,6 +31,9 @@ export function ToursHomePage() {
   if (status === "guest") {
     return (
       <div className="mx-auto max-w-md space-y-4 rounded-2xl border bg-white p-6 text-center shadow-sm">
+        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-700">
+          <Users size={28} />
+        </span>
         <h1 className="text-2xl font-bold">{t("tour")}</h1>
         <p className="text-stone-600">{t("tourHubIntro")}</p>
         <Link to="/login" state={{ from: "/tour" }} className="inline-block rounded-xl bg-brand-700 px-5 py-2.5 font-semibold text-white hover:bg-brand-800">
@@ -54,15 +58,23 @@ export function ToursHomePage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold">{t("tour")}</h1>
-        <p className="mt-1 text-stone-600">{t("tourHubIntro")}</p>
+      <div className="flex items-start gap-4">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-50 text-brand-700">
+          <Users size={24} />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold">{t("tour")}</h1>
+          <p className="mt-1 text-stone-600">{t("tourHubIntro")}</p>
+        </div>
       </div>
 
       {mine.isError && <ErrorState message={t("error")} onRetry={() => void mine.refetch()} retryLabel={t("retry")} />}
       {current && (
-        <Link to={`/tour/${current.code}`} className="flex items-center justify-between rounded-2xl border border-gold-500 bg-amber-50 p-4 hover:bg-amber-100">
-          <span>
+        <Link to={`/tour/${current.code}`} className="flex animate-fade-up items-center justify-between gap-3 rounded-2xl border border-gold-500 bg-amber-50 p-4 transition hover:bg-amber-100">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gold-500 text-white">
+            <Flag size={18} />
+          </span>
+          <span className="min-w-0 flex-1">
             <span className="block text-xs font-bold uppercase tracking-wider text-amber-800">{t("myTour")}</span>
             <span className="font-semibold">{current.name}</span> <span className="font-mono text-sm">({current.code})</span>
           </span>
@@ -70,8 +82,9 @@ export function ToursHomePage() {
         </Link>
       )}
 
-      <form onSubmit={join} className="space-y-3 rounded-2xl border bg-white p-5 shadow-sm">
-        <label htmlFor="tour-code" className="block font-semibold">
+      <form onSubmit={join} className="animate-fade-up space-y-3 rounded-2xl border bg-white p-5 shadow-sm">
+        <label htmlFor="tour-code" className="flex items-center gap-2 font-semibold">
+          <KeyRound size={18} className="text-brand-700" />
           {t("tourCodeLabel")}
         </label>
         <div className="flex flex-wrap gap-2">
@@ -85,16 +98,18 @@ export function ToursHomePage() {
             spellCheck={false}
             className="w-44 rounded-xl border px-4 py-2.5 text-center font-mono text-xl tracking-[0.3em] uppercase"
           />
-          <button type="submit" disabled={!ready} className="rounded-xl bg-brand-700 px-5 py-2.5 font-semibold text-white hover:bg-brand-800 disabled:opacity-40">
-            {t("tourFind")}
+          <button type="submit" disabled={!ready} className="inline-flex items-center gap-1.5 rounded-xl bg-brand-700 px-5 py-2.5 font-semibold text-white transition hover:bg-brand-800 disabled:opacity-40">
+            <Search size={16} /> {t("tourFind")}
           </button>
         </div>
         <p className="text-sm text-stone-500">{t("tourCodeHint")}</p>
       </form>
 
       {canCreate && (
-        <form onSubmit={submitCreate} className="space-y-3 rounded-2xl border bg-white p-5 shadow-sm">
-          <h2 className="font-semibold">{t("tourCreateTitle")}</h2>
+        <form onSubmit={submitCreate} className="animate-fade-up space-y-3 rounded-2xl border bg-white p-5 shadow-sm" style={{ animationDelay: "80ms" }}>
+          <h2 className="flex items-center gap-2 font-semibold">
+            <PlusCircle size={18} className="text-brand-700" /> {t("tourCreateTitle")}
+          </h2>
           {current ? (
             <p className="text-sm text-stone-500">{t("tourCreateBusy")}</p>
           ) : (

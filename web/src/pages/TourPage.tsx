@@ -108,13 +108,14 @@ export function TourPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5">
-      <section className="rounded-2xl border bg-white p-5 shadow-sm">
-        <p className="text-xs font-bold uppercase tracking-wider text-stone-500">{t("tour")}</p>
+      <section className="relative isolate overflow-hidden rounded-2xl border bg-white p-5 shadow-sm">
+        <div className="absolute -right-10 -top-10 -z-10 h-32 w-32 rounded-full bg-brand-50" />
+        <p className="relative text-xs font-bold uppercase tracking-wider text-stone-500">{t("tour")}</p>
         <h1 className="mt-1 text-2xl font-bold">{tr.name}</h1>
         <p className="mt-1 text-stone-600">
           {t("tourGuide")}: <span className="font-medium">{tr.guide.fullName}</span> · {t("tourMembers")}: {tr.memberCount}/{tr.maxMembers}
         </p>
-        <p className="mt-1 font-mono text-sm tracking-widest text-brand-700">{tr.code}</p>
+        <p className="mt-2 inline-block rounded-lg bg-brand-50 px-3 py-1 font-mono text-lg font-bold tracking-[0.3em] text-brand-800">{tr.code}</p>
         <p className="mt-3 text-sm text-stone-500">🔒 {t("tourPrivacy")}</p>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -170,8 +171,13 @@ export function TourPage() {
           <h2 className="text-lg font-semibold">{t("tourMembers")}</h2>
           <ul className="divide-y rounded-2xl border bg-white">
             {members.data?.members.map((m) => (
-              <li key={m.userId} className="flex items-center gap-3 px-4 py-3">
-                <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${m.online ? "bg-emerald-500" : "bg-stone-300"}`} />
+              <li key={m.userId} className="flex animate-fade-up items-center gap-3 px-4 py-3">
+                <span className="relative shrink-0">
+                  <span className={`flex h-10 w-10 items-center justify-center rounded-full font-semibold text-white ${m.isGuide ? "bg-gold-500" : "bg-brand-700"}`}>
+                    {m.fullName.trim().charAt(0).toUpperCase()}
+                  </span>
+                  <span className={`absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full ring-2 ring-white ${m.online ? "bg-emerald-500" : "bg-stone-300"}`} />
+                </span>
                 <span className="min-w-0 flex-1">
                   <span className="font-medium">{m.fullName}</span> {m.isGuide && <Pill tone="gold">{t("tourGuide")}</Pill>}
                   <span className="block text-sm text-stone-500">
