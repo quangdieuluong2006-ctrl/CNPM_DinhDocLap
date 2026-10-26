@@ -1,13 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
+import { Building2, Plus, Search, Trees } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { PlacesMap } from "../components/PlacesMap";
 import { Badge, ErrorBox, inputCls, PageHeader } from "../components/ui";
-import { apiGet } from "../lib/api";
+import { apiGet, mediaUrl } from "../lib/api";
 import { PLACE_STATUS_LABEL, TRIGGER_LABEL, ZONE_LABEL } from "../lib/format";
 import type { AdminPlace } from "../lib/types";
 
 const STATUS_TONE = { published: "green", draft: "amber", hidden: "slate" } as const;
+
+// Ảnh đại diện của điểm (nếu đã tải lên ở trang sửa điểm); chưa có ảnh → ô màu theo ngoài trời / trong nhà
+function PlaceThumb(props: { place: AdminPlace }) {
+  const src = mediaUrl(props.place.imageUrl);
+  if (src) return <img src={src} alt="" loading="lazy" className="h-11 w-16 rounded-lg object-cover ring-1 ring-slate-200" />;
+  const outdoor = props.place.trigger === "gps";
+  const Icon = outdoor ? Trees : Building2;
+  return (
+    <span className={`flex h-11 w-16 items-center justify-center rounded-lg ${outdoor ? "bg-gradient-to-br from-emerald-100 to-emerald-200 text-emerald-700" : "bg-gradient-to-br from-amber-100 to-amber-200 text-amber-700"}`}>
+      <Icon size={20} />
+    </span>
+  );
+}
 
 // FE-20 Quản lý điểm thuyết minh: bản đồ + bảng (gồm cả nháp, đã ẩn).
 export function PlacesPage() {
@@ -28,8 +42,8 @@ export function PlacesPage() {
         title="Điểm thuyết minh"
         subtitle="Vòng tròn là vùng tự động phát (điểm GPS). Điểm trong nhà kích hoạt bằng mã QR / số điểm tại phòng."
         actions={
-          <Link to="/places/new" className="rounded-md bg-emerald-700 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-800">
-            + Thêm điểm
+          <Link to="/places/new" className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-800">
+            <Plus size={16} /> Thêm điểm
           </Link>
         }
       />
@@ -37,7 +51,10 @@ export function PlacesPage() {
       <PlacesMap places={items} onSelect={(p) => navigate(`/places/${p.id}`)} />
 
       <div className="flex flex-wrap gap-3 text-sm">
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm theo số điểm, tên…" className={`${inputCls} max-w-xs`} />
+        <span className="relative w-full max-w-xs">
+          <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm theo số điểm, tên…" className={`${inputCls} pl-9`} />
+        </span>
         <select value={status} onChange={(e) => setStatus(e.target.value)} className="rounded-md border px-2 py-2">
           <option value="">Mọi trạng thái</option>
           <option value="published">Đang xuất bản</option>
@@ -46,12 +63,14 @@ export function PlacesPage() {
         </select>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-2xl border bg-white shadow-sm">
         <table className="min-w-full text-sm">
           <thead className="bg-slate-50 text-left text-slate-600">
             <tr>
               <th className="px-4 py-3 font-medium">Số</th>
-              <th className="px-4 py-3 font-medium">Tên nội bộ</th>
+              <th className="px-4 py-3 font-medium" colSpan={2}>
+                Tên nội bộ
+              </th>
               <th className="px-4 py-3 font-medium">Khu vực</th>
               <th className="px-4 py-3 font-medium">Kích hoạt</th>
               <th className="px-4 py-3 font-medium">Bài thuyết minh</th>
@@ -62,12 +81,26 @@ export function PlacesPage() {
           <tbody className="divide-y">
             {places.isPending && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-slate-500">Đang tải…</td>
+                <td colSpan={8} className="px-4 py-4">
+                  <div className="space-y-3">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <div key={i} className="skeleton h-11" />
+                    ))}
+                  </div>
+                </td>
               </tr>
             )}
-            {items.map((p) => (
-              <tr key={p.id} onClick={() => navigate(`/places/${p.id}`)} className="cursor-pointer hover:bg-slate-50">
+            {items.map((p, i) => (
+              <tr
+                key={p.id}
+                onClick={() => navigate(`/places/${p.id}`)}
+                style={{ animationDelay: `${Math.min(i, 12) * 30}ms` }}
+                className="animate-fade-up cursor-pointer transition-colors hover:bg-emerald-50/50"
+              >
                 <td className="px-4 py-3 font-mono font-semibold">{p.code}</td>
+                <td className="py-2 pl-4">
+                  <PlaceThumb place={p} />
+                </td>
                 <td className="px-4 py-3 font-medium text-slate-900">{p.internalName}</td>
                 <td className="px-4 py-3">{ZONE_LABEL[p.zone]}</td>
                 <td className="px-4 py-3 text-slate-600">
