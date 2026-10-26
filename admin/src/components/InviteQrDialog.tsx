@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { apiGet } from "../lib/api";
 
 interface JoinLink {
@@ -33,13 +34,14 @@ export function InviteQrDialog({ onClose }: { onClose: () => void }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4" onClick={onClose}>
+  // Portal ra <body>, z-index trên thanh tiêu đề dính: mã QR không bị che (thiếu góc định vị thì điện thoại không quét được)
+  return createPortal(
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-slate-900/60 p-4" onClick={onClose}>
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Mời tham gia bằng mã QR"
-        className="w-full max-w-md space-y-4 rounded-xl bg-white p-6 text-center shadow-xl"
+        className="max-h-[95vh] w-full max-w-md space-y-4 overflow-y-auto rounded-xl bg-white p-6 text-center shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-semibold text-slate-900">Quét mã để tham gia</h2>
@@ -79,6 +81,7 @@ export function InviteQrDialog({ onClose }: { onClose: () => void }) {
           Đóng
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

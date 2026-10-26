@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 export function PageHeader(props: { title: string; subtitle?: ReactNode; actions?: ReactNode }) {
   return (
@@ -61,8 +62,9 @@ export function Modal(props: { title: string; onClose: () => void; children: Rea
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [props]);
-  return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/50 p-4" onClick={props.onClose}>
+  // Portal ra <body>: lớp phủ luôn che cả màn hình, không bị khung cha (hiệu ứng, overflow, z-index) giới hạn
+  return createPortal(
+    <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-slate-900/50 p-4" onClick={props.onClose}>
       <div
         role="dialog"
         aria-modal="true"
@@ -78,7 +80,8 @@ export function Modal(props: { title: string; onClose: () => void; children: Rea
         </div>
         {props.children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
