@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Link, useParams } from "react-router";
 import { CodeBadge, ErrorState, Pill } from "../components/ui";
+import { useAuth } from "../features/auth";
 import { useRealtime } from "../features/realtime";
 import { ApiError, authRequest } from "../lib/api";
 import type { TKey } from "../lib/i18n";
@@ -39,6 +40,7 @@ const ERROR_KEY: Record<string, TKey> = {
 export function TourPage() {
   const { code = "" } = useParams();
   const { lang, t } = usePrefs();
+  const { user } = useAuth();
   const qc = useQueryClient();
   const { socket, connected } = useRealtime();
   const places = usePlaces(lang);
@@ -80,16 +82,28 @@ export function TourPage() {
     },
     onSuccess: refreshAll,
   });
+  const end = useMutation({ mutationFn: (id: number) => authRequest(`/tours/${id}/end`, { method: "POST" }), onSuccess: refreshAll });
 
   if (tour.isPending) return <p className="text-stone-500">{t("loading")}</p>;
   if (tour.isError) {
     const key = tour.error instanceof ApiError ? ERROR_KEY[tour.error.code] : undefined;
-    return key ? <p className="text-lg font-semibold">{t(key)}</p> : <ErrorState message={t("error")} onRetry={() => void tour.refetch()} retryLabel={t("retry")} />;
+    return key ? (
+      <div className="space-y-3">
+        <p className="text-lg font-semibold">{t(key)}</p>
+        <Link to="/tour" className="font-semibold text-brand-700 hover:underline">
+          {t("tourBack")}
+        </Link>
+      </div>
+    ) : (
+      <ErrorState message={t("error")} onRetry={() => void tour.refetch()} retryLabel={t("retry")} />
+    );
   }
 
   const tr = tour.data;
   const joinError = join.error instanceof ApiError ? join.error.code : null;
   const other = mine.data?.tour && !isMember ? mine.data.tour : null;
+  // Hướng dẫn viên của nhóm hoặc quản trị viên được kết thúc nhóm (API trả 403 với người khác)
+  const canEnd = tr.status === "active" && (tr.guide.id === user?.id || user?.role === "admin");
   const titleOf = (placeId: number | null) => places.data?.find((p) => p.id === placeId)?.content?.title;
 
   return (
@@ -105,7 +119,12 @@ export function TourPage() {
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
           {tr.status === "ended" ? (
-            <Pill>{t("tourEnded")}</Pill>
+            <>
+              <Pill>{t("tourEnded")}</Pill>
+              <Link to="/tour" className="text-sm font-semibold text-brand-700 hover:underline">
+                {t("tourBack")}
+              </Link>
+            </>
           ) : isMember ? (
             <>
               <Pill tone="brand">✓ {t("tourJoined")}</Pill>
@@ -129,6 +148,21 @@ export function TourPage() {
           )}
         </div>
         {joinError && <p className="mt-2 text-sm text-red-700">{t(ERROR_KEY[joinError] ?? "error")}</p>}
+
+        {canEnd && (
+          <div className="mt-4 space-y-2 border-t pt-4 text-sm">
+            <p className="text-stone-600">{t("tourShareHint")}</p>
+            <p className="break-all rounded-lg bg-stone-50 px-3 py-2 font-mono text-brand-800">{`${window.location.origin}/tour/${tr.code}`}</p>
+            <button
+              onClick={() => window.confirm(t("tourEndConfirm")) && end.mutate(tr.id)}
+              disabled={end.isPending}
+              className="rounded-xl border border-red-300 px-4 py-2 font-medium text-red-700 hover:bg-red-50"
+            >
+              {t("tourEnd")}
+            </button>
+            {end.isError && <p className="text-red-700">{t("error")}</p>}
+          </div>
+        )}
       </section>
 
       {isMember && (

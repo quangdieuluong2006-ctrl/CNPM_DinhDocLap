@@ -9,6 +9,7 @@ import { MapPage } from "./pages/MapPage";
 import { PlaceDetailPage } from "./pages/PlaceDetailPage";
 import { PlacesPage } from "./pages/PlacesPage";
 import { TourPage } from "./pages/TourPage";
+import { ToursHomePage } from "./pages/ToursHomePage";
 
 // Trang cần đăng nhập: chưa đăng nhập → /login, nhớ trang đang mở để quay lại.
 function RequireAuth({ children }: { children: ReactNode }) {
@@ -30,6 +31,7 @@ export function App() {
         <Route path="map" element={<MapPage />} />
         <Route path="login" element={<AuthPage mode="login" />} />
         <Route path="register" element={<AuthPage mode="register" />} />
+        <Route path="tour" element={<ToursHomePage />} />
         <Route
           path="tour/:code"
           element={
