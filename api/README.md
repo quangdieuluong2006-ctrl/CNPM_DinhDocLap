@@ -24,6 +24,10 @@ chạy API, Web User, Web Admin và Cloudflare Tunnel trong một terminal (log 
 **LINK CÔNG KHAI** `https://….trycloudflare.com` và ghi link vào `api/.tunnel-url` → mã QR "Mời tham gia" tự dùng link này, không
 cần sửa `.env`. **Ctrl + C** tắt tất cả. Chưa cài `cloudflared` thì vẫn chạy, chỉ dùng được trong cùng Wi-Fi.
 
+**`npm run demo`** = `npm run dev` + tự mở trình duyệt: Web Admin và các tab **khách ảo** – mỗi tab một địa chỉ khác nhau
+(`localhost`, `127.0.0.1`, IP Wi-Fi, link tunnel). Trình duyệt tách cookie theo địa chỉ nên mỗi tab là một khách ẩn danh riêng
+trong "Đang hoạt động" (mở nhiều tab cùng một địa chỉ thì vẫn chỉ là một khách – đúng với thực tế: một trình duyệt = một du khách).
+
 Tài khoản mẫu (mật khẩu `Demo@12345`): `admin@demo.vn` (admin), `guide1@demo.vn`, `guide2@demo.vn` (hướng dẫn viên),
 `user1@demo.vn` … `user6@demo.vn`.
 
@@ -34,6 +38,7 @@ PowerShell báo "running scripts is disabled": chạy một lần `Set-Execution
 | Lệnh | Việc |
 |---|---|
 | `npm run dev` | Chạy cả hệ thống để demo: API + Web User + Web Admin + Cloudflare Tunnel (`-- --no-tunnel`: bỏ tunnel) |
+| `npm run demo` | Như `npm run dev`, chạy xong tự mở Web Admin + các tab khách ảo (mỗi tab một khách) |
 | `npm run dev:api` | Chỉ chạy API, tự tải lại khi sửa code |
 | `npm run db:migrate` · `npm run db:seed` | Chạy migration chưa chạy · nạp dữ liệu mẫu (chạy lại an toàn) |
 | `npm run typecheck` · `npm run lint` | Kiểm tra kiểu · kiểm tra mã |
