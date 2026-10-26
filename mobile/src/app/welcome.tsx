@@ -9,7 +9,7 @@ import { useColors } from "../theme";
 
 const SHADE_STEPS = [0.1, 0.12, 0.15, 0.18, 0.22, 0.26];
 
-// FE-01 bước 1: lần đầu mở – "Bắt đầu tham quan" (dùng ngay, không tài khoản) hoặc "Đăng nhập / Đăng ký".
+// Lần đầu mở: một nút "Bắt đầu tham quan" – không đăng nhập / đăng ký (app tự tạo phiên khách ẩn danh).
 export default function Welcome() {
   const c = useColors();
   const t = useT();
@@ -43,17 +43,6 @@ export default function Welcome() {
           }}
         />
         <Text style={styles.hint}>{t("guestHint")}</Text>
-        <Button
-          title={t("loginOrRegister")}
-          variant="ghost"
-          style={{ borderColor: "#ffffffaa" }}
-          textColor="#fff"
-          onPress={() => {
-            void store.updateSettings({ welcomed: true });
-            router.push({ pathname: "/login", params: { next: "/" } });
-          }}
-        />
-        <Text style={styles.hint}>{t("accountHint")}</Text>
       </FadeIn>
     </SafeAreaView>
     </ImageBackground>

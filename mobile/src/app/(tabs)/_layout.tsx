@@ -37,10 +37,6 @@ export default function TabsLayout() {
         options={{ title: t("tabPlaces"), tabBarIcon: icon("list") }}
       />
       <Tabs.Screen
-        name="tour"
-        options={{ title: t("tabTour"), tabBarIcon: icon("people") }}
-      />
-      <Tabs.Screen
         name="settings"
         options={{ title: t("tabSettings"), tabBarIcon: icon("settings") }}
       />

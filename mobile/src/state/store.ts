@@ -12,11 +12,10 @@ import { downloadAudio, getJson, loadBundle, saveBundle, setJson, type StoredBun
 import { Realtime } from "../services/realtime";
 import { clearRefreshToken, readRefreshToken, saveRefreshToken } from "../services/session";
 import { enqueueVisit, flushVisits, pendingVisits } from "../services/visits";
-import type { UiLocale } from "../i18n";
+import { uiLocaleFor, type UiLocale } from "../i18n";
 
 export interface Settings {
   narrationLang: string | null; // null = chưa chọn → mở màn hình chọn ngôn ngữ
-  uiLocale: UiLocale;
   autoPlay: boolean;
   simulate: boolean;
   apiUrl: string | null; // null = tự suy ra (services/config.ts)
@@ -48,12 +47,16 @@ export interface AppState {
 const deviceLocale = getLocales()[0]?.languageCode ?? "vi";
 const DEFAULT_SETTINGS: Settings = {
   narrationLang: null,
-  uiLocale: deviceLocale === "vi" ? "vi" : "en",
   autoPlay: true,
   simulate: false,
   apiUrl: null,
   welcomed: false,
 };
+
+// Ngôn ngữ giao diện = ngôn ngữ thuyết minh đã chọn; chưa chọn (màn Chào mừng, chọn ngôn ngữ) → ngôn ngữ của máy
+export function uiLocaleOf(settings: Pick<Settings, "narrationLang">): UiLocale {
+  return uiLocaleFor(settings.narrationLang ?? deviceLocale);
+}
 
 // Toàn bộ trạng thái ứng dụng trong một store (không phụ thuộc React) + hook useApp() để màn hình đọc.
 class AppStore {
@@ -85,9 +88,6 @@ class AppStore {
     onVisit: (v) => void this.recordVisit(v),
     onStart: (item, trigger) => {
       if (trigger === "gps" || trigger === "simulated") this.geofence.markAutoPlayed(item.placeId);
-      // Đang ở nhóm tham quan: báo cho cả nhóm điểm mình đang nghe – chỉ placeId, không gửi tọa độ (PRD mục 4.7).
-      // Không ở nhóm thì máy chủ bỏ qua.
-      this.realtime.current?.emit("tour.position", { placeId: item.placeId });
     },
     isStillInside: (placeId) => this.geofence.isInside(placeId),
   });
@@ -118,13 +118,17 @@ class AppStore {
     await this.startLocation();
   }
 
-  // ---- Tài khoản (PRD v1.0, FE-01) ----
+  // ---- Phiên khách ẩn danh ----
+  // Khách không đăng nhập / đăng ký: lần đầu mở app, API tạo một "khách ẩn danh" cho máy này (POST /auth/guest);
+  // refresh token lưu trong expo-secure-store, các lần sau chỉ làm mới phiên. Nhờ phiên khách, lượt nghe gắn với máy
+  // và khách hiện trong "Đang hoạt động" của Web Admin. authStatus "authenticated" = đã có phiên khách.
 
-  // Mở app: có refresh token đã lưu → làm mới phiên. Mất mạng thì vẫn hiện tài khoản đã lưu và thử lại sau.
+  // Mở app: có refresh token đã lưu → làm mới phiên; chưa có → tạo khách. Mất mạng thì thử lại khi có mạng.
   private async restoreSession(): Promise<void> {
     this.refreshToken = await readRefreshToken();
     if (!this.refreshToken) {
       this.set({ authStatus: "guest" });
+      await this.startGuest();
       void this.syncVisits();
       return;
     }
@@ -135,7 +139,21 @@ class AppStore {
     void this.syncVisits();
   }
 
-  // Làm mới access token (single-flight). Refresh token hỏng/bị thu hồi → về chế độ khách.
+  // Tạo khách ẩn danh (single-flight: nhiều chỗ cùng gọi lúc mở app chỉ tạo MỘT khách). Lỗi mạng → false, thử lại sau.
+  private startGuest = singleFlight(async (): Promise<boolean> => {
+    if (this.state.authNotice === "ACCOUNT_LOCKED") return false; // khách bị khóa: không tự tạo khách mới
+    try {
+      const { narrationLang } = this.state.settings;
+      // Cột ui_locale chỉ nhận vi/en (CSDL) – giao diện thật vẫn hiển thị theo ngôn ngữ thuyết minh trên máy
+      const locale = uiLocaleOf(this.state.settings) === "vi" ? "vi" : "en";
+      await this.applySession(await this.api.guest({ locale, narrationLang: narrationLang ?? undefined }));
+      return true;
+    } catch {
+      return false;
+    }
+  });
+
+  // Làm mới access token (single-flight). Refresh token hết hạn/bị thu hồi → lặng lẽ tạo khách mới; bị khóa → dừng.
   private refreshAccess = singleFlight(async (): Promise<boolean> => {
     if (!this.refreshToken) return false;
     try {
@@ -143,7 +161,9 @@ class AppStore {
       return true;
     } catch (err) {
       if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
-        await this.endSession(err.code === "ACCOUNT_LOCKED" ? "ACCOUNT_LOCKED" : null);
+        const locked = err.code === "ACCOUNT_LOCKED";
+        await this.endSession(locked ? "ACCOUNT_LOCKED" : null);
+        if (!locked) return this.startGuest();
       }
       return false;
     }
@@ -160,27 +180,6 @@ class AppStore {
     if (firstConnect || !this.realtime.current) this.realtime.start(this.api.baseUrl());
   }
 
-  async login(email: string, password: string): Promise<void> {
-    await this.applySession(await this.api.login(email, password));
-    // Máy chưa chọn ngôn ngữ thuyết minh → dùng ngôn ngữ đã lưu trong tài khoản
-    const saved = this.state.user?.narrationLang;
-    if (!this.state.settings.narrationLang && saved) void this.setLanguage(saved);
-    // Lượt nghe lúc dùng thử (chưa gửi) được gửi kèm tài khoản (PRD v1.0, FE-01)
-    void this.syncVisits();
-  }
-
-  async register(input: { email: string; password: string; fullName: string }): Promise<void> {
-    const { uiLocale, narrationLang } = this.state.settings;
-    await this.applySession(await this.api.register({ ...input, locale: uiLocale, narrationLang: narrationLang ?? undefined }));
-    void this.syncVisits();
-  }
-
-  async logout(): Promise<void> {
-    const rt = this.refreshToken;
-    await this.endSession(null);
-    if (rt) await this.api.logout(rt).catch(() => undefined);
-  }
-
   // Kết thúc phiên trên máy: đóng realtime, xóa token. Dữ liệu offline (gói nội dung, tiến độ) vẫn giữ.
   private async endSession(notice: string | null): Promise<void> {
     this.realtime.stop();
@@ -191,10 +190,10 @@ class AppStore {
     this.set({ authStatus: "guest", user: null, authNotice: notice });
   }
 
-  // Gọi trước các API cần đăng nhập: mở app xong phiên có thể chưa làm mới kịp (mới có refresh token đã lưu).
+  // Gọi trước các API cần phiên: mở app xong phiên có thể chưa làm mới kịp, hoặc lúc mở app chưa có mạng để tạo khách.
   async ensureSession(): Promise<boolean> {
     if (this.accessToken) return true;
-    return this.refreshToken ? this.refreshAccess() : false;
+    return this.refreshToken ? this.refreshAccess() : this.startGuest();
   }
 
   clearAuthNotice(): void {
@@ -218,6 +217,8 @@ class AppStore {
       const languages = await this.api.languages();
       await setJson("languages", languages);
       this.set({ languages, online: true });
+      // Có mạng trở lại mà chưa có phiên khách (mở app lúc mất mạng) → tạo / làm mới phiên
+      if (!this.accessToken) void this.ensureSession();
     } catch {
       this.set({ languages: await getJson<Language[]>("languages", this.state.languages), online: false });
     }
