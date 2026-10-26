@@ -6,8 +6,11 @@
 // Link tunnel đổi mỗi lần chạy: script ghi vào api/.tunnel-url, API đọc tệp này để tạo mã QR "Mời tham gia"
 // (không cần sửa .env). Ctrl + C: tắt tất cả, xóa tệp link.
 // Tùy chọn: npm run dev -- --no-tunnel (chỉ dùng trong Wi-Fi) · npm run dev:api (chỉ chạy API).
+// npm run demo (= --open-guests): chạy xong tự mở Web Admin + các tab khách ảo, mỗi tab một địa chỉ khác nhau
+// (localhost, 127.0.0.1, IP Wi-Fi, link tunnel) → trình duyệt tách cookie theo địa chỉ nên mỗi tab là một khách riêng.
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, rmSync, writeFileSync } from "node:fs";
+import { networkInterfaces } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -16,6 +19,7 @@ const rootDir = path.resolve(apiDir, "..");
 const tunnelFile = path.join(apiDir, ".tunnel-url");
 const isWin = process.platform === "win32";
 const withTunnel = !process.argv.includes("--no-tunnel");
+const openGuests = process.argv.includes("--open-guests");
 
 const COLORS = { api: 36, web: 32, admin: 35, tunnel: 33 }; // cyan, xanh lá, tím, vàng
 const tag = (name) => `\x1b[${COLORS[name]}m[${name}]\x1b[0m`.padEnd(18);
@@ -83,6 +87,62 @@ function stopAll() {
   }
   setTimeout(() => process.exit(0), 500);
 }
+// Mở link bằng trình duyệt mặc định của máy
+function openBrowser(url) {
+  const [cmd, args] = isWin ? ["cmd", ["/c", "start", "", url]] : process.platform === "darwin" ? ["open", [url]] : ["xdg-open", [url]];
+  const child = spawn(cmd, args, { stdio: "ignore", detached: true });
+  child.on("error", () => say(`Không mở được trình duyệt – hãy tự mở: ${url}`));
+  child.unref();
+}
+
+// Đợi đến khi url trả lời 2xx (tối đa timeoutMs); true = sẵn sàng
+async function waitFor(url, timeoutMs) {
+  const end = Date.now() + timeoutMs;
+  while (Date.now() < end && !stopping) {
+    try {
+      if ((await fetch(url, { signal: AbortSignal.timeout(3000) })).ok) return true;
+    } catch {
+      // chưa chạy xong
+    }
+    await new Promise((r) => setTimeout(r, 1000));
+  }
+  return false;
+}
+
+// IP Wi-Fi/LAN nội bộ (bỏ card ảo Docker, WSL, VPN…) – giống cách chọn trong src/modules/admin/joinLink.ts
+function lanIp() {
+  const virtual = /docker|^br-|veth|vethernet|wsl|hyper-v|virtualbox|vmware|vbox|radmin|zerotier|tailscale|hamachi|loopback/i;
+  for (const [name, addrs] of Object.entries(networkInterfaces())) {
+    if (virtual.test(name)) continue;
+    const a = (addrs ?? []).find((x) => x.family === "IPv4" && !x.internal && /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(x.address));
+    if (a) return a.address;
+  }
+  return null;
+}
+
+let tunnelReady = null; // Promise<string | null>: link tunnel khi đã truy cập được
+const guestCount = { n: 0 };
+function openGuest(url) {
+  guestCount.n += 1;
+  say(`  Khách ảo #${guestCount.n}: ${url}`);
+  openBrowser(url);
+}
+
+async function openDemoTabs() {
+  const ready = (await waitFor("http://localhost:3000/health", 90_000)) && (await waitFor("http://localhost:5173", 90_000));
+  if (!ready) return say("API/Web chưa chạy được nên không tự mở trình duyệt – xem lỗi phía trên.");
+  await waitFor("http://localhost:5174", 30_000);
+  say("\nMở Web Admin và các tab khách ảo (mỗi tab là một khách riêng):");
+  openBrowser("http://localhost:5174");
+  openGuest("http://localhost:5173");
+  openGuest("http://127.0.0.1:5173");
+  const ip = lanIp();
+  if (ip) openGuest(`http://${ip}:5173`);
+  const tunnel = await tunnelReady;
+  if (tunnel) openGuest(tunnel);
+  say(`→ ${guestCount.n} khách ảo. Cần thêm: mở Chrome ẩn danh / Edge rồi dán một trong các link trên, hoặc dùng điện thoại quét QR.\n`);
+}
+
 process.on("SIGINT", stopAll);
 process.on("SIGTERM", stopAll);
 
@@ -106,15 +166,22 @@ if (withTunnel) {
     say("Không tìm thấy cloudflared → chỉ chạy trong Wi-Fi. Cài: winget install --id Cloudflare.cloudflared");
   } else {
     let announced = false;
-    start("tunnel", cloudflared, ["tunnel", "--url", "http://localhost:5173", "--no-autoupdate"], apiDir, (line) => {
+    let found;
+    tunnelReady = new Promise((resolve) => (found = resolve));
+    setTimeout(() => found(null), 90_000); // tunnel lỗi / mạng chặn → vẫn mở các tab còn lại
+    const child = start("tunnel", cloudflared, ["tunnel", "--url", "http://localhost:5173", "--no-autoupdate"], apiDir, (line) => {
       const m = line.match(/https:\/\/(?!api\.)[a-z0-9-]+\.trycloudflare\.com/);
       if (!m || announced) return;
       announced = true;
       writeFileSync(tunnelFile, `${m[0]}\n`);
       const bar = "=".repeat(m[0].length + 8);
       say(`\n${bar}\n  LINK CÔNG KHAI (4G vẫn vào được): ${m[0]}\n  Mã QR "Mời tham gia" trên Web Admin đã tự dùng link này.\n${bar}\n`);
+      // Link vừa in ra thường cần vài giây mới truy cập được → chỉ mở tab khi link đã trả lời
+      if (openGuests) void waitFor(m[0], 45_000).then((ok) => found(ok ? `${m[0]}/` : null));
     });
+    child.on("exit", () => found(null));
   }
 }
 
 say("Web User: http://localhost:5173 · Web Admin: http://localhost:5174 · Swagger: http://localhost:3000/api/docs");
+if (openGuests) void openDemoTabs();
