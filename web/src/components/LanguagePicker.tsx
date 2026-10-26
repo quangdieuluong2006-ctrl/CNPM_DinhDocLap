@@ -1,3 +1,4 @@
+import { Check, Search } from "lucide-react";
 import { useState } from "react";
 import { matchLanguage } from "../lib/i18n";
 import { usePrefs } from "../lib/prefs";
@@ -13,23 +14,26 @@ export function LanguagePicker({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal title={t("chooseLanguage")} onClose={onClose}>
-      <input
-        autoFocus
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder={t("searchLanguage")}
-        className="mb-3 w-full rounded-xl border px-4 py-3 outline-none focus:ring-2 focus:ring-brand-600"
-      />
+      <span className="relative mb-3 block">
+        <Search size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+        <input
+          autoFocus
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder={t("searchLanguage")}
+          className="w-full rounded-xl border py-3 pl-10 pr-4 outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+        />
+      </span>
       {languages.isError && <ErrorState message={t("error")} onRetry={() => void languages.refetch()} retryLabel={t("retry")} />}
       <ul className="-mx-1 flex-1 space-y-1.5 overflow-y-auto px-1">
-        {items.map((l) => (
-          <li key={l.code}>
+        {items.map((l, i) => (
+          <li key={l.code} style={{ animationDelay: `${Math.min(i, 10) * 25}ms` }} className="animate-fade-up">
             <button
               onClick={() => {
                 setLang(l.code);
                 onClose();
               }}
-              className={`flex w-full items-center gap-3 rounded-xl border-2 px-4 py-3 text-left hover:bg-brand-50 ${lang === l.code ? "border-brand-700" : "border-transparent bg-stone-50"}`}
+              className={`flex w-full items-center gap-3 rounded-xl border-2 px-4 py-3 text-left transition hover:bg-brand-50 ${lang === l.code ? "border-brand-700 bg-brand-50" : "border-transparent bg-stone-50"}`}
             >
               <span className="flex-1">
                 <span className="block text-lg font-semibold">{l.nameNative}</span>
@@ -45,6 +49,11 @@ export function LanguagePicker({ onClose }: { onClose: () => void }) {
               <span className="text-sm text-stone-500 tabular-nums">
                 {l.approved + l.pending} {t("places")}
               </span>
+              {lang === l.code && (
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-700 text-white">
+                  <Check size={14} />
+                </span>
+              )}
             </button>
           </li>
         ))}
