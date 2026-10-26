@@ -66,6 +66,49 @@ describe.skipIf(!runDbTests)("API xác thực (FE-01) trên SQL Server", () => {
     });
   });
 
+  describe("POST /api/v1/auth/guest (khách ẩn danh – dùng ngay không đăng ký)", () => {
+    it("Mobile: tạo khách, trả phiên đầy đủ, tên Khách #XXXX, không email thật", async () => {
+      const res = await request(app).post("/api/v1/auth/guest").send({ clientType: "mobile", locale: "en", narrationLang: "ja" });
+      expect(res.status).toBe(201);
+      expect(res.body.accessToken).toBeTruthy();
+      expect(res.body.refreshToken).toBeTruthy();
+      expect(res.body.user).toMatchObject({ role: "user", isGuest: true, uiLocale: "en", narrationLang: "ja" });
+      expect(res.body.user.fullName).toMatch(/^Khách #[0-9A-F]{4}$/);
+      expect(res.body.user.email).toMatch(/@guest\.local$/);
+      expect(await countLogs("auth.guest", res.body.user.id)).toBe(1);
+
+      // Phiên khách dùng được như phiên thường: /me, làm mới bằng refresh token
+      const me = await request(app).get("/api/v1/me").set("Authorization", `Bearer ${res.body.accessToken}`);
+      expect(me.status).toBe(200);
+      expect(me.body.isGuest).toBe(true);
+      const again = await request(app).post("/api/v1/auth/refresh").send({ clientType: "mobile", refreshToken: res.body.refreshToken });
+      expect(again.status).toBe(200);
+      expect(again.body.user.id).toBe(res.body.user.id);
+    });
+
+    it("Web: refresh token nằm trong cookie, body không có refreshToken; mỗi lần gọi là một khách khác", async () => {
+      const a = await request(app).post("/api/v1/auth/guest").send({});
+      const b = await request(app).post("/api/v1/auth/guest").send({ clientType: "web" });
+      expect(a.status).toBe(201);
+      expect(a.body.refreshToken).toBeUndefined();
+      expect(a.body.csrfToken).toBeTruthy();
+      expect(cookieValue(a, "rt_web")).toBeTruthy();
+      expect(a.body.user.id).not.toBe(b.body.user.id);
+    });
+
+    it("không ai đăng nhập được bằng tài khoản khách (không có mật khẩu)", async () => {
+      const g = await request(app).post("/api/v1/auth/guest").send({ clientType: "mobile" });
+      const res = await request(app).post("/api/v1/auth/login").send({ email: g.body.user.email, password: "bat-ky-mat-khau1", clientType: "mobile" });
+      expect(res.status).toBe(401);
+      expect(res.body.error.code).toBe("AUTH_INVALID_CREDENTIALS");
+    });
+
+    it("không tạo khách cho Web Admin", async () => {
+      const res = await request(app).post("/api/v1/auth/guest").send({ clientType: "admin" });
+      expect(res.status).toBe(400);
+    });
+  });
+
   describe("POST /api/v1/auth/login", () => {
     it("Web: trả access token + csrfToken, refresh token chỉ nằm trong cookie HttpOnly", async () => {
       const res = await request(app)

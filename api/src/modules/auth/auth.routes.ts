@@ -3,7 +3,7 @@ import { rateLimit } from "express-rate-limit";
 import { env } from "../../config/env.js";
 import { ApiError } from "../../lib/apiError.js";
 import { clearSessionCookies, readBrowserRefreshToken, setSessionCookies } from "./auth.cookies.js";
-import { type ClientType, loginSchema, refreshSchema, registerSchema } from "./auth.schemas.js";
+import { type ClientType, guestSchema, loginSchema, refreshSchema, registerSchema } from "./auth.schemas.js";
 import * as auth from "./auth.service.js";
 
 // Web/Admin: refresh token chỉ nằm trong cookie, body trả csrfToken.
@@ -22,8 +22,21 @@ function refreshTokenFrom(req: Request, clientType: ClientType, bodyToken: strin
   return clientType === "mobile" ? bodyToken : readBrowserRefreshToken(req, clientType);
 }
 
-export function authRouter(opts: { loginRateLimitMax?: number } = {}) {
+export function authRouter(opts: { loginRateLimitMax?: number; guestRateLimitMax?: number } = {}) {
   const router = Router();
+
+  // Chống tạo khách hàng loạt: tối đa N khách / 15 phút / IP. Mỗi thiết bị chỉ tạo khách một lần rồi dùng refresh token,
+  // nên giới hạn rộng (cả đoàn khách dùng chung Wi-Fi của Dinh vẫn đủ).
+  const guestLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: opts.guestRateLimitMax ?? env.GUEST_RATE_LIMIT_MAX,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    handler: (_req, res, next) => {
+      const retryAfter = Number(res.getHeader("retry-after")) || undefined;
+      next(new ApiError(429, "RATE_LIMITED", "Quá nhiều yêu cầu, vui lòng thử lại sau", { retryAfter }));
+    },
+  });
 
   // Chống dò mật khẩu: tối đa N lần đăng nhập THẤT BẠI / 15 phút / IP (PRD v1.0, mục 15.1).
   // Đăng nhập thành công không bị đếm, để nhiều tài khoản demo trên cùng máy không tự khóa nhau.
@@ -43,6 +56,11 @@ export function authRouter(opts: { loginRateLimitMax?: number } = {}) {
   router.post("/auth/register", async (req, res) => {
     const input = registerSchema.parse(req.body);
     sendSession(res, 201, input.clientType, await auth.register(input, req.ip));
+  });
+
+  router.post("/auth/guest", guestLimiter, async (req, res) => {
+    const input = guestSchema.parse(req.body ?? {});
+    sendSession(res, 201, input.clientType, await auth.guest(input, req.ip));
   });
 
   router.post("/auth/login", loginLimiter, async (req, res) => {

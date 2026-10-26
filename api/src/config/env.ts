@@ -20,6 +20,7 @@ const schema = z.object({
   // Bật khi chạy HTTPS (staging/production); dev dùng http://localhost nên để false.
   COOKIE_SECURE: z.stringbool().default(false),
   LOGIN_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(10),
+  GUEST_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(300),
   // Presence (PRD v1.0, mục 4.7, Phụ lục C): chu kỳ dọn phiên mất nhịp tim.
   PRESENCE_CLEANUP_INTERVAL_SEC: z.coerce.number().int().positive().default(30),
   // Link mời tham gia (mã QR trên Web Admin): cổng Web User, hoặc địa chỉ công khai nếu đã triển khai.
