@@ -119,9 +119,10 @@ export function ActiveUsersPage() {
               <tr key={u.userId} className="hover:bg-slate-50">
                 <td className="px-4 py-3 font-medium text-slate-900">
                   {u.fullName}
+                  {u.isGuest && <span className="ml-2 rounded bg-sky-50 px-1.5 py-0.5 text-xs text-sky-800 ring-1 ring-inset ring-sky-200">Khách ẩn danh</span>}
                   {u.role !== "user" && <span className="ml-2 rounded bg-slate-200 px-1.5 py-0.5 text-xs text-slate-700">{u.role === "admin" ? "admin" : "HDV"}</span>}
                 </td>
-                <td className="px-4 py-3 text-slate-600">{u.email}</td>
+                <td className="px-4 py-3 text-slate-600">{u.isGuest ? <span className="text-slate-400">–</span> : u.email}</td>
                 <td className="px-4 py-3">
                   <div className="flex gap-1">
                     {u.clientTypes.map((c) => (

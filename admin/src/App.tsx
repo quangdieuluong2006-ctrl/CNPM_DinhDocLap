@@ -10,7 +10,6 @@ import { LoginPage } from "./pages/LoginPage";
 import { PlaceEditPage } from "./pages/PlaceEditPage";
 import { PlacesPage } from "./pages/PlacesPage";
 import { PrintQrPage } from "./pages/PrintQrPage";
-import { ToursPage } from "./pages/ToursPage";
 import { UsersPage } from "./pages/UsersPage";
 
 // Chưa đăng nhập → về /login, nhớ trang đang mở để quay lại sau khi đăng nhập.
@@ -39,7 +38,6 @@ export function App() {
         <Route path="places" element={<PlacesPage />} />
         <Route path="places/:id" element={<PlaceEditPage />} />
         <Route path="languages" element={<LanguagesPage />} />
-        <Route path="tours" element={<ToursPage />} />
         <Route path="activity" element={<ActivityPage />} />
         <Route path="print-qr" element={<PrintQrPage />} />
       </Route>

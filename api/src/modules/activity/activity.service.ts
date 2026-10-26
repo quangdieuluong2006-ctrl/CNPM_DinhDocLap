@@ -4,6 +4,7 @@ import { logger } from "../../lib/logger.js";
 // Danh sách hành động được ghi: PRD v1.0, mục 13.2.
 export type ActivityAction =
   | "auth.register"
+  | "auth.guest"
   | "auth.login"
   | "auth.login_failed"
   | "auth.logout"

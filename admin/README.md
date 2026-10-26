@@ -24,11 +24,10 @@ cookie `rt_admin` hoạt động, không cần cấu hình CORS. Đổi địa c
 |---|---|
 | Tổng quan | FE-17: 6 thẻ (đang hoạt động cập nhật realtime), lượt tham quan 7 ngày, 5 điểm nghe nhiều nhất, tỷ lệ ngôn ngữ, 10 hoạt động gần nhất |
 | Đang hoạt động | FE-19: số và danh sách người dùng đang hoạt động, mã QR mời tham gia |
-| Người dùng | FE-18: lọc vai trò/trạng thái/online, hoạt động gần nhất, nhóm; khóa/mở khóa, đổi vai trò, lịch sử phiên |
+| Người dùng | FE-18: khách ẩn danh (`Khách #…`, Web/Mobile tự tạo – không đăng ký) và tài khoản quản trị; lọc loại/vai trò/trạng thái/online, hoạt động gần nhất; khóa/mở khóa, đổi vai trò, lịch sử phiên |
 | Điểm thuyết minh | FE-20: bản đồ OpenStreetMap (Leaflet) + bảng; thêm/sửa điểm bằng cách bấm bản đồ, cảnh báo vùng chồng lấn, xóa (chỉ khi chưa có lượt nghe), ảnh |
 | ↳ Bài theo ngôn ngữ | FE-21: soạn bài từng ngôn ngữ, Nháp → Chờ duyệt → Đã duyệt, tải/nghe thử/xóa tệp âm thanh |
 | Ngôn ngữ | FE-22: thêm từ danh mục 183 ngôn ngữ ISO 639-1 có tìm kiếm, bật/tắt, mức hoàn thiện |
-| Nhóm tham quan | FE-23: danh sách nhóm, hướng dẫn viên, số thành viên |
 | Nhật ký hoạt động | FE-24: lọc theo nhóm hành động và ngày |
 | In mã QR | FE-24: A4, 6 ô/trang (QR → `<Web User>/p/{số}`, số điểm, tên Việt + Anh) |
 

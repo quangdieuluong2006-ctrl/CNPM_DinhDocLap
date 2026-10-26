@@ -33,6 +33,7 @@ const ACTION_ICON: { prefix: string; icon: LucideIcon; cls: string }[] = [
   { prefix: "auth.login_failed", icon: ShieldAlert, cls: "bg-red-100 text-red-600" },
   { prefix: "auth.refresh_reuse", icon: ShieldAlert, cls: "bg-red-100 text-red-600" },
   { prefix: "auth.register", icon: UserPlus, cls: "bg-sky-100 text-sky-700" },
+  { prefix: "auth.guest", icon: UserPlus, cls: "bg-sky-100 text-sky-700" },
   { prefix: "auth.", icon: LogIn, cls: "bg-emerald-100 text-emerald-700" },
   { prefix: "tour.", icon: Flag, cls: "bg-amber-100 text-amber-700" },
   { prefix: "content.", icon: BookOpenCheck, cls: "bg-violet-100 text-violet-700" },
@@ -134,22 +135,19 @@ export function DashboardPage() {
         </div>
       </section>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <Link to="/users">
-          <StatCard label="Tổng người dùng" value={s.totalUsers} hint="Khách tham quan + hướng dẫn viên" icon={Users} tone="sky" delayMs={0} />
+          <StatCard label="Khách đã dùng" value={s.totalUsers} hint="Khách ẩn danh trên Web + Mobile (không cần đăng ký)" icon={Users} tone="sky" delayMs={0} />
         </Link>
         <Link to="/active-users">
           <StatCard label="Đang hoạt động" value={activeNow} highlight hint="Cập nhật theo thời gian thực" icon={Activity} tone="emerald" delayMs={60} />
         </Link>
         <StatCard label="Lượt tham quan hôm nay" value={s.visitsToday} hint="Không tính lượt mô phỏng" icon={Footprints} tone="amber" delayMs={120} />
-        <Link to="/tours">
-          <StatCard label="Nhóm đang tham quan" value={s.activeTours} hint="Đoàn có hướng dẫn viên" icon={Flag} tone="rose" delayMs={180} />
+        <Link to="/places">
+          <StatCard label="Điểm đang xuất bản" value={s.publishedPlaces} hint="Ngoài trời (GPS) + trong nhà (QR)" icon={MapPin} tone="teal" delayMs={180} />
         </Link>
         <Link to="/places">
-          <StatCard label="Điểm đang xuất bản" value={s.publishedPlaces} hint="Ngoài trời (GPS) + trong nhà (QR)" icon={MapPin} tone="teal" delayMs={240} />
-        </Link>
-        <Link to="/places">
-          <StatCard label="Bài chờ duyệt" value={s.pendingContents} hint="Bản dịch cần kiểm tra trước khi duyệt" icon={BookOpenCheck} tone="violet" delayMs={300} />
+          <StatCard label="Bài chờ duyệt" value={s.pendingContents} hint="Bản dịch cần kiểm tra trước khi duyệt" icon={BookOpenCheck} tone="violet" delayMs={240} />
         </Link>
       </div>
 

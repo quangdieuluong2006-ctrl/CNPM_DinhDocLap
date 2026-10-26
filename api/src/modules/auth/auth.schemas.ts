@@ -22,6 +22,13 @@ export const registerSchema = z.object({
   clientType: z.enum(["web", "mobile"]).default("web"),
 });
 
+// Khách ẩn danh (Web User, Mobile): dùng ngay, không email/mật khẩu.
+export const guestSchema = z.object({
+  locale: z.enum(["vi", "en"]).default("vi"),
+  narrationLang: z.string().trim().toLowerCase().max(10).optional(),
+  clientType: z.enum(["web", "mobile"]).default("web"),
+});
+
 export const loginSchema = z.object({
   email,
   password: z.string().min(1).max(72),

@@ -17,6 +17,7 @@ export interface PresenceUser {
   fullName: string;
   email: string;
   role: Role;
+  isGuest: boolean;
   clientTypes: ClientType[];
   openSessions: number;
   onlineSince: string;
@@ -131,6 +132,7 @@ export interface AdminUser {
   lockedReason: string | null;
   uiLocale: string;
   narrationLang: string | null;
+  isGuest: boolean;
   createdAt: string;
   online: boolean;
   clientTypes: ClientType[];
