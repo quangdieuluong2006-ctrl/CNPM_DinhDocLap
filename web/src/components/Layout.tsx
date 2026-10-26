@@ -15,6 +15,7 @@ export function Layout() {
     { to: "/", label: t("navHome"), end: true },
     { to: "/places", label: t("navPlaces"), end: false },
     { to: "/map", label: t("navMap"), end: false },
+    { to: "/tour", label: t("navTour"), end: false },
   ];
 
   return (
