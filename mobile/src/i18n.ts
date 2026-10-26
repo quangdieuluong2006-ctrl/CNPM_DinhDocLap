@@ -1,4 +1,14 @@
-// Ngôn ngữ giao diện: tiếng Việt và tiếng Anh (PRD v1.0, mục 4.9). Ngôn ngữ thuyết minh chọn riêng.
+import { de } from "./locales/de";
+import { es } from "./locales/es";
+import { fr } from "./locales/fr";
+import { ja } from "./locales/ja";
+import { ko } from "./locales/ko";
+import { ru } from "./locales/ru";
+import { th } from "./locales/th";
+import { zh } from "./locales/zh";
+
+// Ngôn ngữ giao diện: đủ 10 ngôn ngữ thuyết minh, đi theo ngôn ngữ thuyết minh khách đã chọn (chưa chọn → ngôn ngữ của máy),
+// để khách không biết tiếng Anh vẫn hiểu các nút bấm. Tiếng Việt / tiếng Anh ở đây, 8 ngôn ngữ còn lại trong ./locales.
 const vi = {
   appName: "Thuyết minh Dinh Độc Lập",
   tabMap: "Bản đồ",
@@ -45,7 +55,6 @@ const vi = {
   speed: "Tốc độ",
   replay: "Phát lại",
   settingsLanguage: "Ngôn ngữ thuyết minh",
-  settingsUi: "Ngôn ngữ giao diện",
   settingsAutoPlay: "Tự động thuyết minh theo vị trí",
   settingsSimulate: "Chế độ mô phỏng vị trí",
   settingsServer: "Máy chủ API",
@@ -125,10 +134,13 @@ const vi = {
   retry: "Thử lại",
   audioFailed: "Không tải được tệp âm thanh – bạn có thể đọc nội dung",
   ok: "OK",
+  photoBy: "Ảnh",
+  photoCollected: "Sưu tầm",
+  nowPlaying: "Đang phát",
   stop: "Dừng",
 };
 
-type Dict = typeof vi;
+export type Dict = typeof vi;
 
 const en: Dict = {
   appName: "Independence Palace Audio Guide",
@@ -176,7 +188,6 @@ const en: Dict = {
   speed: "Speed",
   replay: "Replay",
   settingsLanguage: "Narration language",
-  settingsUi: "App language",
   settingsAutoPlay: "Automatic narration by location",
   settingsSimulate: "Location simulation",
   settingsServer: "API server",
@@ -256,15 +267,25 @@ const en: Dict = {
   retry: "Retry",
   audioFailed: "Could not load the audio – you can read the text",
   ok: "OK",
+  photoBy: "Photo",
+  photoCollected: "Collected online",
+  nowPlaying: "Now playing",
   stop: "Stop",
 };
 
-export type UiLocale = "vi" | "en";
 export type TKey = keyof Dict;
-const dicts: Record<UiLocale, Dict> = { vi, en };
+export const UI_LOCALES = ["vi", "en", "zh", "ko", "ja", "fr", "de", "ru", "es", "th"] as const;
+export type UiLocale = (typeof UI_LOCALES)[number];
+export const DICTS: Record<UiLocale, Dict> = { vi, en, zh, ko, ja, fr, de, ru, es, th };
+
+// Ngôn ngữ chưa có bản dịch giao diện (quản trị viên thêm ngôn ngữ thuyết minh mới) → giao diện tiếng Anh
+export function uiLocaleFor(lang: string): UiLocale {
+  return (UI_LOCALES as readonly string[]).includes(lang) ? (lang as UiLocale) : "en";
+}
 
 export function translator(locale: UiLocale) {
-  return (key: TKey) => dicts[locale][key];
+  const dict = DICTS[locale];
+  return (key: TKey) => dict[key] || en[key];
 }
 
 // Bỏ dấu, chữ thường – để gõ "nhat" vẫn khớp "Tiếng Nhật".

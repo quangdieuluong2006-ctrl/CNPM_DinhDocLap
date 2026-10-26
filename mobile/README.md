@@ -2,6 +2,14 @@
 
 Ứng dụng thuyết minh đa ngôn ngữ theo vị trí cho khách tham quan Dinh Độc Lập (PRD v1.0, mục 4–5).
 
+**Ngôn ngữ giao diện đi theo ngôn ngữ thuyết minh** – đủ 10 ngôn ngữ (vi, en, zh, ko, ja, fr, de, ru, es, th); chưa chọn thì theo
+ngôn ngữ của điện thoại, ngôn ngữ chưa có bản dịch giao diện thì dùng tiếng Anh. Bản dịch: `src/i18n.ts` (vi, en) và `src/locales/`;
+test `tests/i18n.test.ts` báo lỗi nếu một ngôn ngữ thiếu câu. Bản dịch tiếng Thái và tiếng Nga cần người bản ngữ xem lại.
+
+Ảnh 5 điểm ngoài trời có sẵn trong `assets/places/` (nguồn ở `assets/places/CREDITS.md`, chỉ dùng cho mục đích học tập);
+ảnh quản trị viên tải lên ở Web Admin luôn được ưu tiên, điểm chưa có ảnh hiện ô màu theo khu vực. Hiệu ứng động dùng
+`Animated` có sẵn của React Native (`src/components/ui.tsx`: `FadeIn`, `Equalizer`, `PulseRing`), không thêm thư viện.
+
 ## Chạy trên điện thoại (Expo Go)
 
 1. Điện thoại cài **Expo Go** (CH Play / App Store) – bản mới nhất (hỗ trợ SDK 58).
