@@ -42,10 +42,11 @@ export interface User {
   status: "active" | "locked";
   uiLocale: "vi" | "en";
   narrationLang: string | null;
+  isGuest: boolean;
   createdAt: string;
 }
 
-interface Session {
+export interface Session {
   accessToken: string;
   expiresIn: number;
   csrfToken: string;
@@ -92,12 +93,9 @@ async function postSession(path: string, body: unknown, withCsrf = false): Promi
   return remember((await res.json()) as Session);
 }
 
-export function login(email: string, password: string): Promise<Session> {
-  return postSession("/auth/login", { email, password, clientType: "web" });
-}
-
-export function register(input: { email: string; password: string; fullName: string; locale: "vi" | "en"; narrationLang?: string }): Promise<Session> {
-  return postSession("/auth/register", { ...input, clientType: "web" });
+// Khách ẩn danh: không email/mật khẩu, API tạo khách mới và cấp phiên (refresh token trong cookie rt_web).
+export function startGuest(narrationLang: string | undefined, locale: "vi" | "en"): Promise<Session> {
+  return postSession("/auth/guest", { clientType: "web", narrationLang, locale });
 }
 
 // Single-flight: nhiều request cùng hết hạn token thì chỉ gọi /auth/refresh một lần.
@@ -111,18 +109,6 @@ export function refreshSession(): Promise<Session> {
       refreshing = null;
     });
   return refreshing;
-}
-
-export async function logout(): Promise<void> {
-  try {
-    await rawFetch("/auth/logout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-CSRF-Token": readCsrf() ?? "" },
-      body: JSON.stringify({ clientType: "web" }),
-    });
-  } finally {
-    clearSession();
-  }
 }
 
 // Gọi API cần đăng nhập; gặp 401 hết hạn → làm mới một lần rồi gửi lại.

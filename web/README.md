@@ -18,15 +18,16 @@ Vite chuyển tiếp `/api`, `/socket.io`, `/media` sang API nên không cần c
 
 ## Trang
 
+**Không đăng nhập / đăng ký:** khách quét QR là dùng ngay. Lần đầu mở, web gọi `POST /auth/guest` để API tạo một
+*khách ẩn danh* (`Khách #A1B2`) cho trình duyệt này; các lần sau chỉ khôi phục phiên từ cookie `rt_web`. Nhờ đó lượt nghe
+vẫn vào lịch sử và khách hiện trong "Đang hoạt động" của Web Admin. Liên kết cũ `/login`, `/register`, `/tour` chuyển về trang chủ.
+
 | Route | Trang |
 |---|---|
 | `/` | Trang chủ: giới thiệu, chọn ngôn ngữ thuyết minh, danh sách điểm theo khu vực |
 | `/places?zone=&q=` | Danh sách điểm: tìm theo tên/số điểm (không dấu), lọc khu vực; tham số nằm trên URL để chia sẻ |
 | `/map` | Bản đồ khuôn viên (Leaflet + OpenStreetMap): vùng tự phát của điểm ngoài trời, marker 🏛 gộp các phòng trong nhà, vị trí của bạn (không gửi lên máy chủ) |
-| `/login`, `/register` | Đăng nhập, đăng ký (giao diện chia đôi, hiện/ẩn mật khẩu) |
-| `/tour` | Mục **Nhóm** trên menu: nhập mã nhóm 6 ký tự; hướng dẫn viên / quản trị viên tạo nhóm mới và nhận mã |
-| `/tour/:code` | Tham gia nhóm tham quan (đích của mã nhóm hướng dẫn viên chia sẻ): thành viên, ai đang nghe điểm nào – cập nhật realtime; hướng dẫn viên thấy đường dẫn chia sẻ và nút **Kết thúc nhóm** |
-| `/me` | Tài khoản: thông tin, lịch sử các điểm đã nghe (cần đăng nhập) |
+| `/me` | Lịch sử các điểm đã nghe trên trình duyệt này (nút đồng hồ trên menu) |
 | `/p/:code` | Chi tiết điểm + nghe thuyết minh (đích của mã QR). Có tệp âm thanh → thẻ `<audio>`; không có → giọng đọc của trình duyệt (Web Speech API) |
 
 Ngôn ngữ thuyết minh chọn bằng nút 🎧 (nhớ trong trình duyệt, hoặc truyền `?lang=ja` trên liên kết). **Giao diện đổi theo ngôn ngữ thuyết minh**

@@ -12,14 +12,14 @@ interface RealtimeValue {
 
 const RealtimeContext = createContext<RealtimeValue>({ socket: null, connected: false });
 
-// Một kết nối Socket.IO sau khi đăng nhập (clientType "web"): máy chủ ghi user_sessions → người dùng hiện
+// Một kết nối Socket.IO khi đã có phiên khách (clientType "web"): máy chủ ghi user_sessions → người dùng hiện
 // trong "Đang hoạt động" của Web Admin; gửi presence.ping mỗi 30 giây (PRD v1.0, mục 4.7, 12).
 export function RealtimeProvider({ children }: { children: ReactNode }) {
-  const { status, logout } = useAuth();
+  const { status, endSession } = useAuth();
   const [value, setValue] = useState<RealtimeValue>({ socket: null, connected: false });
 
   useEffect(() => {
-    if (status !== "authenticated") return;
+    if (status !== "ready") return;
     // auth dạng hàm: mỗi lần (kết nối lại) đều lấy access token mới nhất
     const socket = io(API_ROOT || undefined, {
       auth: (cb) => cb({ token: getAccessToken() }),
@@ -35,13 +35,13 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       if (code === "AUTH_TOKEN_EXPIRED") {
         refreshSession()
           .then(() => socket.connect())
-          .catch(() => void logout());
+          .catch(() => undefined); // refresh thất bại → AuthProvider tự tạo phiên khách mới
       } else if (code === "ACCOUNT_LOCKED" || code === "AUTH_TOKEN_INVALID") {
-        void logout();
+        endSession();
       }
     });
-    // Admin khóa tài khoản → đăng xuất ngay
-    socket.on("session.revoked", () => void logout());
+    // Admin khóa khách → bỏ phiên ngay (khách vẫn nghe được nội dung công khai)
+    socket.on("session.revoked", endSession);
 
     const ping = setInterval(() => {
       if (socket.connected) socket.emit("presence.ping", {});
@@ -52,7 +52,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       socket.disconnect();
       setValue({ socket: null, connected: false });
     };
-  }, [status, logout]);
+  }, [status, endSession]);
 
   return <RealtimeContext.Provider value={value}>{children}</RealtimeContext.Provider>;
 }

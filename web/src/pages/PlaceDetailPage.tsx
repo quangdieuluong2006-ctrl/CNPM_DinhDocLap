@@ -4,7 +4,6 @@ import { Link, useLocation, useParams } from "react-router";
 import { CampusMap } from "../components/CampusMap";
 import { Player } from "../components/Player";
 import { ZoneThumb } from "../components/ZoneArt";
-import { useRealtime } from "../features/realtime";
 import { CodeBadge, ErrorState, Pill } from "../components/ui";
 import { ApiError, mediaUrl, sendVisit } from "../lib/api";
 import { placePhoto } from "../lib/photos";
@@ -20,7 +19,6 @@ export function PlaceDetailPage() {
   const { lang, setLang, t } = usePrefs();
   const place = usePlace(code, lang);
   const languages = useLanguages();
-  const { socket } = useRealtime();
   // Mở từ danh sách = chọn tay; mở thẳng liên kết (quét QR) = qr
   const trigger: Trigger = (location.state as { from?: string } | null)?.from === "list" ? "manual" : "qr";
 
@@ -106,8 +104,6 @@ export function PlaceDetailPage() {
         <Player
           source={{ key: `${p!.code}-${c.lang}`, audioUrl: mediaUrl(c.audioUrl), text: `${c.title}. ${c.body ?? c.summary}`, ttsLocale }}
           onFinish={onFinish}
-          // Đang ở nhóm tham quan: báo cho cả nhóm điểm mình đang nghe (chỉ placeId, không gửi tọa độ)
-          onStart={() => socket?.emit("tour.position", { placeId: p!.id })}
         />
       )}
 
