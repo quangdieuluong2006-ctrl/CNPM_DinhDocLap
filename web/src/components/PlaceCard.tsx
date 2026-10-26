@@ -1,6 +1,6 @@
 import { ChevronRight, Volume2 } from "lucide-react";
 import { Link } from "react-router";
-import { mediaUrl } from "../lib/api";
+import { placePhoto } from "../lib/photos";
 import { usePrefs } from "../lib/prefs";
 import type { Place } from "../lib/types";
 import { Pill } from "./ui";
@@ -9,7 +9,7 @@ import { ZoneThumb } from "./ZoneArt";
 export function PlaceCard({ place, delayMs = 0 }: { place: Place; delayMs?: number }) {
   const { t } = usePrefs();
   const c = place.content;
-  const image = mediaUrl(place.imageUrl);
+  const image = placePhoto(place)?.src;
   return (
     <Link
       to={`/p/${place.code}`}

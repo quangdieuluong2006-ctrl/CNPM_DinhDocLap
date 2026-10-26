@@ -2,9 +2,9 @@ import { ArrowRight, Headphones, Languages, MapPin, QrCode, Smartphone, type Luc
 import { useState } from "react";
 import { Link } from "react-router";
 import { LanguagePicker } from "../components/LanguagePicker";
-import { PalaceArt } from "../components/PalaceArt";
 import { PlaceList } from "../components/PlaceList";
 import type { TKey } from "../lib/i18n";
+import { HERO_PHOTO } from "../lib/photos";
 import { usePrefs } from "../lib/prefs";
 import { useLanguages, usePlaces } from "../lib/queries";
 
@@ -60,7 +60,13 @@ export function HomePage() {
               )}
             </div>
           </div>
-          <PalaceArt className="w-full animate-fade-in text-brand-100" />
+          <figure className="relative animate-fade-in">
+            <div className="absolute -inset-2 rotate-2 rounded-3xl bg-gold-500/30" />
+            <img src={HERO_PHOTO.src} alt="Dinh Độc Lập" className="relative aspect-[3/2] w-full rounded-2xl object-cover shadow-2xl ring-4 ring-white/20" />
+            <figcaption className="relative mt-2 text-right text-[11px] text-white/60">
+              {t("photoBy")}: {HERO_PHOTO.credit}
+            </figcaption>
+          </figure>
         </div>
         <p className="relative mt-6 flex items-center gap-2 text-sm text-white/70">
           <Smartphone size={16} /> {t("getApp")}

@@ -7,6 +7,7 @@ import { ZoneThumb } from "../components/ZoneArt";
 import { useRealtime } from "../features/realtime";
 import { CodeBadge, ErrorState, Pill } from "../components/ui";
 import { ApiError, mediaUrl, sendVisit } from "../lib/api";
+import { placePhoto } from "../lib/photos";
 import type { TKey } from "../lib/i18n";
 import { usePrefs } from "../lib/prefs";
 import { useLanguages, usePlace } from "../lib/queries";
@@ -58,7 +59,7 @@ export function PlaceDetailPage() {
     );
   }
 
-  const image = mediaUrl(p!.imageUrl);
+  const photo = placePhoto(p!);
   const ttsLocale = languages.data?.find((l) => l.code === c?.lang)?.ttsLocale ?? c?.lang ?? "vi-VN";
   const available = (languages.data ?? []).filter((l) => p!.languages.includes(l.code));
 
@@ -67,13 +68,14 @@ export function PlaceDetailPage() {
       <Link to="/places" className="group inline-flex items-center gap-1 text-sm text-brand-700 hover:underline">
         <ChevronLeft size={16} className="transition group-hover:-translate-x-0.5" /> {t("backToList")}
       </Link>
-      <div className="relative h-56 overflow-hidden rounded-3xl shadow-sm">
-        {image ? (
-          <img src={image} alt="" className="h-full w-full animate-fade-in object-cover" />
+      <div className="relative h-56 overflow-hidden rounded-3xl shadow-sm sm:h-72">
+        {photo ? (
+          <img src={photo.src} alt={c?.title ?? ""} className="h-full w-full animate-fade-in object-cover" />
         ) : (
           <ZoneThumb zone={p!.zone} iconSize={72} className="h-full w-full animate-fade-in" />
         )}
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 to-transparent" />
+        {photo?.credit && <span className="absolute bottom-2 right-3 text-[11px] text-white/80">{t("photoBy")}: {photo.credit}</span>}
         <span className="absolute bottom-4 left-4 rounded-full ring-4 ring-white/80">
           <CodeBadge code={p!.code} size="lg" />
         </span>
