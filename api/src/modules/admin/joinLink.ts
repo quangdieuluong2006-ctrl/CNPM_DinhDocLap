@@ -29,13 +29,13 @@ function score(name: string, ip: string): number {
 // Danh sách link mở trang Đăng ký của Web User, dùng để tạo mã QR cho người tham gia quét.
 export function joinLinks(): JoinLink[] {
   if (env.WEB_USER_PUBLIC_URL) {
-    return [{ url: new URL("/register", env.WEB_USER_PUBLIC_URL).toString(), label: "Địa chỉ công khai", recommended: true }];
+    return [{ url: new URL("/", env.WEB_USER_PUBLIC_URL).toString(), label: "Địa chỉ công khai", recommended: true }];
   }
   const found: { url: string; label: string; score: number }[] = [];
   for (const [name, addrs] of Object.entries(networkInterfaces())) {
     for (const a of addrs ?? []) {
       if (a.family !== "IPv4" || a.internal || a.address.startsWith("169.254.")) continue;
-      found.push({ url: `http://${a.address}:${env.WEB_USER_PORT}/register`, label: name, score: score(name, a.address) });
+      found.push({ url: `http://${a.address}:${env.WEB_USER_PORT}/`, label: name, score: score(name, a.address) });
     }
   }
   found.sort((x, y) => y.score - x.score);

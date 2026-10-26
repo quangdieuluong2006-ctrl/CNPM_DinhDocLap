@@ -43,6 +43,18 @@ export async function register(
   return issueSession(user);
 }
 
+// Khách ẩn danh: tạo tài khoản khách cho thiết bị và cấp phiên ngay (PRD: khách quét QR là dùng, không đăng ký).
+export async function guest(
+  input: { locale: "vi" | "en"; narrationLang?: string; clientType: "web" | "mobile" },
+  ip?: string,
+): Promise<Session> {
+  const id = await repo.insertGuest(input);
+  const user = await repo.findUserById(id);
+  if (!user) throw new Error("Không đọc lại được khách vừa tạo");
+  await logActivity({ userId: id, action: "auth.guest", entityType: "user", entityId: id, ip, detail: { clientType: input.clientType } });
+  return issueSession(user);
+}
+
 export async function login(input: { email: string; password: string; clientType: ClientType }, ip?: string): Promise<Session> {
   const user = await repo.findUserByEmail(input.email);
   const passwordOk = await bcrypt.compare(input.password, user?.password_hash ?? DUMMY_HASH);

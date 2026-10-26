@@ -55,6 +55,7 @@ adminRouter.get("/admin/presence", async (req, res) => {
       fullName: r.full_name,
       email: r.email,
       role: r.role,
+      isGuest: r.is_guest === true,
       clientTypes: (["web", "mobile", "admin"] as const).filter((c) => r[`on_${c}`] === 1),
       openSessions: r.open_sessions,
       onlineSince: r.online_since,
@@ -64,7 +65,7 @@ adminRouter.get("/admin/presence", async (req, res) => {
   });
 });
 
-// Link + mã QR "Mời tham gia": người dùng quét bằng điện thoại để mở trang Đăng ký của Web User.
+// Link + mã QR "Mời tham gia": khách quét bằng điện thoại để mở thẳng Web User (không cần đăng ký).
 adminRouter.get("/admin/join-link", (_req, res) => {
   res.json({ links: joinLinks() });
 });

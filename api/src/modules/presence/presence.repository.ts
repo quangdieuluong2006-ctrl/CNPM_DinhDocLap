@@ -82,6 +82,7 @@ export interface ActiveUserRow {
   full_name: string;
   email: string;
   role: Role;
+  is_guest: boolean;
   last_seen_at: Date;
   online_since: Date;
   open_sessions: number;
