@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { networkInterfaces } from "node:os";
 import { env } from "../../config/env.js";
 
@@ -26,11 +27,23 @@ function score(name: string, ip: string): number {
   return s;
 }
 
-// Danh sách link mở trang Đăng ký của Web User, dùng để tạo mã QR cho người tham gia quét.
+// Link Cloudflare Tunnel đang chạy (scripts/dev-all.mjs ghi vào TUNNEL_URL_FILE, xóa khi tắt). Không có / sai → null.
+function tunnelUrl(): string | null {
+  try {
+    const url = readFileSync(env.TUNNEL_URL_FILE, "utf8").trim();
+    return /^https:\/\/[a-z0-9-]+\.trycloudflare\.com\/?$/.test(url) ? new URL("/", url).toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+// Danh sách link mở trang chủ Web User, dùng để tạo mã QR cho khách quét.
+// Thứ tự ưu tiên: WEB_USER_PUBLIC_URL (đã triển khai) → Cloudflare Tunnel đang chạy (khách dùng 4G vẫn vào) → IP Wi-Fi.
 export function joinLinks(): JoinLink[] {
   if (env.WEB_USER_PUBLIC_URL) {
     return [{ url: new URL("/", env.WEB_USER_PUBLIC_URL).toString(), label: "Địa chỉ công khai", recommended: true }];
   }
+  const tunnel = tunnelUrl();
   const found: { url: string; label: string; score: number }[] = [];
   for (const [name, addrs] of Object.entries(networkInterfaces())) {
     for (const a of addrs ?? []) {
@@ -39,6 +52,10 @@ export function joinLinks(): JoinLink[] {
     }
   }
   found.sort((x, y) => y.score - x.score);
+  if (tunnel) {
+    // Có tunnel: khuyên dùng link công khai, vẫn liệt kê IP Wi-Fi để chọn khi cả lớp dùng chung Wi-Fi
+    return [{ url: tunnel, label: "Cloudflare Tunnel (mọi mạng, kể cả 4G)", recommended: true }, ...found.map((f) => ({ url: f.url, label: f.label, recommended: false }))];
+  }
   // Chỉ khuyên dùng địa chỉ đứng đầu, và chỉ khi nó không phải card ảo
   return found.map((f, i) => ({ url: f.url, label: f.label, recommended: i === 0 && f.score >= 0 }));
 }

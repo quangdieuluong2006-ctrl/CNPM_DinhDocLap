@@ -1,3 +1,6 @@
+import { rmSync, writeFileSync } from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import request from "supertest";
 import { describe, expect, it } from "vitest";
 import { createApp } from "../src/app.js";
@@ -84,5 +87,28 @@ describe("chọn card mạng cho mã QR", () => {
     expect(ranked[0]![0]).toBe("Wi-Fi");
     expect(ranked[1]![0]).toBe("Ethernet");
     expect(ranked.slice(-3).map((c) => c[0])).not.toContain("Wi-Fi");
+  });
+
+  it("có Cloudflare Tunnel đang chạy (tệp .tunnel-url) → mã QR khuyên dùng link công khai; tệp sai/không có → bỏ qua", async () => {
+    const { joinLinks } = await import("../src/modules/admin/joinLink.js");
+    const { env } = await import("../src/config/env.js");
+    const file = path.join(os.tmpdir(), `tunnel-url-test-${process.pid}`);
+    const original = env.TUNNEL_URL_FILE;
+    (env as { TUNNEL_URL_FILE: string }).TUNNEL_URL_FILE = file;
+    try {
+      writeFileSync(file, "https://blue-river-taste-sample.trycloudflare.com\n");
+      const links = joinLinks();
+      expect(links[0]).toEqual({ url: "https://blue-river-taste-sample.trycloudflare.com/", label: expect.stringContaining("Cloudflare"), recommended: true });
+      expect(links.filter((l) => l.recommended)).toHaveLength(1);
+
+      writeFileSync(file, "https://evil.example.com"); // chỉ chấp nhận *.trycloudflare.com
+      expect(joinLinks().some((l) => l.url.includes("evil"))).toBe(false);
+
+      rmSync(file);
+      expect(joinLinks().some((l) => l.url.includes("trycloudflare"))).toBe(false);
+    } finally {
+      rmSync(file, { force: true });
+      (env as { TUNNEL_URL_FILE: string }).TUNNEL_URL_FILE = original;
+    }
   });
 });

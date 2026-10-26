@@ -16,8 +16,13 @@ copy .env.example .env      # sửa DB_PASSWORD cho đúng mật khẩu sa
 npm install
 npm run db:migrate          # tạo CSDL DinhDocLapDB và chạy db/migrations/*.sql
 npm run db:seed             # 10 ngôn ngữ, 9 tài khoản, 12 điểm Dinh Độc Lập × 10 ngôn ngữ, lượt ghé mẫu
-npm run dev                 # http://localhost:3000
+npm run dev                 # chạy CẢ hệ thống: API :3000, Web User :5173, Web Admin :5174, Cloudflare Tunnel
 ```
+
+**Demo chỉ cần `cd api` → `npm run dev`** (lần đầu nhớ `npm install` trong `api`, `web`, `admin`). Script `scripts/dev-all.mjs`
+chạy API, Web User, Web Admin và Cloudflare Tunnel trong một terminal (log có nhãn `[api]` `[web]` `[admin]` `[tunnel]`), in khung
+**LINK CÔNG KHAI** `https://….trycloudflare.com` và ghi link vào `api/.tunnel-url` → mã QR "Mời tham gia" tự dùng link này, không
+cần sửa `.env`. **Ctrl + C** tắt tất cả. Chưa cài `cloudflared` thì vẫn chạy, chỉ dùng được trong cùng Wi-Fi.
 
 Tài khoản mẫu (mật khẩu `Demo@12345`): `admin@demo.vn` (admin), `guide1@demo.vn`, `guide2@demo.vn` (hướng dẫn viên),
 `user1@demo.vn` … `user6@demo.vn`.
@@ -28,7 +33,8 @@ PowerShell báo "running scripts is disabled": chạy một lần `Set-Execution
 
 | Lệnh | Việc |
 |---|---|
-| `npm run dev` | Chạy API, tự tải lại khi sửa code |
+| `npm run dev` | Chạy cả hệ thống để demo: API + Web User + Web Admin + Cloudflare Tunnel (`-- --no-tunnel`: bỏ tunnel) |
+| `npm run dev:api` | Chỉ chạy API, tự tải lại khi sửa code |
 | `npm run db:migrate` · `npm run db:seed` | Chạy migration chưa chạy · nạp dữ liệu mẫu (chạy lại an toàn) |
 | `npm run typecheck` · `npm run lint` | Kiểm tra kiểu · kiểm tra mã |
 | `npm test` | Test đơn vị |
