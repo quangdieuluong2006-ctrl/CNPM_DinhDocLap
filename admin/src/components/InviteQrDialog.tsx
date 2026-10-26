@@ -9,7 +9,7 @@ interface JoinLink {
   recommended: boolean;
 }
 
-// Hộp thoại chiếu mã QR để người dùng thật quét bằng điện thoại và đăng ký tham gia hệ thống.
+// Hộp thoại chiếu mã QR để khách quét bằng điện thoại và dùng Web User ngay (không cần đăng ký).
 // Điện thoại phải dùng CÙNG mạng Wi-Fi với máy đang chạy Web User.
 export function InviteQrDialog({ onClose }: { onClose: () => void }) {
   const links = useQuery({ queryKey: ["join-link"], queryFn: () => apiGet<{ links: JoinLink[] }>("/admin/join-link") });
@@ -43,7 +43,7 @@ export function InviteQrDialog({ onClose }: { onClose: () => void }) {
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-semibold text-slate-900">Quét mã để tham gia</h2>
-        <p className="text-sm text-slate-500">Dùng camera điện thoại quét mã, đăng ký tài khoản và bạn sẽ xuất hiện trong danh sách đang hoạt động.</p>
+        <p className="text-sm text-slate-500">Dùng camera điện thoại quét mã là nghe thuyết minh ngay – không cần đăng ký; khách xuất hiện trong danh sách đang hoạt động với tên "Khách #…".</p>
 
         {links.isPending && <p className="text-slate-500">Đang lấy địa chỉ mạng…</p>}
         {links.isError && <p className="text-red-700">Không lấy được địa chỉ: {links.error.message}</p>}

@@ -1,5 +1,5 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { CheckCircle2, ChevronRight, Clock, Flag, Headphones, LogOut } from "lucide-react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { CheckCircle2, ChevronRight, Clock, Headphones, History } from "lucide-react";
 import { Link } from "react-router";
 import { CodeBadge, ErrorState, Pill } from "../components/ui";
 import { useAuth } from "../features/auth";
@@ -23,9 +23,9 @@ interface MyVisit {
 
 const PAGE_SIZE = 20;
 
-// FE-16 Trang tài khoản: thông tin và lịch sử các điểm đã nghe (GET /me/visits, phân trang).
+// Lịch sử các điểm đã nghe của khách trên trình duyệt này (GET /me/visits, phân trang) – không cần tài khoản.
 export function MePage() {
-  const { user, logout } = useAuth();
+  const { status } = useAuth();
   const { connected } = useRealtime();
   const { ui, t } = usePrefs();
   const visits = useInfiniteQuery({
@@ -33,27 +33,25 @@ export function MePage() {
     queryFn: ({ pageParam }) => authRequest<{ items: MyVisit[]; total: number; page: number }>(`/me/visits?page=${pageParam}&pageSize=${PAGE_SIZE}`),
     initialPageParam: 1,
     getNextPageParam: (last) => (last.page * PAGE_SIZE < last.total ? last.page + 1 : undefined),
+    enabled: status === "ready", // chờ có phiên khách
   });
-  const myTour = useQuery({ queryKey: ["me", "tour"], queryFn: () => authRequest<{ tour: { code: string; name: string } | null }>("/me/tour") });
   const fmt = new Intl.DateTimeFormat(ui === "en" ? "en-GB" : ui, { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh" });
   const items = visits.data?.pages.flatMap((p) => p.items) ?? [];
-  if (!user) return null;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-900 via-brand-800 to-brand-600 p-5 text-white shadow-lg sm:p-6">
         <PalaceArt className="pointer-events-none absolute -bottom-6 -right-10 w-72 text-white/15" />
         <div className="relative flex flex-wrap items-center gap-4">
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gold-500 text-2xl font-bold text-brand-900 shadow-lg ring-4 ring-white/20">
-            {user.fullName.trim().charAt(0).toUpperCase()}
+          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-500 text-brand-900 shadow-lg ring-4 ring-white/20">
+            <History size={28} />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-xl font-semibold">{user.fullName}</p>
-            <p className="text-sm text-white/70">{user.email}</p>
-            <p className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-white/70">
-              {t("memberSince")} {fmt.format(new Date(user.createdAt))}
+            <h1 className="text-xl font-semibold">{t("history")}</h1>
+            <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-white/75">
+              {t("historyHint")}
               {connected && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2 py-0.5 text-white">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2 py-0.5 text-xs text-white">
                   <span className="relative flex h-2 w-2">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-75" />
                     <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-300" />
@@ -63,9 +61,6 @@ export function MePage() {
               )}
             </p>
           </div>
-          <button onClick={() => void logout()} className="inline-flex items-center gap-1.5 rounded-xl border border-white/30 px-4 py-2 text-sm font-medium transition hover:bg-white/10">
-            <LogOut size={15} /> {t("logout")}
-          </button>
         </div>
         {visits.data && (
           <div className="relative mt-5 inline-flex items-center gap-2 rounded-2xl bg-white/10 px-4 py-2 text-sm">
@@ -74,25 +69,10 @@ export function MePage() {
         )}
       </section>
 
-      {myTour.data?.tour && (
-        <Link to={`/tour/${myTour.data.tour.code}`} className="flex animate-fade-up items-center justify-between gap-3 rounded-2xl border border-gold-500 bg-amber-50 p-4 transition hover:bg-amber-100">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gold-500 text-white">
-            <Flag size={18} />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-xs font-bold uppercase tracking-wider text-amber-800">{t("myTour")}</span>
-            <span className="font-semibold">{myTour.data.tour.name}</span> <span className="font-mono text-sm">({myTour.data.tour.code})</span>
-          </span>
-          <span className="font-semibold text-brand-700">{t("open")} →</span>
-        </Link>
-      )}
-
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">
-          {t("history")} {visits.data && <span className="text-stone-400">({visits.data.pages[0]?.total ?? 0})</span>}
-        </h2>
+        {status === "none" && <ErrorState message={t("error")} />}
         {visits.isError && <ErrorState message={t("error")} onRetry={() => void visits.refetch()} retryLabel={t("retry")} />}
-        {visits.isPending && (
+        {status !== "none" && visits.isPending && (
           <div className="space-y-2">
             {Array.from({ length: 4 }, (_, i) => (
               <div key={i} className="skeleton h-[74px]" />

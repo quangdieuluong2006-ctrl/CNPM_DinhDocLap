@@ -1,14 +1,12 @@
-import { Headphones, Home, List, Map as MapIcon, Users } from "lucide-react";
+import { Headphones, History, Home, List, Map as MapIcon } from "lucide-react";
 import { useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router";
-import { useAuth } from "../features/auth";
 import { usePrefs } from "../lib/prefs";
 import { useLanguages } from "../lib/queries";
 import { LanguagePicker } from "./LanguagePicker";
 
 export function Layout() {
   const { lang, t } = usePrefs();
-  const { status, user } = useAuth();
   const languages = useLanguages();
   const [picking, setPicking] = useState(false);
   const location = useLocation();
@@ -17,7 +15,6 @@ export function Layout() {
     { to: "/", label: t("navHome"), end: true, icon: Home },
     { to: "/places", label: t("navPlaces"), end: false, icon: List },
     { to: "/map", label: t("navMap"), end: false, icon: MapIcon },
-    { to: "/tour", label: t("navTour"), end: false, icon: Users },
   ];
 
   return (
@@ -51,15 +48,16 @@ export function Layout() {
             <Headphones size={15} className="inline align-[-2px]" /> <span className="sm:hidden">{lang.toUpperCase()}</span>
             <span className="hidden sm:inline">{current?.nameNative ?? lang.toUpperCase()}</span>
           </button>
-          {status === "authenticated" ? (
-            <Link to="/me" title={t("account")} className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-700 text-sm font-bold text-white">
-              {user?.fullName.trim().charAt(0).toUpperCase()}
-            </Link>
-          ) : (
-            <Link to="/login" className="whitespace-nowrap rounded-lg px-2 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50">
-              {t("login")}
-            </Link>
-          )}
+          <NavLink
+            to="/me"
+            title={t("history")}
+            aria-label={t("history")}
+            className={({ isActive }) =>
+              `flex h-8 w-8 items-center justify-center rounded-full transition-colors ${isActive ? "bg-brand-700 text-white" : "bg-brand-50 text-brand-700 hover:bg-brand-100"}`
+            }
+          >
+            <History size={16} />
+          </NavLink>
         </div>
       </header>
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">

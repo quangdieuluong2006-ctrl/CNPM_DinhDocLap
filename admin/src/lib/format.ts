@@ -55,6 +55,7 @@ export const TRIGGER_LABEL: Record<string, string> = { gps: "Tự động (GPS)"
 // Tên hành động trong nhật ký (PRD v1.0, mục 13.2) → tiếng Việt
 export const ACTION_LABEL: Record<string, string> = {
   "auth.register": "Đăng ký",
+  "auth.guest": "Bắt đầu dùng (khách ẩn danh)",
   "auth.login": "Đăng nhập",
   "auth.login_failed": "Đăng nhập thất bại",
   "auth.logout": "Đăng xuất",

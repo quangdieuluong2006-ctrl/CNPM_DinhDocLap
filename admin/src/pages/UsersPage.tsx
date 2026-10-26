@@ -6,13 +6,15 @@ import { apiGet, apiRequest, ApiError } from "../lib/api";
 import { CLIENT_LABEL, dateTime, ROLE_LABEL, timeAgo } from "../lib/format";
 import type { AdminUser, Page, Role, UserSession } from "../lib/types";
 
-// FE-18 Quản lý người dùng: online/offline, hoạt động gần nhất, nhóm; khóa/mở, đổi vai trò; lịch sử phiên.
+// FE-18 Quản lý người dùng: khách ẩn danh (Web/Mobile tự tạo) và tài khoản quản trị; online/offline, hoạt động gần nhất;
+// khóa/mở, đổi vai trò; lịch sử phiên.
 export function UsersPage() {
   const [q, setQ] = useState("");
   const [search, setSearch] = useState("");
   const [role, setRole] = useState("");
   const [status, setStatus] = useState("");
   const [online, setOnline] = useState("");
+  const [guest, setGuest] = useState("");
   const [page, setPage] = useState(1);
   const [detailId, setDetailId] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
@@ -35,6 +37,7 @@ export function UsersPage() {
   if (role) params.set("role", role);
   if (status) params.set("status", status);
   if (online) params.set("online", online);
+  if (guest) params.set("guest", guest);
   const users = useQuery({ queryKey: ["users", params.toString()], queryFn: () => apiGet<Page<AdminUser>>(`/admin/users?${params}`) });
 
   const filter = (setter: (v: string) => void) => (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -46,7 +49,12 @@ export function UsersPage() {
     <div className="space-y-5">
       <PageHeader title="Người dùng" subtitle="Người đang hoạt động xếp trước. Trạng thái online cập nhật theo thời gian thực." />
       <div className="flex flex-wrap items-center gap-3 text-sm">
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm theo họ tên, email…" className={`${inputCls} max-w-xs`} />
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm theo tên (Khách #…), email…" className={`${inputCls} max-w-xs`} />
+        <select value={guest} onChange={filter(setGuest)} className="rounded-md border px-2 py-2">
+          <option value="">Mọi loại</option>
+          <option value="true">Khách ẩn danh</option>
+          <option value="false">Tài khoản có email</option>
+        </select>
         <select value={role} onChange={filter(setRole)} className="rounded-md border px-2 py-2">
           <option value="">Mọi vai trò</option>
           <option value="user">Khách tham quan</option>
@@ -75,7 +83,6 @@ export function UsersPage() {
               <th className="px-4 py-3 font-medium">Vai trò</th>
               <th className="px-4 py-3 font-medium">Trực tuyến</th>
               <th className="px-4 py-3 font-medium">Hoạt động gần nhất</th>
-              <th className="px-4 py-3 font-medium">Nhóm tham quan</th>
               <th className="px-4 py-3 text-right font-medium">Lượt nghe</th>
               <th className="px-4 py-3 font-medium">Trạng thái</th>
             </tr>
@@ -83,12 +90,12 @@ export function UsersPage() {
           <tbody className="divide-y">
             {users.isPending && (
               <tr>
-                <td colSpan={8} className="px-4 py-6 text-center text-slate-500">Đang tải…</td>
+                <td colSpan={7} className="px-4 py-6 text-center text-slate-500">Đang tải…</td>
               </tr>
             )}
             {users.data?.items.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-6 text-center text-slate-500">Không có người dùng phù hợp</td>
+                <td colSpan={7} className="px-4 py-6 text-center text-slate-500">Không có người dùng phù hợp</td>
               </tr>
             )}
             {users.data?.items.map((u) => (
@@ -96,7 +103,7 @@ export function UsersPage() {
                 <td className="px-4 py-3 tabular-nums text-slate-500">{u.id}</td>
                 <td className="px-4 py-3">
                   <p className="font-medium text-slate-900">{u.fullName}</p>
-                  <p className="text-xs text-slate-500">{u.email}</p>
+                  {u.isGuest ? <Badge tone="blue">Khách ẩn danh</Badge> : <p className="text-xs text-slate-500">{u.email}</p>}
                 </td>
                 <td className="px-4 py-3">{ROLE_LABEL[u.role]}</td>
                 <td className="px-4 py-3">
@@ -109,7 +116,6 @@ export function UsersPage() {
                   )}
                 </td>
                 <td className="px-4 py-3 text-slate-600">{u.lastSeenAt ? timeAgo(u.lastSeenAt, now) : "Chưa từng"}</td>
-                <td className="px-4 py-3">{u.tour ? <Badge tone="blue">{u.tour.code} · {u.tour.name}</Badge> : <span className="text-slate-400">–</span>}</td>
                 <td className="px-4 py-3 text-right tabular-nums">{u.visits}</td>
                 <td className="px-4 py-3">{u.status === "locked" ? <Badge tone="red">Đã khóa</Badge> : <Badge tone="green">Hoạt động</Badge>}</td>
               </tr>
@@ -152,8 +158,8 @@ function UserDetail({ id, onClose }: { id: number; onClose: () => void }) {
         <div className="space-y-5 text-sm">
           <dl className="grid grid-cols-2 gap-x-6 gap-y-2">
             <dt className="text-slate-500">Email</dt>
-            <dd>{u.email}</dd>
-            <dt className="text-slate-500">Ngày đăng ký</dt>
+            <dd>{u.isGuest ? <Badge tone="blue">Khách ẩn danh – không email</Badge> : u.email}</dd>
+            <dt className="text-slate-500">{u.isGuest ? "Bắt đầu dùng" : "Ngày đăng ký"}</dt>
             <dd>{dateTime(u.createdAt)}</dd>
             <dt className="text-slate-500">Ngôn ngữ thuyết minh</dt>
             <dd>{u.narrationLang?.toUpperCase() ?? "–"}</dd>
@@ -165,6 +171,7 @@ function UserDetail({ id, onClose }: { id: number; onClose: () => void }) {
             <p className="rounded-md bg-slate-50 px-3 py-2 text-slate-500">Đây là tài khoản của bạn – không thể tự khóa hoặc đổi vai trò.</p>
           ) : (
             <div className="space-y-3 rounded-lg border p-4">
+              {!u.isGuest && (
               <Field label="Vai trò">
                 <select
                   value={u.role}
@@ -173,10 +180,11 @@ function UserDetail({ id, onClose }: { id: number; onClose: () => void }) {
                   className="rounded-md border px-2 py-2"
                 >
                   <option value="user">Khách tham quan</option>
-                  <option value="guide">Hướng dẫn viên (được tạo nhóm)</option>
+                  <option value="guide">Hướng dẫn viên</option>
                   <option value="admin">Quản trị viên</option>
                 </select>
               </Field>
+              )}
               {u.status === "active" ? (
                 <div className="flex items-end gap-2">
                   <div className="flex-1">

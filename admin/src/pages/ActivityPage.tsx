@@ -7,7 +7,7 @@ import type { ActivityLog, Page } from "../lib/types";
 
 const GROUPS = [
   ["", "Mọi hành động"],
-  ["auth", "Đăng nhập / đăng ký"],
+  ["auth", "Đăng nhập / khách bắt đầu dùng"],
   ["auth.login_failed", "Đăng nhập thất bại"],
   ["place", "Điểm và bài thuyết minh"],
   ["language", "Ngôn ngữ"],

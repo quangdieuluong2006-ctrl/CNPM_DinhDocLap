@@ -1,4 +1,4 @@
-import { Activity, Flag, Languages, LayoutDashboard, LogOut, MapPin, QrCode, Radio, ScrollText, Users, type LucideIcon } from "lucide-react";
+import { Activity, Languages, LayoutDashboard, LogOut, MapPin, QrCode, Radio, ScrollText, Users, type LucideIcon } from "lucide-react";
 import { NavLink, Outlet, useLocation } from "react-router";
 import { useAuth } from "../features/auth/AuthProvider";
 import { useRealtime } from "../features/realtime/RealtimeProvider";
@@ -10,7 +10,6 @@ const navItems: { to: string; label: string; end: boolean; icon: LucideIcon }[] 
   { to: "/users", label: "Người dùng", end: false, icon: Users },
   { to: "/places", label: "Điểm thuyết minh", end: false, icon: MapPin },
   { to: "/languages", label: "Ngôn ngữ", end: false, icon: Languages },
-  { to: "/tours", label: "Nhóm tham quan", end: false, icon: Flag },
   { to: "/activity", label: "Nhật ký hoạt động", end: false, icon: ScrollText },
   { to: "/print-qr", label: "In mã QR", end: false, icon: QrCode },
 ];
