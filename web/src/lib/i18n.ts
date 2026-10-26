@@ -1,4 +1,14 @@
-// Ngôn ngữ giao diện của Web User: tiếng Việt / tiếng Anh (PRD v1.0, mục 4.9). Ngôn ngữ thuyết minh chọn riêng.
+import { de } from "./locales/de";
+import { es } from "./locales/es";
+import { fr } from "./locales/fr";
+import { ja } from "./locales/ja";
+import { ko } from "./locales/ko";
+import { ru } from "./locales/ru";
+import { th } from "./locales/th";
+import { zh } from "./locales/zh";
+
+// Ngôn ngữ giao diện của Web User: đủ 10 ngôn ngữ thuyết minh. Giao diện đi theo ngôn ngữ thuyết minh khách đã chọn,
+// để khách không biết tiếng Anh vẫn hiểu các nút bấm. Tiếng Việt / tiếng Anh ở đây, 8 ngôn ngữ còn lại trong ./locales.
 const vi = {
   brand: "Thuyết minh Dinh Độc Lập",
   navHome: "Trang chủ",
@@ -43,6 +53,7 @@ const vi = {
   step3Text: "Nghe thuyết minh, tua, đổi tốc độ. Đăng nhập để lưu các điểm đã nghe.",
   nowPlaying: "Đang phát",
   photoBy: "Ảnh",
+  photoCollected: "Sưu tầm",
   listens: "lượt nghe",
   loading: "Đang tải…",
   error: "Không tải được dữ liệu",
@@ -162,6 +173,7 @@ const en: Dict = {
   step3Text: "Listen, skip, change the speed. Sign in to keep the places you listened to.",
   nowPlaying: "Now playing",
   photoBy: "Photo",
+  photoCollected: "Collected online",
   listens: "listens",
   loading: "Loading…",
   error: "Could not load data",
@@ -234,11 +246,18 @@ const en: Dict = {
   open: "Open",
 };
 
-export type UiLocale = "vi" | "en";
-const dicts: Record<UiLocale, Dict> = { vi, en };
+export const UI_LOCALES = ["vi", "en", "zh", "ko", "ja", "fr", "de", "ru", "es", "th"] as const;
+export type UiLocale = (typeof UI_LOCALES)[number];
+export const DICTS: Record<UiLocale, Dict> = { vi, en, zh, ko, ja, fr, de, ru, es, th };
+
+// Ngôn ngữ thuyết minh chưa có bản dịch giao diện (quản trị viên thêm ngôn ngữ mới) → giao diện tiếng Anh
+export function uiLocaleFor(lang: string): UiLocale {
+  return (UI_LOCALES as readonly string[]).includes(lang) ? (lang as UiLocale) : "en";
+}
 
 export function translator(locale: UiLocale) {
-  return (key: TKey) => dicts[locale][key];
+  const dict = DICTS[locale];
+  return (key: TKey) => dict[key] || en[key];
 }
 
 // Bỏ dấu, chữ thường – để gõ "nhat" vẫn khớp "Tiếng Nhật", "trinh quoc thu" khớp "Trình Quốc thư".

@@ -13,7 +13,7 @@ export function LanguagePicker({ onClose }: { onClose: () => void }) {
   const items = (languages.data ?? []).filter((l) => matchLanguage(l, q));
 
   return (
-    <Modal title={t("chooseLanguage")} onClose={onClose}>
+    <Modal title={t("chooseLanguage")} onClose={onClose} closeLabel={t("close")}>
       <span className="relative mb-3 block">
         <Search size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
         <input

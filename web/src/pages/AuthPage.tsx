@@ -53,7 +53,7 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
     setBusy(true);
     try {
       if (mode === "login") await login(email.trim(), password);
-      else await register({ email: email.trim(), password, fullName: fullName.trim(), locale: ui, narrationLang: lang });
+      else await register({ email: email.trim(), password, fullName: fullName.trim(), locale: ui === "vi" ? "vi" : "en", narrationLang: lang });
       navigate(from, { replace: true });
     } catch (err) {
       setError(messageKey(err));
@@ -72,7 +72,7 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
           <p className="text-2xl font-semibold leading-snug">{t("heroTitle")}</p>
           <p className="mt-3 text-sm text-white/80">{t("authAside")}</p>
           <p className="mt-4 text-[11px] text-white/50">
-            {t("photoBy")}: {HERO_PHOTO.credit}
+            {t("photoBy")}: {HERO_PHOTO.credit ?? t("photoCollected")}
           </p>
         </div>
       </aside>

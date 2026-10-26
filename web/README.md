@@ -29,7 +29,10 @@ Vite chuyển tiếp `/api`, `/socket.io`, `/media` sang API nên không cần c
 | `/me` | Tài khoản: thông tin, lịch sử các điểm đã nghe (cần đăng nhập) |
 | `/p/:code` | Chi tiết điểm + nghe thuyết minh (đích của mã QR). Có tệp âm thanh → thẻ `<audio>`; không có → giọng đọc của trình duyệt (Web Speech API) |
 
-Ngôn ngữ thuyết minh chọn bằng nút 🎧 (nhớ trong trình duyệt, hoặc truyền `?lang=ja` trên liên kết); ngôn ngữ giao diện đổi bằng nút VI/EN.
+Ngôn ngữ thuyết minh chọn bằng nút 🎧 (nhớ trong trình duyệt, hoặc truyền `?lang=ja` trên liên kết). **Giao diện đổi theo ngôn ngữ thuyết minh**
+– đủ 10 ngôn ngữ (vi, en, zh, ko, ja, fr, de, ru, es, th), để khách không biết tiếng Anh vẫn hiểu các nút bấm. Ngôn ngữ thuyết minh
+mới chưa có bản dịch giao diện → giao diện tiếng Anh. Bản dịch nằm ở `src/lib/i18n.ts` (vi, en) và `src/lib/locales/` (8 ngôn ngữ còn lại);
+test `tests/i18n-locales.test.ts` báo lỗi nếu một ngôn ngữ thiếu câu. Bản dịch tiếng Thái và tiếng Nga cần người bản ngữ xem lại.
 Đã đăng nhập: mở một kết nối Socket.IO (`clientType: "web"`) và gửi nhịp tim 30 giây → người dùng hiện trong
 "Đang hoạt động" của Web Admin; bị admin khóa thì tự đăng xuất (`session.revoked`).
 

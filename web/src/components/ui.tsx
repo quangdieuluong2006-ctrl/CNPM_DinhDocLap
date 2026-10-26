@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 
-export function Modal(props: { title: string; onClose: () => void; children: ReactNode }) {
+export function Modal(props: { title: string; onClose: () => void; children: ReactNode; closeLabel?: string }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && props.onClose();
     window.addEventListener("keydown", onKey);
@@ -17,7 +17,7 @@ export function Modal(props: { title: string; onClose: () => void; children: Rea
       >
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold">{props.title}</h2>
-          <button onClick={props.onClose} aria-label="Đóng" className="rounded-full p-1.5 text-stone-400 hover:bg-stone-100 hover:text-stone-700">
+          <button onClick={props.onClose} aria-label={props.closeLabel ?? "Đóng"} className="rounded-full p-1.5 text-stone-400 hover:bg-stone-100 hover:text-stone-700">
             ✕
           </button>
         </div>
