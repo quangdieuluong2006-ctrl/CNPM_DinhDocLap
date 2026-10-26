@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useT } from "../hooks";
 import { store, useNarration } from "../state/store";
 import { useColors } from "../theme";
-import { CodeBadge } from "./ui";
+import { CodeBadge, Equalizer, PlaceThumb } from "./ui";
 
 // Trình phát thu nhỏ luôn nằm trên thanh tab khi có bài đang phát (PRD v1.0, FE-07).
 export function MiniPlayer() {
@@ -14,14 +14,16 @@ export function MiniPlayer() {
   const cur = n.current;
   if (!cur) return null;
   const progress = n.durationSec > 0 ? n.positionSec / n.durationSec : 0;
+  const place = store.places.find((p) => p.id === cur.placeId);
   return (
     <Pressable onPress={() => router.push("/player")} style={[styles.wrap, { backgroundColor: c.card, borderColor: c.border }]}>
       <View style={[styles.progress, { width: `${Math.min(100, progress * 100)}%`, backgroundColor: c.accent }]} />
-      <CodeBadge code={cur.code} size={36} />
+      {place ? <PlaceThumb place={place} size={40} /> : <CodeBadge code={cur.code} size={36} />}
       <View style={styles.text}>
         <Text numberOfLines={1} style={[styles.title, { color: c.text }]}>{cur.title}</Text>
         <Text style={[styles.sub, { color: c.muted }]}>{cur.engine === "tts" ? t("tts") : cur.lang.toUpperCase()}</Text>
       </View>
+      <Equalizer active={n.status === "playing"} color={c.accent} height={14} />
       <Pressable accessibilityLabel="play-pause" hitSlop={10} onPress={() => store.narration.toggle()}>
         <Ionicons name={n.status === "playing" ? "pause" : "play"} size={28} color={c.primary} />
       </Pressable>

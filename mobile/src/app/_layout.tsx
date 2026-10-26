@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { ActivityIndicator, Alert, View } from "react-native";
 import { translator } from "../i18n";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { store, useApp } from "../state/store";
+import { store, uiLocaleOf, useApp } from "../state/store";
 import { useColors } from "../theme";
 
 export default function RootLayout() {
@@ -13,14 +13,14 @@ export default function RootLayout() {
   useEffect(() => {
     void store.init();
   }, []);
-  // Bị đăng xuất ngoài ý muốn (admin khóa tài khoản, phiên hết hạn) → báo cho người dùng
+  // Admin khóa khách này → báo cho người dùng (nội dung vẫn nghe được). Phiên hết hạn thì app tự tạo khách mới, không báo.
   useEffect(() => {
-    if (!authNotice) return;
-    const t = translator(settings.uiLocale);
-    Alert.alert(t("account"), authNotice === "ACCOUNT_LOCKED" ? t("lockedNotice") : t("expiredNotice"), [
+    if (authNotice !== "ACCOUNT_LOCKED") return;
+    const t = translator(uiLocaleOf(settings));
+    Alert.alert(t("appName"), t("lockedNotice"), [
       { text: t("ok"), onPress: () => store.clearAuthNotice() },
     ]);
-  }, [authNotice, settings.uiLocale]);
+  }, [authNotice, settings]);
   if (!ready) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: c.bg }}>
@@ -40,8 +40,6 @@ export default function RootLayout() {
         <Stack.Screen name="scan" options={{ title: "", presentation: "modal" }} />
         <Stack.Screen name="p/[code]" options={{ headerShown: false }} />
         <Stack.Screen name="welcome" options={{ headerShown: false }} />
-        <Stack.Screen name="login" options={{ title: "", presentation: "modal" }} />
-        <Stack.Screen name="register" options={{ title: "", presentation: "modal" }} />
       </Stack>
     </SafeAreaProvider>
   );

@@ -2,10 +2,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import { Pressable, SectionList, StyleSheet, Text, TextInput, View } from "react-native";
-import { CodeBadge, Pill } from "../../components/ui";
+import { FadeIn, Pill, PlaceThumb } from "../../components/ui";
 import { bearingDeg, formatDistance } from "../../core/geo";
 import { useT } from "../../hooks";
 import { fold, type TKey } from "../../i18n";
+import { zoneStyle } from "../../photos";
 import type { Place } from "../../services/api";
 import { store, useApp } from "../../state/store";
 import { useColors } from "../../theme";
@@ -76,14 +77,23 @@ export default function PlacesScreen() {
         </View>
       }
       renderSectionHeader={({ section }) => (
-        <Text style={[styles.section, { color: c.muted }]}>{t(section.zone as TKey)}</Text>
+        <View style={styles.sectionRow}>
+          <Ionicons name={zoneStyle(section.zone).icon} size={14} color={c.muted} />
+          <Text style={[styles.section, { color: c.muted }]}>
+            {t(section.zone as TKey)} · {section.data.length}
+          </Text>
+        </View>
       )}
-      renderItem={({ item: p }) => {
+      renderItem={({ item: p, index }) => {
         const dist = p.trigger === "gps" ? store.distanceTo(p) : null;
         const isDone = app.completed.includes(p.id);
         return (
-          <Pressable onPress={() => router.push(`/place/${p.code}`)} style={[styles.row, { backgroundColor: c.card, borderColor: c.border }]}>
-            <CodeBadge code={p.code} color={isDone ? c.markerDone : c.primary} />
+          <FadeIn delay={Math.min(index, 8) * 50}>
+          <Pressable
+            onPress={() => router.push(`/place/${p.code}`)}
+            style={({ pressed }) => [styles.row, { backgroundColor: c.card, borderColor: c.border, transform: [{ scale: pressed ? 0.98 : 1 }] }]}
+          >
+            <PlaceThumb place={p} dim={isDone} />
             <View style={{ flex: 1, gap: 3 }}>
               <Text numberOfLines={1} style={{ color: c.text, fontWeight: "600", fontSize: 16 }}>{p.content?.title ?? p.code}</Text>
               <Text numberOfLines={1} style={{ color: c.muted, fontSize: 13 }}>{p.content?.summary}</Text>
@@ -93,8 +103,9 @@ export default function PlacesScreen() {
               </View>
             </View>
             {dist !== null && <Text style={{ color: c.muted, fontSize: 13 }}>{formatDistance(dist)}</Text>}
-            {isDone && <Ionicons name="checkmark-circle" size={20} color={c.done} />}
+            {isDone ? <Ionicons name="checkmark-circle" size={20} color={c.done} /> : <Ionicons name="chevron-forward" size={18} color={c.border} />}
           </Pressable>
+          </FadeIn>
         );
       }}
     />
@@ -102,11 +113,12 @@ export default function PlacesScreen() {
 }
 
 const styles = StyleSheet.create({
-  progressCard: { borderWidth: 1, borderRadius: 14, padding: 14, gap: 10 },
+  progressCard: { borderWidth: 1, borderRadius: 16, padding: 14, gap: 10 },
   bar: { height: 8, borderRadius: 4, overflow: "hidden" },
   barFill: { height: 8, borderRadius: 4 },
   nextRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   search: { flexDirection: "row", alignItems: "center", gap: 8, borderWidth: 1, borderRadius: 12, paddingHorizontal: 12 },
-  section: { fontSize: 13, fontWeight: "700", textTransform: "uppercase", marginTop: 12, marginBottom: 4, letterSpacing: 0.5 },
-  row: { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderRadius: 12, borderWidth: 1, marginBottom: 8 },
+  sectionRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 12, marginBottom: 4 },
+  section: { fontSize: 13, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.5 },
+  row: { flexDirection: "row", alignItems: "center", gap: 12, padding: 10, borderRadius: 14, borderWidth: 1, marginBottom: 8 },
 });

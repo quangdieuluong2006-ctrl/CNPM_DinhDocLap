@@ -1,10 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import { Button, CodeBadge, Pill } from "../../components/ui";
+import { Button, CodeBadge, FadeIn, Pill, ZoneTile } from "../../components/ui";
 import { formatDistance } from "../../core/geo";
 import { useT } from "../../hooks";
 import type { TKey } from "../../i18n";
+import { placePhoto } from "../../photos";
 import { store, useApp, useNarration } from "../../state/store";
 import { useColors } from "../../theme";
 
@@ -27,15 +28,25 @@ export default function PlaceDetail() {
   const content = place.content;
   const isCurrent = n.current?.placeId === place.id;
   const dist = place.trigger === "gps" ? store.distanceTo(place) : null;
-  const image = store.api.mediaUrl(place.imageUrl);
+  const photo = placePhoto(place, (u) => store.api.mediaUrl(u));
 
   return (
     <ScrollView style={{ backgroundColor: c.bg }} contentContainerStyle={{ paddingBottom: 40 }}>
       <Stack.Screen options={{ title: place.code }} />
-      {image ? <Image source={{ uri: image }} style={styles.hero} /> : <View style={[styles.hero, { backgroundColor: c.primary, opacity: 0.12 }]} />}
-      <View style={styles.body}>
+      <View style={styles.hero}>
+        {photo ? <Image source={photo.source} style={styles.heroImg} resizeMode="cover" /> : <ZoneTile zone={place.zone} iconSize={64} style={StyleSheet.absoluteFill} />}
+        <View style={styles.heroShade} />
+        <View style={styles.heroBadge}>
+          <CodeBadge code={place.code} size={52} />
+        </View>
+        {photo && photo.credit !== "" && (
+          <Text style={styles.credit}>
+            {t("photoBy")}: {photo.credit ?? t("photoCollected")}
+          </Text>
+        )}
+      </View>
+      <FadeIn style={styles.body}>
         <View style={styles.titleRow}>
-          <CodeBadge code={place.code} size={48} />
           <View style={{ flex: 1 }}>
             <Text style={[styles.title, { color: c.text }]}>{content?.title ?? place.code}</Text>
             <Text style={{ color: c.muted }}>{t(place.zone as TKey)}{dist !== null ? ` · ${formatDistance(dist)}` : ""}</Text>
@@ -60,14 +71,18 @@ export default function PlaceDetail() {
         )}
         <Text style={[styles.summary, { color: c.text }]}>{content?.summary}</Text>
         <Text style={[styles.text, { color: c.text }]}>{content?.body}</Text>
-      </View>
+      </FadeIn>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
-  hero: { width: "100%", height: 180 },
+  hero: { width: "100%", height: 230, overflow: "hidden" },
+  heroImg: { width: "100%", height: "100%" },
+  heroShade: { position: "absolute", left: 0, right: 0, bottom: 0, height: 80, backgroundColor: "#00000040" },
+  heroBadge: { position: "absolute", left: 16, bottom: 14, borderRadius: 999, borderWidth: 3, borderColor: "#ffffffcc" },
+  credit: { position: "absolute", right: 10, bottom: 8, color: "#ffffffcc", fontSize: 11 },
   body: { padding: 16, gap: 14 },
   titleRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   title: { fontSize: 22, fontWeight: "700" },

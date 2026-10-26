@@ -70,26 +70,8 @@ export interface User {
   status: "active" | "locked";
   uiLocale: "vi" | "en";
   narrationLang: string | null;
+  isGuest: boolean;
   createdAt: string;
-}
-
-export interface Tour {
-  id: number;
-  code: string;
-  name: string;
-  guide: { id: number; fullName: string };
-  status: "active" | "ended";
-  maxMembers: number;
-  memberCount: number;
-}
-
-export interface TourMember {
-  userId: number;
-  fullName: string;
-  isGuide: boolean;
-  online: boolean;
-  currentPlaceId: number | null;
-  currentPlaceCode: string | null;
 }
 
 // Mobile nhận refresh token trong body (không dùng cookie như web) – lưu trong expo-secure-store (PRD v1.0, mục 11.1).
@@ -152,27 +134,12 @@ export function createApi(
       const r = await request<ContentBundle>(`/content/bundle?lang=${lang}`, { headers: etag ? { "If-None-Match": etag } : {} });
       return r.status === 304 ? null : { bundle: r.body, etag: r.etag };
     },
-    login: async (email: string, password: string) =>
-      (await postJson<MobileSession>("/auth/login", { email, password, clientType: "mobile" })).body,
-    register: async (input: { email: string; password: string; fullName: string; locale: "vi" | "en"; narrationLang?: string }) =>
-      (await postJson<MobileSession>("/auth/register", { ...input, clientType: "mobile" })).body,
+    // Khách ẩn danh: không email/mật khẩu, nhận refreshToken trong body để lưu vào expo-secure-store
+    guest: async (input: { locale: "vi" | "en"; narrationLang?: string }) =>
+      (await postJson<MobileSession>("/auth/guest", { ...input, clientType: "mobile" })).body,
     refresh: async (refreshToken: string) =>
       (await postJson<MobileSession>("/auth/refresh", { clientType: "mobile", refreshToken })).body,
-    logout: async (refreshToken: string) => {
-      await postJson<void>("/auth/logout", { clientType: "mobile", refreshToken });
-    },
     me: async () => (await request<User>("/me")).body,
-    // Nhóm tham quan (PRD v1.0, FE-10)
-    myTour: async () => (await request<{ tour: Tour | null }>("/me/tour")).body.tour,
-    joinTour: async (code: string) => (await postJson<{ result: string; tour: Tour }>(`/tours/${encodeURIComponent(code)}/join`, {})).body.tour,
-    leaveTour: async (id: number) => {
-      await postJson<void>(`/tours/${id}/leave`, {});
-    },
-    createTour: async (name: string, maxMembers: number) => (await postJson<Tour>("/tours", { name, maxMembers })).body,
-    endTour: async (id: number) => {
-      await postJson<void>(`/tours/${id}/end`, {});
-    },
-    tourMembers: async (id: number) => (await request<{ tour: Tour; members: TourMember[] }>(`/tours/${id}/members`)).body,
     sendVisits: async (visits: VisitPayload[]) =>
       (await request<{ accepted: number; duplicates: number; rejected: number }>("/visits/batch", {
         method: "POST",

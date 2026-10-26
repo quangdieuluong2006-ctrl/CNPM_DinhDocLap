@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { CodeBadge, Pill } from "../components/ui";
+import { CodeBadge, Equalizer, FadeIn, Pill, PlaceThumb, PulseRing } from "../components/ui";
 import { RATES } from "../core/narration";
 import { formatTime, useT } from "../hooks";
 import { store, useNarration } from "../state/store";
@@ -43,10 +43,17 @@ export default function PlayerScreen() {
   const progress = n.durationSec > 0 ? n.positionSec / n.durationSec : 0;
   const isAudio = cur.engine === "audio";
   const nextRate = RATES[(RATES.indexOf(n.rate as (typeof RATES)[number]) + 1) % RATES.length]!;
+  const playing = n.status === "playing";
 
   return (
     <ScrollView style={{ backgroundColor: c.bg }} contentContainerStyle={styles.root}>
-      <CodeBadge code={cur.code} size={72} />
+      <FadeIn style={{ ...styles.cover, shadowColor: c.primary }}>
+        {place ? <PlaceThumb place={place} size={200} /> : <CodeBadge code={cur.code} size={72} />}
+      </FadeIn>
+      <View style={styles.nowRow}>
+        <Equalizer active={playing} color={c.accent} />
+        <Text style={{ color: c.accent, fontWeight: "700", fontSize: 13 }}>{playing ? t("nowPlaying") : t("listen")}</Text>
+      </View>
       <Text style={[styles.title, { color: c.text }]}>{cur.title}</Text>
       <View style={{ flexDirection: "row", gap: 6 }}>
         <Pill tone="info" text={cur.lang.toUpperCase()} />
@@ -67,9 +74,15 @@ export default function PlayerScreen() {
         <Pressable disabled={!isAudio} onPress={() => store.narration.seekBy(-10)} style={{ opacity: isAudio ? 1 : 0.3 }}>
           <Ionicons name="play-back" size={30} color={c.text} />
         </Pressable>
-        <Pressable onPress={() => store.narration.toggle()} style={[styles.play, { backgroundColor: c.primary }]}>
-          <Ionicons name={n.status === "playing" ? "pause" : "play"} size={36} color={c.primaryText} />
-        </Pressable>
+        <View style={styles.playWrap}>
+          <PulseRing active={playing} size={76} color={c.primary} />
+          <Pressable
+            onPress={() => store.narration.toggle()}
+            style={({ pressed }) => [styles.play, { backgroundColor: c.primary, transform: [{ scale: pressed ? 0.94 : 1 }] }]}
+          >
+            <Ionicons name={playing ? "pause" : "play"} size={36} color={c.primaryText} />
+          </Pressable>
+        </View>
         <Pressable disabled={!isAudio} onPress={() => store.narration.seekBy(10)} style={{ opacity: isAudio ? 1 : 0.3 }}>
           <Ionicons name="play-forward" size={30} color={c.text} />
         </Pressable>
@@ -108,6 +121,9 @@ const styles = StyleSheet.create({
   times: { flexDirection: "row", justifyContent: "space-between" },
   controls: { flexDirection: "row", alignItems: "center", gap: 36 },
   play: { width: 76, height: 76, borderRadius: 38, alignItems: "center", justifyContent: "center" },
+  playWrap: { width: 76, height: 76, alignItems: "center", justifyContent: "center" },
+  cover: { borderRadius: 16, shadowOpacity: 0.25, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 8, marginTop: 4 },
+  nowRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   row: { flexDirection: "row", flexWrap: "wrap", gap: 8, justifyContent: "center" },
   chip: { flexDirection: "row", alignItems: "center", gap: 6, borderWidth: 1, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
   text: { alignSelf: "stretch", fontSize: 16, lineHeight: 25, marginTop: 8 },

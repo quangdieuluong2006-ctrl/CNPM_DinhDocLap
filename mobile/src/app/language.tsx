@@ -6,7 +6,7 @@ import { Button, Pill } from "../components/ui";
 import { useT } from "../hooks";
 import { fold } from "../i18n";
 import type { Language } from "../services/api";
-import { store, useApp } from "../state/store";
+import { store, uiLocaleOf, useApp } from "../state/store";
 import { useColors } from "../theme";
 import { getLocales } from "expo-localization";
 
@@ -73,7 +73,7 @@ export default function LanguageScreen() {
               <View style={{ flex: 1, gap: 2 }}>
                 <Text style={[styles.native, { color: c.text }]}>{l.nameNative}</Text>
                 <Text style={{ color: c.muted }}>
-                  {settings.uiLocale === "vi" ? l.nameVi : l.nameEn} · {l.code}
+                  {uiLocaleOf(settings) === "vi" ? l.nameVi : l.nameEn} · {l.code}
                 </Text>
                 {l.pending > 0 && <Pill text={t("reviewing")} tone="info" />}
               </View>

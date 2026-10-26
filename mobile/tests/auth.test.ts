@@ -4,7 +4,7 @@ import { ApiError, createApi } from "../src/services/api";
 
 const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 
-describe("đăng nhập trên Mobile (FE-01)", () => {
+describe("phiên khách ẩn danh trên Mobile", () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it("singleFlight: 3 lần gọi đồng thời chỉ chạy hàm một lần; xong rồi gọi lại thì chạy lần mới", async () => {
@@ -18,15 +18,16 @@ describe("đăng nhập trên Mobile (FE-01)", () => {
     expect(await refresh()).toBe(2);
   });
 
-  it("đăng nhập gửi clientType=mobile, nhận refreshToken trong body", async () => {
-    const fetchMock = vi.fn(async () => json(200, { accessToken: "a1", expiresIn: 900, refreshToken: "r1", user: { id: 2 } }));
+  it("khách ẩn danh: gọi /auth/guest với clientType=mobile, nhận refreshToken trong body (không email/mật khẩu)", async () => {
+    const fetchMock = vi.fn(async () => json(201, { accessToken: "a1", expiresIn: 900, refreshToken: "r1", user: { id: 2, isGuest: true } }));
     vi.stubGlobal("fetch", fetchMock);
     const api = createApi(() => "http://api");
-    const s = await api.login("user1@demo.vn", "Demo@12345");
+    const s = await api.guest({ locale: "en", narrationLang: "ja" });
     expect(s.refreshToken).toBe("r1");
+    expect(s.user.isGuest).toBe(true);
     const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
-    expect(url).toBe("http://api/api/v1/auth/login");
-    expect(JSON.parse(init.body as string)).toMatchObject({ clientType: "mobile" });
+    expect(url).toBe("http://api/api/v1/auth/guest");
+    expect(JSON.parse(init.body as string)).toEqual({ locale: "en", narrationLang: "ja", clientType: "mobile" });
   });
 
   it("access token hết hạn → làm mới một lần rồi gửi lại request với token mới", async () => {

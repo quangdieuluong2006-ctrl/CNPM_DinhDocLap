@@ -1,9 +1,18 @@
-// Ngôn ngữ giao diện: tiếng Việt và tiếng Anh (PRD v1.0, mục 4.9). Ngôn ngữ thuyết minh chọn riêng.
+import { de } from "./locales/de";
+import { es } from "./locales/es";
+import { fr } from "./locales/fr";
+import { ja } from "./locales/ja";
+import { ko } from "./locales/ko";
+import { ru } from "./locales/ru";
+import { th } from "./locales/th";
+import { zh } from "./locales/zh";
+
+// Ngôn ngữ giao diện: đủ 10 ngôn ngữ thuyết minh, đi theo ngôn ngữ thuyết minh khách đã chọn (chưa chọn → ngôn ngữ của máy),
+// để khách không biết tiếng Anh vẫn hiểu các nút bấm. Tiếng Việt / tiếng Anh ở đây, 8 ngôn ngữ còn lại trong ./locales.
 const vi = {
   appName: "Thuyết minh Dinh Độc Lập",
   tabMap: "Bản đồ",
   tabPlaces: "Điểm",
-  tabTour: "Nhóm",
   tabSettings: "Cài đặt",
   chooseLanguage: "Chọn ngôn ngữ thuyết minh",
   searchLanguage: "Tìm: nhật, japanese, 日本, ja…",
@@ -11,12 +20,10 @@ const vi = {
   tryEnglish: "Dùng tiếng Anh",
   reviewing: "Bản dịch đang được kiểm duyệt",
   points: "điểm",
-  continue: "Tiếp tục",
   loading: "Đang tải nội dung…",
   offlineNoData: "Chưa có mạng và chưa tải nội dung. Kiểm tra kết nối tới máy chủ trong Cài đặt.",
   listen: "Nghe thuyết minh",
   listenNow: "Nghe ngay",
-  later: "Để sau",
   nearPlace: "Bạn đang ở gần",
   searchPlace: "Tìm theo tên hoặc số điểm",
   progress: "Đã nghe",
@@ -45,7 +52,6 @@ const vi = {
   speed: "Tốc độ",
   replay: "Phát lại",
   settingsLanguage: "Ngôn ngữ thuyết minh",
-  settingsUi: "Ngôn ngữ giao diện",
   settingsAutoPlay: "Tự động thuyết minh theo vị trí",
   settingsSimulate: "Chế độ mô phỏng vị trí",
   settingsServer: "Máy chủ API",
@@ -67,57 +73,11 @@ const vi = {
   welcomeText: "Nghe thuyết minh bằng ngôn ngữ của bạn. Ngoài trời, ứng dụng tự phát khi bạn đến gần từng điểm; trong nhà, quét mã QR tại cửa phòng.",
   startGuest: "Bắt đầu tham quan",
   guestHint: "Không cần tài khoản",
-  loginOrRegister: "Đăng nhập / Đăng ký",
-  accountHint: "Lưu lịch sử nghe và tham gia nhóm cùng hướng dẫn viên",
-  login: "Đăng nhập",
-  register: "Đăng ký",
-  logout: "Đăng xuất",
-  account: "Tài khoản",
-  email: "Email",
-  password: "Mật khẩu",
-  fullName: "Họ và tên",
-  show: "Hiện",
-  hide: "Ẩn",
-  passwordHint: "Ít nhất 8 ký tự, có cả chữ và số",
-  noAccount: "Chưa có tài khoản?",
-  haveAccount: "Đã có tài khoản?",
-  errInvalid: "Email hoặc mật khẩu không đúng",
-  errLocked: "Tài khoản đã bị khóa – bạn vẫn dùng được chế độ khách",
-  errEmailTaken: "Email này đã được đăng ký – hãy đăng nhập",
-  errRate: "Bạn đã thử quá nhiều lần, vui lòng đợi rồi thử lại",
-  errNetwork: "Không kết nối được máy chủ – kiểm tra địa chỉ trong Cài đặt",
-  errValidation: "Thông tin chưa hợp lệ – mật khẩu ít nhất 8 ký tự, có chữ và số",
-  errUnknown: "Đã có lỗi xảy ra, vui lòng thử lại",
   lockedNotice: "Tài khoản của bạn đã bị khóa nên đã được đăng xuất. Bạn vẫn nghe thuyết minh ở chế độ khách.",
-  expiredNotice: "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
   guestMode: "Bạn đang dùng chế độ khách",
   online: "Đang trực tuyến",
   offline: "Ngoại tuyến",
-  tourNeedLogin: "Đăng nhập để tham gia nhóm tham quan cùng hướng dẫn viên.",
-  tourTitle: "Nhóm tham quan",
-  tourJoinTitle: "Tham gia nhóm",
-  tourJoinHint: "Nhập mã 6 ký tự hướng dẫn viên đưa cho bạn",
-  tourJoin: "Tham gia",
-  tourCreateTitle: "Tạo nhóm mới (hướng dẫn viên)",
-  tourName: "Tên nhóm, ví dụ: Đoàn Hàn Quốc 28/10",
-  tourCreate: "Tạo nhóm",
-  tourCode: "Mã nhóm",
-  tourShare: "Chia sẻ mã",
-  tourShareMessage: "Tham gia nhóm tham quan Dinh Độc Lập: mở ứng dụng → tab Nhóm → nhập mã",
-  tourGuide: "Hướng dẫn viên",
-  tourMembers: "Thành viên",
-  tourListening: "đang nghe",
-  tourLeave: "Rời nhóm",
-  tourEnd: "Kết thúc nhóm",
-  tourEndConfirm: "Kết thúc nhóm? Mọi thành viên sẽ rời nhóm.",
-  tourEndedNotice: "Nhóm đã kết thúc",
-  tourPrivacy: "Nhóm chỉ thấy điểm bạn đang nghe, không thấy vị trí GPS của bạn.",
-  tourErrNotFound: "Không tìm thấy nhóm – kiểm tra lại mã",
-  tourErrEnded: "Nhóm đã kết thúc",
-  tourErrFull: "Nhóm đã đủ thành viên",
-  tourErrOther: "Bạn đang ở một nhóm khác – hãy rời nhóm đó trước",
   cancel: "Hủy",
-  you: "bạn",
   apiAuto: "Địa chỉ tự động (theo máy chạy Expo)",
   inUse: "đang dùng",
   useAuto: "Dùng địa chỉ tự động",
@@ -125,16 +85,18 @@ const vi = {
   retry: "Thử lại",
   audioFailed: "Không tải được tệp âm thanh – bạn có thể đọc nội dung",
   ok: "OK",
+  photoBy: "Ảnh",
+  photoCollected: "Sưu tầm",
+  nowPlaying: "Đang phát",
   stop: "Dừng",
 };
 
-type Dict = typeof vi;
+export type Dict = typeof vi;
 
 const en: Dict = {
   appName: "Independence Palace Audio Guide",
   tabMap: "Map",
   tabPlaces: "Places",
-  tabTour: "Group",
   tabSettings: "Settings",
   chooseLanguage: "Choose narration language",
   searchLanguage: "Search: japanese, 日本, ja…",
@@ -142,12 +104,10 @@ const en: Dict = {
   tryEnglish: "Use English",
   reviewing: "Translation under review",
   points: "places",
-  continue: "Continue",
   loading: "Loading content…",
   offlineNoData: "No connection and no downloaded content. Check the server address in Settings.",
   listen: "Listen",
   listenNow: "Listen now",
-  later: "Later",
   nearPlace: "You are near",
   searchPlace: "Search by name or number",
   progress: "Listened",
@@ -176,7 +136,6 @@ const en: Dict = {
   speed: "Speed",
   replay: "Replay",
   settingsLanguage: "Narration language",
-  settingsUi: "App language",
   settingsAutoPlay: "Automatic narration by location",
   settingsSimulate: "Location simulation",
   settingsServer: "API server",
@@ -198,57 +157,11 @@ const en: Dict = {
   welcomeText: "Hear the narration in your language. Outdoors, the app plays automatically when you reach each stop; indoors, scan the QR code at the room's door.",
   startGuest: "Start the tour",
   guestHint: "No account needed",
-  loginOrRegister: "Sign in / Sign up",
-  accountHint: "Keep your listening history and join guided groups",
-  login: "Sign in",
-  register: "Sign up",
-  logout: "Sign out",
-  account: "Account",
-  email: "Email",
-  password: "Password",
-  fullName: "Full name",
-  show: "Show",
-  hide: "Hide",
-  passwordHint: "At least 8 characters with letters and numbers",
-  noAccount: "No account yet?",
-  haveAccount: "Already have an account?",
-  errInvalid: "Incorrect email or password",
-  errLocked: "This account is locked – you can still use guest mode",
-  errEmailTaken: "This email is already registered – please sign in",
-  errRate: "Too many attempts, please wait and try again",
-  errNetwork: "Cannot reach the server – check the address in Settings",
-  errValidation: "Invalid information – password needs 8+ characters with letters and numbers",
-  errUnknown: "Something went wrong, please try again",
   lockedNotice: "Your account was locked so you have been signed out. You can keep listening as a guest.",
-  expiredNotice: "Your session has expired, please sign in again.",
   guestMode: "You are using guest mode",
   online: "Online",
   offline: "Offline",
-  tourNeedLogin: "Sign in to join a tour group with a guide.",
-  tourTitle: "Tour group",
-  tourJoinTitle: "Join a group",
-  tourJoinHint: "Enter the 6-character code from your guide",
-  tourJoin: "Join",
-  tourCreateTitle: "Create a group (guides)",
-  tourName: "Group name, e.g. Korean group 28/10",
-  tourCreate: "Create group",
-  tourCode: "Group code",
-  tourShare: "Share code",
-  tourShareMessage: "Join the Independence Palace tour group: open the app → Group tab → enter code",
-  tourGuide: "Guide",
-  tourMembers: "Members",
-  tourListening: "listening to",
-  tourLeave: "Leave group",
-  tourEnd: "End group",
-  tourEndConfirm: "End the group? All members will leave.",
-  tourEndedNotice: "The group has ended",
-  tourPrivacy: "The group only sees which place you are listening to, never your GPS location.",
-  tourErrNotFound: "Group not found – check the code",
-  tourErrEnded: "This group has ended",
-  tourErrFull: "This group is full",
-  tourErrOther: "You are in another group – leave it first",
   cancel: "Cancel",
-  you: "you",
   apiAuto: "Automatic address (computer running Expo)",
   inUse: "in use",
   useAuto: "Use automatic address",
@@ -256,15 +169,25 @@ const en: Dict = {
   retry: "Retry",
   audioFailed: "Could not load the audio – you can read the text",
   ok: "OK",
+  photoBy: "Photo",
+  photoCollected: "Collected online",
+  nowPlaying: "Now playing",
   stop: "Stop",
 };
 
-export type UiLocale = "vi" | "en";
 export type TKey = keyof Dict;
-const dicts: Record<UiLocale, Dict> = { vi, en };
+export const UI_LOCALES = ["vi", "en", "zh", "ko", "ja", "fr", "de", "ru", "es", "th"] as const;
+export type UiLocale = (typeof UI_LOCALES)[number];
+export const DICTS: Record<UiLocale, Dict> = { vi, en, zh, ko, ja, fr, de, ru, es, th };
+
+// Ngôn ngữ chưa có bản dịch giao diện (quản trị viên thêm ngôn ngữ thuyết minh mới) → giao diện tiếng Anh
+export function uiLocaleFor(lang: string): UiLocale {
+  return (UI_LOCALES as readonly string[]).includes(lang) ? (lang as UiLocale) : "en";
+}
 
 export function translator(locale: UiLocale) {
-  return (key: TKey) => dicts[locale][key];
+  const dict = DICTS[locale];
+  return (key: TKey) => dict[key] || en[key];
 }
 
 // Bỏ dấu, chữ thường – để gõ "nhat" vẫn khớp "Tiếng Nhật".

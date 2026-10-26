@@ -1,10 +1,11 @@
 import { useMemo } from "react";
 import { translator } from "./i18n";
-import { useApp } from "./state/store";
+import { uiLocaleOf, useApp } from "./state/store";
 
 export function useT() {
   const { settings } = useApp();
-  return useMemo(() => translator(settings.uiLocale), [settings.uiLocale]);
+  const ui = uiLocaleOf(settings);
+  return useMemo(() => translator(ui), [ui]);
 }
 
 export function formatTime(sec: number): string {
