@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { authRequest, clearSession, getAccessToken, sendVisit, startGuest } from "../src/lib/api";
+import { authRequest, clearSession, getAccessToken, sendVisit, startGuest, uuidV4 } from "../src/lib/api";
 
 const session = (token: string) => ({
   accessToken: token,
@@ -57,5 +57,15 @@ describe("lớp gọi API của Web User", () => {
     sendVisit(visit);
     [, init] = fetchMock.mock.calls[2] as unknown as [string, RequestInit];
     expect(new Headers(init.headers).get("Authorization")).toBe("Bearer tok-2");
+  });
+
+  it("mở bằng http://<IP> (không có crypto.randomUUID): vẫn tạo clientId UUID v4 và gửi được lượt nghe", () => {
+    const fetchMock = vi.fn(async () => json(201, {}));
+    vi.stubGlobal("fetch", fetchMock);
+    const real = globalThis.crypto;
+    vi.stubGlobal("crypto", { getRandomValues: (a: Uint8Array<ArrayBuffer>) => real.getRandomValues(a) });
+    expect(uuidV4()).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    expect(() => sendVisit({ placeId: 7, lang: "vi", trigger: "qr", listenedSec: 5, completed: false, startedAt: "2026-10-27T03:00:00Z" })).not.toThrow();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
