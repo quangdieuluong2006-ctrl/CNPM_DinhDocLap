@@ -12,6 +12,6 @@ describe("ảnh của điểm", () => {
     expect(p?.credit).not.toBe("");
   });
   it("điểm không có ảnh nào → null (giao diện dùng ô màu theo khu vực)", () => {
-    expect(placePhoto({ code: "201", imageUrl: null })).toBeNull();
+    expect(placePhoto({ code: "999", imageUrl: null })).toBeNull();
   });
 });
