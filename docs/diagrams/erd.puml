@@ -9,10 +9,11 @@ entity users {
   *id : INT
   --
   email : NVARCHAR(255) UQ
-  password_hash
+  password_hash NULL
   full_name
   role : user|guide|admin
   status : active|locked
+  is_guest : BIT
   locked_reason
   ui_locale
   narration_lang FK
@@ -79,7 +80,7 @@ entity content_releases {
   published_by FK
   published_at, note
 }
-entity tours {
+entity "tours (không dùng từ v1.1)" as tours {
   *id
   --
   code CHAR(6) UQ
@@ -89,7 +90,7 @@ entity tours {
   max_members
   created_at, ended_at
 }
-entity tour_members {
+entity "tour_members (không dùng từ v1.1)" as tour_members {
   *tour_id FK
   *user_id FK
   --

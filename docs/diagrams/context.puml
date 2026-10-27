@@ -1,8 +1,7 @@
 @startuml
 !include skin.iuml
 left to right direction
-actor "Khách tham quan" as V
-actor "Hướng dẫn viên" as G
+actor "Khách tham quan\n(ẩn danh)" as V
 actor "Biên tập viên /\nQuản trị viên" as A
 rectangle "Hệ thống thuyết minh đa ngôn ngữ theo vị trí" as S {
   component "Mobile App\n(React Native)" as M
@@ -14,8 +13,7 @@ rectangle "Hệ thống thuyết minh đa ngôn ngữ theo vị trí" as S {
 cloud "Vệ tinh GPS\n(dịch vụ định vị thiết bị)" as GPS
 rectangle "Biển QR + số điểm\ntại các phòng" as QR
 V --> M : nghe thuyết minh
-V --> WU : xem trước / nghe
-G --> M : tạo nhóm
+V --> WU : quét QR, nghe
 A --> WA : quản lý nội dung
 GPS --> M : vị trí
 QR --> M : quét mã

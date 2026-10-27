@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+/* Cùng bảng màu với ứng dụng Mobile: xanh lục sẫm của mái Dinh và vàng đồng của chi tiết trang trí */
+@theme {
+  --color-brand-50: #eef6f2;
+  --color-brand-100: #d6ebe1;
+  --color-brand-600: #2c7a62;
+  --color-brand-700: #1f5c4a;
+  --color-brand-800: #17473a;
+  --color-brand-900: #0f2f27;
+  --color-gold-500: #c99a3e;
+  --color-gold-600: #b8862f;
+  --color-paper: #f6f5f1;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-stone-200);
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-stone-900);
+  }
+}
+
+/* Hiệu ứng động vừa phải (giống Web Admin): hiện dần, khung chờ tải lấp lánh, sóng âm khi đang nghe.
+   Hệ điều hành bật "giảm chuyển động" → tắt hết. */
+@theme {
+  /* fill "backwards" (không phải "both"): chạy xong thì bỏ hẳn transform – phần tử còn giữ transform sẽ thành mốc
+     định vị cho position: fixed, làm hộp thoại bên trong trang bị kẹt trong vùng nội dung */
+  --animate-fade-up: fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --animate-fade-in: fade-in 0.6s ease-out both;
+  --animate-shimmer: shimmer 1.4s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-eq: eq 0.9s ease-in-out infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes shimmer {
+    from {
+      background-position: -400px 0;
+    }
+    to {
+      background-position: 400px 0;
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+  @keyframes eq {
+    0%,
+    100% {
+      transform: scaleY(0.3);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+}
+
+@layer components {
+  .skeleton {
+    border-radius: 1rem;
+    background: linear-gradient(90deg, var(--color-stone-100) 25%, var(--color-stone-200) 37%, var(--color-stone-100) 63%);
+    background-size: 800px 100%;
+    animation: var(--animate-shimmer);
+  }
+}
+
+/* Bản đồ Leaflet có z-index nội bộ tới 1000 → gói trong lớp xếp chồng riêng để không đè lên thanh menu dính */
+.leaflet-container {
+  z-index: 0;
+  isolation: isolate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
