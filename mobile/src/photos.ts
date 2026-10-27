@@ -16,6 +16,13 @@ export const PLACE_PHOTOS: Record<string, Photo> = {
   "003": { source: require("../assets/places/003-dai-phun-nuoc.jpg"), credit: null },
   "004": HERO_PHOTO,
   "005": { source: require("../assets/places/005-may-bay-f5.jpg"), credit: null },
+  "101": { source: require("../assets/places/101-hoi-truong-thong-nhat.jpg"), credit: null },
+  "102": { source: require("../assets/places/102-phong-hop-noi-cac.jpg"), credit: null },
+  "103": { source: require("../assets/places/103-phong-khanh-tiet.jpg"), credit: null },
+  "201": { source: require("../assets/places/201-phong-trinh-quoc-thu.jpg"), credit: null },
+  "202": { source: require("../assets/places/202-phong-lam-viec-tong-thong.jpg"), credit: null },
+  "401": { source: require("../assets/places/401-san-thuong-truc-thang.jpg"), credit: null },
+  "901": { source: require("../assets/places/901-ham-chi-huy.jpg"), credit: null },
 };
 
 export function placePhoto(place: { code: string; imageUrl: string | null }, mediaUrl: (p: string | null) => string | null): Photo | null {
