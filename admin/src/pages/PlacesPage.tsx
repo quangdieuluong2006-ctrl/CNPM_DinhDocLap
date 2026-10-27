@@ -4,20 +4,35 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { PlacesMap } from "../components/PlacesMap";
 import { Badge, ErrorBox, inputCls, PageHeader } from "../components/ui";
-import { apiGet, mediaUrl } from "../lib/api";
+import { apiGet } from "../lib/api";
 import { PLACE_STATUS_LABEL, TRIGGER_LABEL, ZONE_LABEL } from "../lib/format";
+import { placeImage } from "../lib/photos";
 import type { AdminPlace } from "../lib/types";
 
-const STATUS_TONE = { published: "green", draft: "amber", hidden: "slate" } as const;
+const STATUS_TONE = {
+  published: "green",
+  draft: "amber",
+  hidden: "slate",
+} as const;
 
-// Ảnh đại diện của điểm (nếu đã tải lên ở trang sửa điểm); chưa có ảnh → ô màu theo ngoài trời / trong nhà
+// Ảnh đại diện của điểm: ảnh tải lên ở trang sửa điểm, không có thì ảnh có sẵn; không có cả hai → ô màu theo ngoài trời / trong nhà
 function PlaceThumb(props: { place: AdminPlace }) {
-  const src = mediaUrl(props.place.imageUrl);
-  if (src) return <img src={src} alt="" loading="lazy" className="h-11 w-16 rounded-lg object-cover ring-1 ring-slate-200" />;
+  const image = placeImage(props.place);
+  if (image)
+    return (
+      <img
+        src={image.src}
+        alt=""
+        loading="lazy"
+        className="h-11 w-16 rounded-lg object-cover ring-1 ring-slate-200"
+      />
+    );
   const outdoor = props.place.trigger === "gps";
   const Icon = outdoor ? Trees : Building2;
   return (
-    <span className={`flex h-11 w-16 items-center justify-center rounded-lg ${outdoor ? "bg-gradient-to-br from-emerald-100 to-emerald-200 text-emerald-700" : "bg-gradient-to-br from-amber-100 to-amber-200 text-amber-700"}`}>
+    <span
+      className={`flex h-11 w-16 items-center justify-center rounded-lg ${outdoor ? "bg-gradient-to-br from-emerald-100 to-emerald-200 text-emerald-700" : "bg-gradient-to-br from-amber-100 to-amber-200 text-amber-700"}`}
+    >
       <Icon size={20} />
     </span>
   );
@@ -28,12 +43,20 @@ export function PlacesPage() {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("");
-  const places = useQuery({ queryKey: ["places"], queryFn: () => apiGet<{ items: AdminPlace[] }>("/admin/places") });
+  const places = useQuery({
+    queryKey: ["places"],
+    queryFn: () => apiGet<{ items: AdminPlace[] }>("/admin/places"),
+  });
 
   const all = places.data?.items ?? [];
   const needle = q.trim().toLowerCase();
   const items = all.filter(
-    (p) => (!status || p.status === status) && (!needle || p.code.includes(needle) || p.internalName.toLowerCase().includes(needle) || p.slug.includes(needle)),
+    (p) =>
+      (!status || p.status === status) &&
+      (!needle ||
+        p.code.includes(needle) ||
+        p.internalName.toLowerCase().includes(needle) ||
+        p.slug.includes(needle)),
   );
 
   return (
@@ -42,20 +65,37 @@ export function PlacesPage() {
         title="Điểm thuyết minh"
         subtitle="Vòng tròn là vùng tự động phát (điểm GPS). Điểm trong nhà kích hoạt bằng mã QR / số điểm tại phòng."
         actions={
-          <Link to="/places/new" className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-800">
+          <Link
+            to="/places/new"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 px-3 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-800"
+          >
             <Plus size={16} /> Thêm điểm
           </Link>
         }
       />
-      {places.isError && <ErrorBox error={places.error} onRetry={() => void places.refetch()} />}
+      {places.isError && (
+        <ErrorBox error={places.error} onRetry={() => void places.refetch()} />
+      )}
       <PlacesMap places={items} onSelect={(p) => navigate(`/places/${p.id}`)} />
 
       <div className="flex flex-wrap gap-3 text-sm">
         <span className="relative w-full max-w-xs">
-          <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm theo số điểm, tên…" className={`${inputCls} pl-9`} />
+          <Search
+            size={16}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+          />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Tìm theo số điểm, tên…"
+            className={`${inputCls} pl-9`}
+          />
         </span>
-        <select value={status} onChange={(e) => setStatus(e.target.value)} className="rounded-md border px-2 py-2">
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="rounded-md border px-2 py-2"
+        >
           <option value="">Mọi trạng thái</option>
           <option value="published">Đang xuất bản</option>
           <option value="draft">Nháp</option>
@@ -101,7 +141,9 @@ export function PlacesPage() {
                 <td className="py-2 pl-4">
                   <PlaceThumb place={p} />
                 </td>
-                <td className="px-4 py-3 font-medium text-slate-900">{p.internalName}</td>
+                <td className="px-4 py-3 font-medium text-slate-900">
+                  {p.internalName}
+                </td>
                 <td className="px-4 py-3">{ZONE_LABEL[p.zone]}</td>
                 <td className="px-4 py-3 text-slate-600">
                   {TRIGGER_LABEL[p.trigger]}
@@ -110,14 +152,24 @@ export function PlacesPage() {
                 <td className="px-4 py-3">
                   <div className="flex flex-wrap gap-1">
                     <Badge tone="green">{p.contents.approved} đã duyệt</Badge>
-                    {p.contents.pending > 0 && <Badge tone="blue">{p.contents.pending} chờ duyệt</Badge>}
-                    {p.contents.draft > 0 && <Badge tone="amber">{p.contents.draft} nháp</Badge>}
-                    {p.contents.withAudio > 0 && <Badge>🔊 {p.contents.withAudio}</Badge>}
+                    {p.contents.pending > 0 && (
+                      <Badge tone="blue">{p.contents.pending} chờ duyệt</Badge>
+                    )}
+                    {p.contents.draft > 0 && (
+                      <Badge tone="amber">{p.contents.draft} nháp</Badge>
+                    )}
+                    {p.contents.withAudio > 0 && (
+                      <Badge>🔊 {p.contents.withAudio}</Badge>
+                    )}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-right tabular-nums">{p.visits}</td>
+                <td className="px-4 py-3 text-right tabular-nums">
+                  {p.visits}
+                </td>
                 <td className="px-4 py-3">
-                  <Badge tone={STATUS_TONE[p.status]}>{PLACE_STATUS_LABEL[p.status]}</Badge>
+                  <Badge tone={STATUS_TONE[p.status]}>
+                    {PLACE_STATUS_LABEL[p.status]}
+                  </Badge>
                 </td>
               </tr>
             ))}

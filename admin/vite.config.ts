@@ -13,6 +13,8 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5174,
       strictPort: true,
+      // Ảnh có sẵn của các điểm nằm ở web/public/images/places (dùng chung với Web User) → cho phép đọc ngoài thư mục admin
+      fs: { allow: [".."] },
       proxy: {
         "/api": { target, changeOrigin: true },
         "/socket.io": { target, ws: true, changeOrigin: true },
