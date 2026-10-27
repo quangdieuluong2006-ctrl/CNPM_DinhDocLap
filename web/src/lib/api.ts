@@ -157,16 +157,32 @@ export interface VisitInput {
   startedAt: string;
 }
 
+// UUID v4 cho clientId. crypto.randomUUID() chỉ có ở "secure context" (https, localhost): khách mở bằng
+// http://<IP Wi-Fi>:5173 thì không có hàm này → tự tạo từ crypto.getRandomValues (có ở mọi ngữ cảnh).
+export function uuidV4(): string {
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6]! & 0x0f) | 0x40; // phiên bản 4
+  b[8] = (b[8]! & 0x3f) | 0x80; // biến thể RFC 4122
+  const h = Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
+
 // Ghi lượt nghe (khách chưa đăng nhập vẫn ghi được; đã đăng nhập thì gắn vào tài khoản để hiện trong lịch sử).
-// keepalive: vẫn gửi được khi người dùng rời trang. Lỗi ghi lượt nghe không làm hỏng trải nghiệm nghe nên chỉ bỏ qua.
+// keepalive: vẫn gửi được khi người dùng rời trang. Lỗi ghi lượt nghe không làm hỏng trải nghiệm nghe nên chỉ bỏ qua
+// (kể cả lỗi đồng bộ: hàm này chạy trong cleanup của React, ném lỗi ở đó sẽ làm trắng cả trang).
 export function sendVisit(v: VisitInput): void {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
-  void fetch(API_BASE + "/visits", {
-    method: "POST",
-    headers,
-    keepalive: true,
-    credentials: "include",
-    body: JSON.stringify({ ...v, clientId: crypto.randomUUID() }),
-  }).catch(() => undefined);
+  try {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+    void fetch(API_BASE + "/visits", {
+      method: "POST",
+      headers,
+      keepalive: true,
+      credentials: "include",
+      body: JSON.stringify({ ...v, clientId: uuidV4() }),
+    }).catch(() => undefined);
+  } catch {
+    // bỏ qua
+  }
 }

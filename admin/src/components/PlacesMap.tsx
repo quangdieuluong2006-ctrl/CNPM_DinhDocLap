@@ -1,6 +1,7 @@
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Circle, MapContainer, Marker, TileLayer, Tooltip, useMapEvents } from "react-leaflet";
+import { useEffect } from "react";
+import { Circle, MapContainer, Marker, TileLayer, Tooltip, useMap, useMapEvents } from "react-leaflet";
 import type { AdminPlace } from "../lib/types";
 
 export const PALACE_CENTER: [number, number] = [10.777, 106.6953];
@@ -18,6 +19,16 @@ function codeIcon(code: string, color: string, selected: boolean): L.DivIcon {
 
 function ClickHandler({ onClick }: { onClick: (lat: number, lng: number) => void }) {
   useMapEvents({ click: (e) => onClick(Number(e.latlng.lat.toFixed(6)), Number(e.latlng.lng.toFixed(6))) });
+  return null;
+}
+
+// MapContainer chỉ dùng `center` lúc tạo bản đồ; dữ liệu điểm tải xong sau đó → đưa bản đồ về điểm đang sửa.
+// Chỉ chạy khi đổi điểm (code), không chạy khi bấm đặt tọa độ để bản đồ không giật.
+function FocusOn({ lat, lng, code }: { lat: number; lng: number; code: string }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([lat, lng], map.getZoom());
+  }, [map, code]); // eslint-disable-line react-hooks/exhaustive-deps
   return null;
 }
 
@@ -60,6 +71,7 @@ export function PlacesMap(props: {
         })}
         {props.editing && (
           <>
+            <FocusOn lat={props.editing.lat} lng={props.editing.lng} code={props.editing.code} />
             {props.editing.trigger === "gps" && (
               <Circle center={[props.editing.lat, props.editing.lng]} radius={props.editing.radiusM} pathOptions={{ color: "#dc2626", weight: 2, dashArray: "6 4", fillOpacity: 0.15 }} />
             )}
