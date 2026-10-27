@@ -17,7 +17,7 @@ package "Web Admin (React)" {
 }
 package "Backend API (Node.js)" {
   [REST /api/v1] as REST
-  [Socket.IO\npresence, tour] as SIO
+  [Socket.IO\npresence] as SIO
   [Media\n/media (Range)] as MED
   [Swagger /api/docs] as SW
 }

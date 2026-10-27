@@ -34,11 +34,12 @@ Chi tiết: [`api/README.md`](api/README.md). App Mobile chạy riêng: xem [`mo
 
 ## Tài liệu
 
-- **PRD v1.0** (căn cứ triển khai): [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.0.pdf`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.0.pdf)
-  · bản Word: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.0.docx`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.0.docx)
+- **PRD v1.1** (căn cứ triển khai, 27/10/2026): [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.pdf`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.pdf)
+  · bản Word: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.docx`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.docx)
+  · bản trước: [PRD v1.0](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.0.pdf)
 - Sơ đồ UML (nguồn PlantUML): [`docs/diagrams/`](docs/diagrams/)
 
-### Thay đổi so với PRD v1.0 (sẽ cập nhật vào PRD v1.1)
+### Thay đổi so với PRD v1.0 (đã cập nhật vào PRD v1.1)
 
 | Nội dung | Trước đây | Hiện tại | Lý do |
 |---|---|---|---|
