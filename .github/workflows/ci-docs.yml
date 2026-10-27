@@ -1,0 +1,30 @@
+name: CI Docs
+
+on:
+  push:
+    branches: [main, develop]
+    paths: ["docs/**", "README.md", ".github/workflows/ci-docs.yml"]
+  pull_request:
+    branches: [main, develop]
+    paths: ["docs/**", "README.md", ".github/workflows/ci-docs.yml"]
+
+jobs:
+  # Tên job "test" trùng với check bắt buộc của nhánh develop/main: PR chỉ sửa tài liệu cũng có kết quả CI.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Liên kết tương đối trong README trỏ đến tệp có thật
+        run: |
+          missing=0
+          for f in $(grep -oE '\]\(([^)#: ]+)\)' README.md | sed -E 's/^\]\((.*)\)$/\1/'); do
+            if [ ! -e "$f" ]; then echo "Thiếu: $f"; missing=1; fi
+          done
+          exit $missing
+      - name: Mỗi sơ đồ PlantUML có ảnh PNG đi kèm
+        run: |
+          missing=0
+          for f in docs/diagrams/*.puml; do
+            [ -e "${f%.puml}.png" ] || { echo "Thiếu ảnh cho $f"; missing=1; }
+          done
+          exit $missing
