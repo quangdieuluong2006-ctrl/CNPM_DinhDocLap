@@ -1,25 +1,27 @@
 @startuml
 !include skin.iuml
-actor "Hướng dẫn viên" as G
 actor "Khách" as K
-participant "Mobile (HDV)" as MG
-participant "Mobile (khách)" as MK
+participant "Web User / Mobile" as C
 participant "API + Socket.IO" as API
 database "SQL Server" as DB
 participant "Web Admin" as WA
-G -> MG : Tạo nhóm "Đoàn sáng"
-MG -> API : POST /tours
-API -> DB : INSERT tours (code K7Q2MX)
-API --> MG : {id, code}
-MG --> G : hiện mã + QR
-K -> MK : quét QR nhóm
-MK -> API : POST /tours/K7Q2MX/join
-API -> DB : INSERT tour_members
-API -> API : socket khách vào phòng tour:{id}
-API --> MG : tour.member.joined
-API --> WA : presence.update / nhóm 4 thành viên
-K -> MK : nghe điểm 002
-MK -> API : socket tour.position {placeId: 2}
-API -> DB : UPDATE tour_members.current_place_id
-API --> MG : tour.member.updated {userId, currentPlaceId: 2}
+== Lần đầu: quét QR là dùng ngay, không đăng ký / đăng nhập ==
+K -> C : quét QR "Mời tham gia"
+C -> API : POST /auth/refresh (cookie rt_web)
+API --> C : 401 (trình duyệt chưa có phiên)
+C -> API : POST /auth/guest {locale, narrationLang}
+API -> DB : INSERT users (is_guest = 1,\nemail guest-<uuid>@guest.local, password_hash NULL)
+API -> DB : INSERT refresh_tokens, activity_logs (auth.guest)
+API --> C : 201 {accessToken, user "Khách #XXXX"}\n+ cookie rt_web (Web) / refreshToken (Mobile)
+C -> API : kết nối Socket.IO (accessToken)
+API -> DB : INSERT user_sessions
+API --> WA : presence.update (khách đang hoạt động)
+== Các lần sau: khôi phục đúng khách cũ ==
+K -> C : mở lại trang / app
+C -> API : POST /auth/refresh (cookie rt_web / refreshToken)
+API -> DB : xoay vòng refresh_tokens
+API --> C : 200 {accessToken, user "Khách #XXXX"}
+K -> C : nghe điểm 002
+C -> API : POST /visits
+API -> DB : INSERT visits (user_id = khách)
 @enduml
