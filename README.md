@@ -34,18 +34,24 @@ Chi tiết: [`api/README.md`](api/README.md). App Mobile chạy riêng: xem [`mo
 
 ## Tài liệu
 
-- **PRD v1.1** (căn cứ triển khai, 27/10/2026): [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.pdf`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.pdf)
-  · bản Word: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.docx`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.docx)
-  · bản trước: [PRD v1.0](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.0.pdf)
+- **PRD v2.0 – bản chính thức** (01/11/2026), căn cứ duy nhất để lập trình và nghiệm thu:
+  [`docs/PRD.md`](docs/PRD.md) (đọc trực tiếp trên GitHub)
+  · PDF: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.0.pdf`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.0.pdf)
+  · Word: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.0.docx`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.0.docx)
+- Bản cũ (lưu lịch sử): [PRD v1.1](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.pdf) · [PRD v1.0](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.0.pdf)
 - Sơ đồ UML (nguồn PlantUML): [`docs/diagrams/`](docs/diagrams/)
 
-### Thay đổi so với PRD v1.0 (đã cập nhật vào PRD v1.1)
+Sửa PRD: sửa `docs/PRD.md` (và sơ đồ `.puml` nếu cần), rồi xuất lại Word bằng lệnh ghi ở đầu
+[`docs/tools/prd-docx.lua`](docs/tools/prd-docx.lua); mở bản Word, cập nhật mục lục và lưu thành PDF.
+
+### Những thay đổi lớn đã chốt (chi tiết ở mục "Lịch sử thay đổi" của PRD)
 
 | Nội dung | Trước đây | Hiện tại | Lý do |
 |---|---|---|---|
 | Tài khoản của khách | Đăng ký / đăng nhập | Khách ẩn danh, quét QR là dùng | Khách du lịch thường chỉ đến một lần, bắt đăng ký gây phiền |
-| Tham quan theo nhóm | Có | Bỏ | Giảng viên không yêu cầu |
+| Tham quan theo nhóm, vai trò hướng dẫn viên | Có | Bỏ hẳn (v2.0 xóa cả bảng CSDL, API) | Giảng viên không yêu cầu; giữ hệ thống gọn |
 | Ngôn ngữ giao diện | Tiếng Việt / tiếng Anh | Theo ngôn ngữ thuyết minh (10 ngôn ngữ) | Khách không biết tiếng Anh vẫn dùng được |
+| Giọng đọc | Giọng tổng hợp của thiết bị | Tệp giọng đọc AI cho 12 điểm × 10 ngôn ngữ | Tự nhiên, đồng nhất mọi máy, nghe offline |
 | Truy cập khi demo | Cùng mạng Wi-Fi | Thêm Cloudflare Tunnel | Khách dùng 4G vẫn quét QR được |
 
 ## Thành phần
@@ -60,7 +66,7 @@ Chi tiết: [`api/README.md`](api/README.md). App Mobile chạy riêng: xem [`mo
 
 ## CI/CD
 
-GitHub Actions có 4 workflow trong [`.github/workflows/`](.github/workflows/), chạy khi push hoặc tạo Pull Request vào `develop` / `main`:
+GitHub Actions có 5 workflow CI trong [`.github/workflows/`](.github/workflows/), chạy khi push hoặc tạo Pull Request vào `develop` / `main`:
 
 | Workflow | Kiểm tra |
 |---|---|
@@ -68,6 +74,7 @@ GitHub Actions có 4 workflow trong [`.github/workflows/`](.github/workflows/), 
 | `ci-web.yml` | Typecheck, lint, test, build |
 | `ci-admin.yml` | Typecheck, lint, test, build |
 | `ci-mobile.yml` | Typecheck, test, `expo export` (bản web) |
+| `ci-docs.yml` | Liên kết trong README, mỗi sơ đồ `.puml` có ảnh `.png` |
 
 Chạy thử trên máy trước khi tạo PR (trong từng thư mục): `npm run typecheck`, `npm run lint`, `npm test`
 (Mobile không có `lint`).

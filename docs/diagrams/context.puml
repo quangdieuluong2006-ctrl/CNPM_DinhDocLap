@@ -2,7 +2,7 @@
 !include skin.iuml
 left to right direction
 actor "Khách tham quan\n(ẩn danh)" as V
-actor "Biên tập viên /\nQuản trị viên" as A
+actor "Quản trị viên" as A
 rectangle "Hệ thống thuyết minh đa ngôn ngữ theo vị trí" as S {
   component "Mobile App\n(React Native)" as M
   component "Web User\n(React.js)" as WU

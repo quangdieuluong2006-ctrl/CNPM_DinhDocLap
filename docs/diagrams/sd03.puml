@@ -1,6 +1,6 @@
 @startuml
 !include skin.iuml
-actor "Biên tập viên" as A
+actor "Quản trị viên" as A
 participant "Web Admin" as WA
 participant "API" as API
 database "SQL Server" as DB
