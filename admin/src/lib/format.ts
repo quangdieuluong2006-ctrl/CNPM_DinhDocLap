@@ -44,7 +44,7 @@ export function duration(sec: number | null | undefined): string {
   return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
 }
 
-export const ROLE_LABEL: Record<string, string> = { user: "Khách tham quan", guide: "Hướng dẫn viên", admin: "Quản trị viên" };
+export const ROLE_LABEL: Record<string, string> = { user: "Khách tham quan", admin: "Quản trị viên" };
 export const ZONE_LABEL: Record<string, string> = {
   outdoor: "Ngoài trời", ground: "Tầng trệt", floor1: "Lầu 1", floor2: "Lầu 2–3", rooftop: "Sân thượng", basement: "Tầng hầm",
 };
@@ -54,7 +54,7 @@ export const TRIGGER_LABEL: Record<string, string> = { gps: "Tự động (GPS)"
 
 // Tên hành động trong nhật ký (PRD v1.0, mục 13.2) → tiếng Việt
 export const ACTION_LABEL: Record<string, string> = {
-  "auth.register": "Đăng ký",
+  "auth.register": "Đăng ký (trước v2.0)",
   "auth.guest": "Bắt đầu dùng (khách ẩn danh)",
   "auth.login": "Đăng nhập",
   "auth.login_failed": "Đăng nhập thất bại",
@@ -67,8 +67,9 @@ export const ACTION_LABEL: Record<string, string> = {
   "place.audio.upload": "Tệp âm thanh",
   "content.publish": "Xuất bản nội dung",
   "language.update": "Cập nhật ngôn ngữ",
-  "tour.create": "Tạo nhóm",
-  "tour.end": "Kết thúc nhóm",
+  // Nhật ký cũ từ trước v2.0 (đã bỏ nhóm tham quan) – vẫn hiển thị đúng tên khi xem lại.
+  "tour.create": "Tạo nhóm (trước v2.0)",
+  "tour.end": "Kết thúc nhóm (trước v2.0)",
   "admin.user.lock": "Khóa tài khoản",
   "admin.user.unlock": "Mở khóa tài khoản",
   "admin.user.role_change": "Đổi vai trò",

@@ -24,7 +24,7 @@ export const requireAuth: RequestHandler = (req, res, next) => {
   }
 };
 
-// Dùng sau requireAuth, ví dụ: router.use(requireAuth, requireRole("admin")) hoặc requireRole("guide", "admin").
+// Dùng sau requireAuth, ví dụ: router.use(requireAuth, requireRole("admin")).
 export function requireRole(...roles: Role[]): RequestHandler {
   return (_req, res, next) => {
     const role = res.locals.auth?.role;

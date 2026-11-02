@@ -3,7 +3,7 @@ import { rateLimit } from "express-rate-limit";
 import { env } from "../../config/env.js";
 import { ApiError } from "../../lib/apiError.js";
 import { clearSessionCookies, readBrowserRefreshToken, setSessionCookies } from "./auth.cookies.js";
-import { type ClientType, guestSchema, loginSchema, refreshSchema, registerSchema } from "./auth.schemas.js";
+import { type ClientType, guestSchema, loginSchema, refreshSchema } from "./auth.schemas.js";
 import * as auth from "./auth.service.js";
 
 // Web/Admin: refresh token chỉ nằm trong cookie, body trả csrfToken.
@@ -51,11 +51,6 @@ export function authRouter(opts: { loginRateLimitMax?: number; guestRateLimitMax
       const retryAfter = Number(res.getHeader("retry-after")) || undefined;
       next(new ApiError(429, "RATE_LIMITED", "Bạn đã thử quá nhiều lần, vui lòng thử lại sau", { retryAfter }));
     },
-  });
-
-  router.post("/auth/register", async (req, res) => {
-    const input = registerSchema.parse(req.body);
-    sendSession(res, 201, input.clientType, await auth.register(input, req.ip));
   });
 
   router.post("/auth/guest", guestLimiter, async (req, res) => {

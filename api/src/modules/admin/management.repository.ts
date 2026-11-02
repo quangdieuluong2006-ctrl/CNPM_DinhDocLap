@@ -52,7 +52,7 @@ export interface AdminUserRow {
   id: number;
   email: string;
   full_name: string;
-  role: "user" | "guide" | "admin";
+  role: "user" | "admin";
   status: "active" | "locked";
   locked_reason: string | null;
   ui_locale: string;
@@ -64,9 +64,6 @@ export interface AdminUserRow {
   on_web: number | null;
   on_mobile: number | null;
   on_admin: number | null;
-  tour_id: number | null;
-  tour_code: string | null;
-  tour_name: string | null;
   visits: number;
   total: number;
 }
@@ -74,14 +71,11 @@ export interface AdminUserRow {
 const USER_SELECT = `
   SELECT u.id, u.email, u.full_name, u.role, u.status, u.locked_reason, u.ui_locale, u.narration_lang, u.is_guest, u.created_at,
          ls.last_seen_at, CASE WHEN a.user_id IS NULL THEN 0 ELSE 1 END AS online, a.on_web, a.on_mobile, a.on_admin,
-         t.id AS tour_id, t.code AS tour_code, t.name AS tour_name,
          (SELECT COUNT(*) FROM dbo.visits v WHERE v.user_id = u.id) AS visits,
          COUNT(*) OVER () AS total
   FROM dbo.users u
   LEFT JOIN dbo.v_user_last_seen ls ON ls.user_id = u.id
-  LEFT JOIN dbo.v_active_users a ON a.user_id = u.id
-  LEFT JOIN dbo.tour_members m ON m.user_id = u.id AND m.left_at IS NULL
-  LEFT JOIN dbo.tours t ON t.id = m.tour_id`;
+  LEFT JOIN dbo.v_active_users a ON a.user_id = u.id`;
 
 export async function listUsers(f: {
   q?: string; role?: string; status?: string; online?: boolean; guest?: boolean; offset: number; limit: number;
@@ -144,7 +138,7 @@ export async function setUserStatus(id: number, status: "active" | "locked", rea
         UPDATE dbo.refresh_tokens SET revoked_at = SYSUTCDATETIME() WHERE user_id = @id AND revoked_at IS NULL;`);
 }
 
-export async function setUserRole(id: number, role: "user" | "guide" | "admin"): Promise<void> {
+export async function setUserRole(id: number, role: "user" | "admin"): Promise<void> {
   const pool = await getPool();
   await pool.request().input("id", sql.Int, id).input("role", sql.VarChar(10), role)
     .query("UPDATE dbo.users SET role = @role, updated_at = SYSUTCDATETIME() WHERE id = @id");

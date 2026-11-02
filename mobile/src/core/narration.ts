@@ -56,7 +56,7 @@ export interface NarrationState {
 export interface NarrationDeps {
   createEngine(item: NarrationItem): PlaybackEngine; // tệp âm thanh hoặc giọng tổng hợp
   onVisit(visit: VisitRecord): void; // ghi lượt ghé khi bài kết thúc hoặc bị dừng
-  onStart?(item: NarrationItem, trigger: Trigger): void; // ví dụ: gửi tour.position, đánh dấu cooldown
+  onStart?(item: NarrationItem, trigger: Trigger): void; // ví dụ: đánh dấu cooldown, cập nhật tiến độ
   isStillInside?(placeId: number): boolean; // điểm trong hàng đợi chỉ phát nếu khách vẫn ở trong vùng
   now?: () => number;
 }

@@ -93,13 +93,13 @@ describe.skipIf(!runDbTests)("Presence – người dùng đang hoạt động (
 
   it("từ chối bắt tay: thiếu token, user thường vào kênh admin", async () => {
     expect((await connectError(undefined, "web")).data?.code).toBe("AUTH_REQUIRED");
-    const userToken = await login("user1@demo.vn");
+    const userToken = await login("user1@test.vn");
     expect((await connectError(userToken, "admin")).data?.code).toBe("FORBIDDEN");
   });
 
   it("4 user đăng nhập → Admin thấy đúng 4; user mở thêm tab không làm tăng số (TC-34)", async () => {
     const admin = await open(adminToken, "admin");
-    const tokens = await Promise.all(["user1@demo.vn", "user2@demo.vn", "user3@demo.vn", "user4@demo.vn"].map((e) => login(e)));
+    const tokens = await Promise.all(["user1@test.vn", "user2@test.vn", "user3@test.vn", "user4@test.vn"].map((e) => login(e)));
 
     const reached4 = waitUpdate(admin, (p) => p.activeUsers === 4);
     await open(tokens[0], "web");
@@ -112,8 +112,8 @@ describe.skipIf(!runDbTests)("Presence – người dùng đang hoạt động (
     const body = await presence(adminToken);
     expect(body.activeUsers).toBe(4);
     expect(body.count).toBe(4);
-    expect(body.users.find((u) => u.email === "user1@demo.vn")?.openSessions).toBe(2);
-    expect(body.users.find((u) => u.email === "user3@demo.vn")?.clientTypes).toEqual(["mobile"]);
+    expect(body.users.find((u) => u.email === "user1@test.vn")?.openSessions).toBe(2);
+    expect(body.users.find((u) => u.email === "user3@test.vn")?.clientTypes).toEqual(["mobile"]);
 
     // Số trên API bằng đúng truy vấn SQL trực tiếp (AC4)
     const pool = await getPool();
@@ -122,12 +122,12 @@ describe.skipIf(!runDbTests)("Presence – người dùng đang hoạt động (
 
     // Bộ lọc: role=all tính cả admin; clientType=mobile chỉ còn user3
     expect((await presence(adminToken, "?role=all")).count).toBe(5);
-    expect((await presence(adminToken, "?clientType=mobile")).users.map((u) => u.email)).toEqual(["user3@demo.vn"]);
+    expect((await presence(adminToken, "?clientType=mobile")).users.map((u) => u.email)).toEqual(["user3@test.vn"]);
   });
 
   it("đóng tab → số giảm ngay; còn tab khác thì vẫn tính là đang hoạt động (TC-35)", async () => {
     const admin = await open(adminToken, "admin");
-    const [t1, t2] = await Promise.all([login("user1@demo.vn"), login("user2@demo.vn")]);
+    const [t1, t2] = await Promise.all([login("user1@test.vn"), login("user2@test.vn")]);
     const tabA = await open(t1, "web");
     await open(t1, "web");
     const u2 = await open(t2, "mobile");
@@ -145,7 +145,7 @@ describe.skipIf(!runDbTests)("Presence – người dùng đang hoạt động (
 
   it("presence.ping cập nhật last_seen_at; mất nhịp tim quá 60 giây thì bị dọn", async () => {
     const pool = await getPool();
-    const token = await login("user5@demo.vn");
+    const token = await login("user5@test.vn");
     const s = await open(token, "mobile");
 
     // Giả lập lần nhịp tim trước cách đây 50 giây, rồi gửi ping
@@ -172,12 +172,12 @@ describe.skipIf(!runDbTests)("Presence – người dùng đang hoạt động (
   });
 
   it("POST /presence/heartbeat dự phòng: tính là đang hoạt động, gọi lại dùng chung một phiên", async () => {
-    const token = await login("user6@demo.vn");
+    const token = await login("user6@test.vn");
     const first = await request(app).post("/api/v1/presence/heartbeat").set("Authorization", `Bearer ${token}`).send({ clientType: "mobile" });
     expect(first.status).toBe(200);
     const second = await request(app).post("/api/v1/presence/heartbeat").set("Authorization", `Bearer ${token}`).send({ clientType: "mobile" });
     expect(second.body.sessionId).toBe(first.body.sessionId);
-    expect((await presence(adminToken)).users.map((u) => u.email)).toEqual(["user6@demo.vn"]);
+    expect((await presence(adminToken)).users.map((u) => u.email)).toEqual(["user6@test.vn"]);
   });
 
   it("GET /admin/join-link trả link trang chủ Web User (khách dùng ngay, không đăng ký)", async () => {
@@ -186,16 +186,17 @@ describe.skipIf(!runDbTests)("Presence – người dùng đang hoạt động (
     for (const l of res.body.links as { url: string }[]) expect(l.url).toMatch(/^http:\/\/[\d.]+:5173\/$/);
   });
 
-  it("GET /admin/stats trả 6 số liệu + 7 ngày; user thường gọi /admin/* bị 403 (TC-41)", async () => {
+  it("GET /admin/stats trả 5 số liệu + 7 ngày; user thường gọi /admin/* bị 403 (TC-41)", async () => {
     const res = await request(app).get("/api/v1/admin/stats").set("Authorization", `Bearer ${adminToken}`);
     expect(res.status).toBe(200);
-    expect(res.body).toMatchObject({ totalUsers: 8, activeUsers: 0, publishedPlaces: 12, pendingContents: 96 });
-    for (const k of ["visitsToday", "activeTours"]) expect(typeof res.body[k]).toBe("number");
+    expect(res.body).toMatchObject({ totalUsers: 12, activeUsers: 0, publishedPlaces: 12, pendingContents: 96 });
+    expect(typeof res.body.visitsToday).toBe("number");
+    expect(res.body).not.toHaveProperty("activeTours");
     expect(res.body.visitsByDay).toHaveLength(7);
     expect(res.body.topPlaces.length).toBeGreaterThan(0);
     expect(Array.isArray(res.body.languages)).toBe(true);
 
-    const userToken = await login("user2@demo.vn");
+    const userToken = await login("user2@test.vn");
     for (const path of ["/api/v1/admin/stats", "/api/v1/admin/presence", "/api/v1/admin/join-link"]) {
       const forbidden = await request(app).get(path).set("Authorization", `Bearer ${userToken}`);
       expect(forbidden.status).toBe(403);

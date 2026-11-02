@@ -13,7 +13,7 @@ export const adminRouter = Router();
 adminRouter.use("/admin", requireAuth, requireRole("admin"));
 adminRouter.use(adminPlacesRouter, adminManagementRouter);
 
-// FE-17: 6 thẻ thống kê + lượt tham quan 7 ngày + điểm nghe nhiều + ngôn ngữ được chọn.
+// FE-17: 5 thẻ thống kê + lượt tham quan 7 ngày + điểm nghe nhiều + ngôn ngữ được chọn.
 adminRouter.get("/admin/stats", async (_req, res) => {
   const [s, visitsByDay, topPlaces, languages] = await Promise.all([
     adminRepo.dashboardStats(),
@@ -25,7 +25,6 @@ adminRouter.get("/admin/stats", async (_req, res) => {
     totalUsers: s.total_users,
     activeUsers: s.active_users,
     visitsToday: s.visits_today,
-    activeTours: s.active_tours,
     publishedPlaces: s.published_places,
     pendingContents: s.pending_contents,
     visitsByDay,

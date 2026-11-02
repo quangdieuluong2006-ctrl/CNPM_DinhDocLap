@@ -48,34 +48,6 @@ export async function insertGuest(input: { locale: "vi" | "en"; narrationLang?: 
   return r.recordset[0]!.id;
 }
 
-// Trả về undefined nếu email đã tồn tại (vi phạm UQ_users_email).
-export async function insertUser(input: {
-  email: string;
-  passwordHash: string;
-  fullName: string;
-  locale: "vi" | "en";
-  narrationLang?: string;
-}): Promise<number | undefined> {
-  const pool = await getPool();
-  try {
-    const r = await pool
-      .request()
-      .input("email", sql.NVarChar(255), input.email)
-      .input("hash", sql.NVarChar(255), input.passwordHash)
-      .input("name", sql.NVarChar(100), input.fullName)
-      .input("locale", sql.VarChar(5), input.locale)
-      .input("lang", sql.VarChar(10), input.narrationLang ?? null).query<{ id: number }>(`
-        INSERT INTO dbo.users (email, password_hash, full_name, ui_locale, narration_lang)
-        OUTPUT INSERTED.id
-        SELECT @email, @hash, @name, @locale, (SELECT code FROM dbo.languages WHERE code = @lang);`);
-    return r.recordset[0]!.id;
-  } catch (err) {
-    // 2627: vi phạm UNIQUE constraint, 2601: vi phạm unique index
-    if (err instanceof sql.RequestError && (err.number === 2627 || err.number === 2601)) return undefined;
-    throw err;
-  }
-}
-
 export async function insertRefreshToken(userId: number, tokenHash: string, ttlDays: number): Promise<void> {
   const pool = await getPool();
   await pool

@@ -1,4 +1,4 @@
-// Phần đặc tả OpenAPI cho nội dung, lượt ghé, nhóm tham quan và quản trị nội dung (PRD v1.0, mục 11.2).
+// Phần đặc tả OpenAPI cho nội dung, lượt ghé và quản trị (PRD v2.0, mục 11.2).
 // Gộp vào openApiSpec trong openapi.ts.
 
 const err = (description: string, code: string, message: string) => ({
@@ -16,7 +16,6 @@ const E = {
   forbidden: err("Không đủ quyền", "FORBIDDEN", "Bạn không có quyền thực hiện thao tác này"),
   placeNotFound: err("Không có điểm", "PLACE_NOT_FOUND", "Không tìm thấy điểm thuyết minh"),
   notFound: err("Không tìm thấy", "NOT_FOUND", "Không tìm thấy"),
-  tourNotFound: err("Không có nhóm", "TOUR_NOT_FOUND", "Không tìm thấy nhóm"),
 };
 const q = (name: string, schema: object, description: string, required = false) => ({ name, in: "query", required, schema, description });
 const p = (name: string, schema: object, description: string) => ({ name, in: "path", required: true, schema, description });
@@ -39,9 +38,8 @@ const items = (ref: string) => ({ type: "object", properties: { items: { type: "
 export const contentTags = [
   { name: "Nội dung", description: "Công khai, không cần đăng nhập: ngôn ngữ, điểm thuyết minh, gói offline" },
   { name: "Lượt ghé", description: "Ghi lượt nghe (khách chưa đăng nhập vẫn được ghi), lịch sử tham quan" },
-  { name: "Nhóm tham quan", description: "FE-10: tạo/tham gia/rời/kết thúc nhóm; chỉ chia sẻ điểm đang nghe, không chia sẻ tọa độ" },
   { name: "Quản trị nội dung", description: "FE-20 → FE-22: điểm, bài theo ngôn ngữ, âm thanh, ảnh, ngôn ngữ. Mọi thay đổi tăng phiên bản nội dung" },
-  { name: "Quản trị người dùng", description: "FE-18, FE-23, FE-24: người dùng, nhóm, nhật ký" },
+  { name: "Quản trị người dùng", description: "FE-18, FE-19, FE-23, FE-24: người dùng, khách đang hoạt động, mời tham gia, nhật ký" },
 ];
 
 export const contentSchemas = {
@@ -132,33 +130,6 @@ export const contentSchemas = {
       listenedSec: { type: "integer" },
       completed: { type: "boolean" },
       startedAt: { type: "string", format: "date-time" },
-    },
-  },
-  Tour: {
-    type: "object",
-    properties: {
-      id: { type: "integer" },
-      code: { type: "string", example: "K7QX2M", description: "Mã 6 ký tự để tham gia (không phân biệt hoa thường)" },
-      name: { type: "string" },
-      guide: { type: "object", properties: { id: { type: "integer" }, fullName: { type: "string" } } },
-      status: { type: "string", enum: ["active", "ended"] },
-      maxMembers: { type: "integer" },
-      memberCount: { type: "integer" },
-      createdAt: { type: "string", format: "date-time" },
-      endedAt: { type: ["string", "null"], format: "date-time" },
-    },
-  },
-  TourMember: {
-    type: "object",
-    properties: {
-      userId: { type: "integer" },
-      fullName: { type: "string" },
-      isGuide: { type: "boolean" },
-      online: { type: "boolean" },
-      joinedAt: { type: "string", format: "date-time" },
-      currentPlaceId: { type: ["integer", "null"] },
-      currentPlaceCode: { type: ["string", "null"] },
-      currentPlaceAt: { type: ["string", "null"], format: "date-time" },
     },
   },
   PlaceInput: {
@@ -280,7 +251,7 @@ export const contentSchemas = {
       id: { type: "integer" },
       email: { type: "string" },
       fullName: { type: "string" },
-      role: { type: "string", enum: ["user", "guide", "admin"] },
+      role: { type: "string", enum: ["user", "admin"] },
       status: { type: "string", enum: ["active", "locked"] },
       lockedReason: { type: ["string", "null"] },
       uiLocale: { type: "string" },
@@ -289,7 +260,6 @@ export const contentSchemas = {
       online: { type: "boolean", description: "Theo view v_active_users" },
       clientTypes: { type: "array", items: { type: "string" } },
       lastSeenAt: { type: ["string", "null"], format: "date-time", description: "Hoạt động gần nhất" },
-      tour: { type: ["object", "null"], properties: { id: { type: "integer" }, code: { type: "string" }, name: { type: "string" } } },
       visits: { type: "integer" },
     },
   },
@@ -424,90 +394,6 @@ export const contentPaths = {
       security: auth,
       parameters: page,
       responses: { 200: { description: "Mới nhất trước", content: { "application/json": { schema: paged("MyVisit") } } }, 401: E.auth },
-    },
-  },
-  "/api/v1/tours": {
-    post: {
-      tags: ["Nhóm tham quan"],
-      summary: "Tạo nhóm (hướng dẫn viên, admin)",
-      description: "Người tạo là thành viên đầu tiên. Đang ở nhóm khác → 409 ALREADY_IN_TOUR.",
-      security: auth,
-      requestBody: { required: true, content: { "application/json": { example: { name: "Đoàn Hàn Quốc 28/10", maxMembers: 30 } } } },
-      responses: { 201: ok("Nhóm mới", "Tour"), 400: E.validation, 401: E.auth, 403: E.forbidden, 409: err("Đang ở nhóm khác", "ALREADY_IN_TOUR", "Bạn đang ở một nhóm khác") },
-    },
-  },
-  "/api/v1/me/tour": {
-    get: {
-      tags: ["Nhóm tham quan"],
-      summary: "Nhóm hiện tại của tôi",
-      security: auth,
-      responses: { 200: { description: "`tour` là null nếu không ở nhóm nào", content: { "application/json": { schema: { type: "object", properties: { tour: { $ref: "#/components/schemas/Tour" } } } } } }, 401: E.auth },
-    },
-  },
-  "/api/v1/tours/{code}": {
-    get: {
-      tags: ["Nhóm tham quan"],
-      summary: "Thông tin nhóm theo mã",
-      security: auth,
-      parameters: [p("code", { type: "string", example: "K7QX2M" }, "Mã nhóm 6 ký tự")],
-      responses: { 200: ok("Nhóm", "Tour"), 401: E.auth, 404: E.tourNotFound },
-    },
-  },
-  "/api/v1/tours/{code}/join": {
-    post: {
-      tags: ["Nhóm tham quan"],
-      summary: "Tham gia nhóm",
-      description: "Gọi lại khi đã là thành viên → 200 (không lỗi). Socket của người dùng vào phòng `tour:{id}` ngay.",
-      security: auth,
-      parameters: [p("code", { type: "string" }, "Mã nhóm")],
-      responses: {
-        201: { description: "Đã tham gia", content: { "application/json": { example: { result: "joined", tour: { id: 3, code: "K7QX2M" } } } } },
-        200: { description: "Đã là thành viên", content: { "application/json": { example: { result: "already_member" } } } },
-        401: E.auth,
-        404: E.tourNotFound,
-        409: err("TOUR_ENDED / TOUR_FULL / ALREADY_IN_TOUR (details: { tourId, code })", "TOUR_FULL", "Nhóm đã đủ thành viên"),
-      },
-    },
-  },
-  "/api/v1/tours/{id}/leave": {
-    post: {
-      tags: ["Nhóm tham quan"],
-      summary: "Rời nhóm",
-      security: auth,
-      parameters: [p("id", { type: "integer" }, "Mã (id) nhóm")],
-      responses: { 204: { description: "Đã rời" }, 401: E.auth, 404: E.tourNotFound },
-    },
-  },
-  "/api/v1/tours/{id}/members": {
-    get: {
-      tags: ["Nhóm tham quan"],
-      summary: "Thành viên, trực tuyến, điểm đang nghe",
-      description: "Chỉ thành viên, hướng dẫn viên của nhóm hoặc admin. Không trả tọa độ.",
-      security: auth,
-      parameters: [p("id", { type: "integer" }, "Mã (id) nhóm")],
-      responses: {
-        200: {
-          description: "Danh sách",
-          content: {
-            "application/json": {
-              schema: { type: "object", properties: { tour: { $ref: "#/components/schemas/Tour" }, members: { type: "array", items: { $ref: "#/components/schemas/TourMember" } } } },
-            },
-          },
-        },
-        401: E.auth,
-        403: E.forbidden,
-        404: E.tourNotFound,
-      },
-    },
-  },
-  "/api/v1/tours/{id}/end": {
-    post: {
-      tags: ["Nhóm tham quan"],
-      summary: "Kết thúc nhóm (hướng dẫn viên của nhóm, admin)",
-      description: "Phát `tour.ended` tới phòng `tour:{id}`.",
-      security: auth,
-      parameters: [p("id", { type: "integer" }, "Mã (id) nhóm")],
-      responses: { 204: { description: "Đã kết thúc" }, 401: E.auth, 403: E.forbidden, 404: E.tourNotFound, 409: err("Nhóm đã kết thúc", "TOUR_ENDED", "Nhóm đã kết thúc") },
     },
   },
   "/api/v1/admin/places": {
@@ -688,12 +574,12 @@ export const contentPaths = {
   "/api/v1/admin/users": {
     get: {
       tags: ["Quản trị người dùng"],
-      summary: "Danh sách người dùng (online, hoạt động gần nhất, nhóm)",
+      summary: "Danh sách người dùng (online, hoạt động gần nhất)",
       description: "Người đang hoạt động xếp trước, sau đó theo hoạt động gần nhất.",
       security: auth,
       parameters: [
         q("q", { type: "string" }, "Tìm theo email, họ tên"),
-        q("role", { type: "string", enum: ["user", "guide", "admin"] }, "Vai trò"),
+        q("role", { type: "string", enum: ["user", "admin"] }, "Vai trò"),
         q("status", { type: "string", enum: ["active", "locked"] }, "Trạng thái"),
         q("online", { type: "string", enum: ["true", "false"] }, "Đang hoạt động"),
         ...page,
@@ -722,21 +608,12 @@ export const contentPaths = {
             examples: {
               lock: { summary: "Khóa", value: { status: "locked", reason: "Spam nội dung" } },
               unlock: { summary: "Mở khóa", value: { status: "active" } },
-              role: { summary: "Đổi vai trò", value: { role: "guide" } },
+              role: { summary: "Đổi vai trò (không áp dụng cho khách ẩn danh)", value: { role: "admin" } },
             },
           },
         },
       },
-      responses: { 200: ok("Sau khi sửa", "AdminUser"), 400: E.validation, 401: E.auth, 403: E.forbidden, 404: E.notFound, 409: err("Sửa chính mình", "CANNOT_MODIFY_SELF", "Không thể khóa hoặc đổi vai trò của chính mình") },
-    },
-  },
-  "/api/v1/admin/tours": {
-    get: {
-      tags: ["Quản trị người dùng"],
-      summary: "Danh sách nhóm tham quan (FE-23)",
-      security: auth,
-      parameters: [q("status", { type: "string", enum: ["active", "ended"] }, "Trạng thái")],
-      responses: { 200: { description: "Danh sách", content: { "application/json": { schema: items("Tour") } } }, 401: E.auth, 403: E.forbidden },
+      responses: { 200: ok("Sau khi sửa", "AdminUser"), 400: E.validation, 401: E.auth, 403: E.forbidden, 404: E.notFound, 409: err("CANNOT_MODIFY_SELF (sửa chính mình) / GUEST_ROLE_FIXED (đổi vai trò khách)", "CANNOT_MODIFY_SELF", "Không thể khóa hoặc đổi vai trò của chính mình") },
     },
   },
   "/api/v1/admin/activity-logs": {

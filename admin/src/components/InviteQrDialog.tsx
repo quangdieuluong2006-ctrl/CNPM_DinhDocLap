@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { apiGet } from "../lib/api";
+import { inviteHint } from "../lib/inviteHint";
 
 interface JoinLink {
   url: string;
@@ -10,8 +11,8 @@ interface JoinLink {
   recommended: boolean;
 }
 
-// Hộp thoại chiếu mã QR để khách quét bằng điện thoại và dùng Web User ngay (không cần đăng ký).
-// Điện thoại phải dùng CÙNG mạng Wi-Fi với máy đang chạy Web User.
+// Hộp thoại chiếu mã QR để khách quét bằng điện thoại và dùng Web User ngay (không cần đăng ký) – FE-23.
+// Thứ tự địa chỉ do API chọn: địa chỉ công khai → Cloudflare Tunnel (mọi mạng) → IP Wi-Fi (cùng mạng).
 export function InviteQrDialog({ onClose }: { onClose: () => void }) {
   const links = useQuery({ queryKey: ["join-link"], queryFn: () => apiGet<{ links: JoinLink[] }>("/admin/join-link") });
   const [index, setIndex] = useState(0);
@@ -59,7 +60,7 @@ export function InviteQrDialog({ onClose }: { onClose: () => void }) {
             <p className="break-all font-mono text-base font-semibold text-slate-900">{selected.url}</p>
             {all.length > 1 && (
               <label className="block text-left text-sm text-slate-600">
-                Mạng (chọn mạng Wi-Fi mà điện thoại đang dùng):
+                Địa chỉ (link https dùng được mọi mạng; IP chỉ dùng trong cùng Wi-Fi):
                 <select value={index} onChange={(e) => setIndex(Number(e.target.value))} className="mt-1 w-full rounded-md border px-2 py-1.5">
                   {all.map((l, i) => (
                     <option key={l.url} value={i}>
@@ -70,10 +71,7 @@ export function InviteQrDialog({ onClose }: { onClose: () => void }) {
                 </select>
               </label>
             )}
-            <p className="text-xs text-slate-500">
-              Điện thoại cần dùng cùng Wi-Fi với máy này. Không mở được: kiểm tra Web User đang chạy (<code>npm run dev</code> trong thư
-              mục <code>web</code>) và Windows Firewall cho phép cổng 5173.
-            </p>
+            <p className="text-xs text-slate-500">{inviteHint(selected.url)}</p>
           </>
         )}
 
