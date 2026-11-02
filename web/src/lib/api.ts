@@ -38,7 +38,7 @@ export interface User {
   id: number;
   email: string;
   fullName: string;
-  role: "user" | "guide" | "admin";
+  role: "user" | "admin";
   status: "active" | "locked";
   uiLocale: "vi" | "en";
   narrationLang: string | null;

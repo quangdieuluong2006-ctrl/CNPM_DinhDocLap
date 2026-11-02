@@ -25,11 +25,11 @@ describe.skipIf(!runDbTests)("API quản trị trên SQL Server", () => {
   }, 120_000);
   afterAll(closePool);
 
-  it("người dùng thường và hướng dẫn viên không vào được API quản trị", async () => {
-    for (const email of ["user1@demo.vn", "guide1@demo.vn"]) {
-      const res = await request(app).get(api("/admin/places")).set(bearer(await loginAs(app, email)));
-      expect(res.status).toBe(403);
-    }
+  it("người dùng thường và khách ẩn danh không vào được API quản trị", async () => {
+    const user = await request(app).get(api("/admin/places")).set(bearer(await loginAs(app, "user1@test.vn")));
+    expect(user.status).toBe(403);
+    const guest = await request(app).post(api("/auth/guest")).send({ clientType: "web" });
+    expect((await request(app).get(api("/admin/places")).set(bearer(guest.body.accessToken))).status).toBe(403);
   });
 
   it("thêm điểm: trùng số điểm → 409; tọa độ trùng vùng điểm khác → cảnh báo; phiên bản nội dung tăng", async () => {
@@ -133,26 +133,35 @@ describe.skipIf(!runDbTests)("API quản trị trên SQL Server", () => {
   it("người dùng: lọc, khóa (không đăng nhập được, refresh bị thu hồi), mở khóa, đổi vai trò", async () => {
     const list = await request(app).get(api("/admin/users?role=user&pageSize=4")).set(admin);
     expect(list.status).toBe(200);
-    expect(list.body).toMatchObject({ page: 1, pageSize: 4, total: 6 });
+    // 6 khách mẫu của seed + 6 tài khoản thử (TEST_USERS) + 1 khách tạo ở test đầu file
+    expect(list.body).toMatchObject({ page: 1, pageSize: 4, total: 13 });
     expect(list.body.items).toHaveLength(4);
     expect(list.body.items[0]).toHaveProperty("lastSeenAt");
 
-    const login = await request(app).post(api("/auth/login")).send({ email: "user6@demo.vn", password: SEED_PASSWORD, clientType: "mobile" });
+    const login = await request(app).post(api("/auth/login")).send({ email: "user6@test.vn", password: SEED_PASSWORD, clientType: "mobile" });
     const user6 = login.body.user.id as number;
     const lock = await request(app).patch(api(`/admin/users/${user6}`)).set(admin).send({ status: "locked", reason: "Spam" });
     expect(lock.status).toBe(200);
     expect(lock.body).toMatchObject({ status: "locked", lockedReason: "Spam" });
-    const again = await request(app).post(api("/auth/login")).send({ email: "user6@demo.vn", password: SEED_PASSWORD, clientType: "mobile" });
+    const again = await request(app).post(api("/auth/login")).send({ email: "user6@test.vn", password: SEED_PASSWORD, clientType: "mobile" });
     expect(again.body.error.code).toBe("ACCOUNT_LOCKED");
     const refresh = await request(app).post(api("/auth/refresh")).send({ clientType: "mobile", refreshToken: login.body.refreshToken });
     expect(refresh.status).toBe(401);
 
     expect((await request(app).patch(api(`/admin/users/${user6}`)).set(admin).send({ status: "locked" })).status).toBe(400);
     expect((await request(app).patch(api(`/admin/users/${user6}`)).set(admin).send({ status: "active" })).body.status).toBe("active");
-    expect((await request(app).patch(api(`/admin/users/${user6}`)).set(admin).send({ role: "guide" })).body.role).toBe("guide");
+    // v2.0 chỉ còn 2 vai trò: "guide" không hợp lệ; khách ẩn danh không đổi vai trò được.
+    expect((await request(app).patch(api(`/admin/users/${user6}`)).set(admin).send({ role: "guide" })).status).toBe(400);
+    expect((await request(app).patch(api(`/admin/users/${user6}`)).set(admin).send({ role: "admin" })).body.role).toBe("admin");
+    const guests = await request(app).get(api("/admin/users?guest=true")).set(admin);
+    expect(guests.body.total).toBe(7);
+    const guestRole = await request(app).patch(api(`/admin/users/${guests.body.items[0].id}`)).set(admin).send({ role: "admin" });
+    expect(guestRole.status).toBe(409);
+    expect(guestRole.body.error.code).toBe("GUEST_ROLE_FIXED");
 
     const detail = await request(app).get(api(`/admin/users/${user6}`)).set(admin);
-    expect(detail.body.user).toMatchObject({ role: "guide", online: false });
+    expect(detail.body.user).toMatchObject({ role: "admin", online: false });
+    expect(detail.body.user).not.toHaveProperty("tour");
     expect(Array.isArray(detail.body.sessions)).toBe(true);
 
     const self = (await request(app).get(api("/me")).set(admin)).body.id as number;
@@ -160,7 +169,7 @@ describe.skipIf(!runDbTests)("API quản trị trên SQL Server", () => {
     expect(selfLock.body.error.code).toBe("CANNOT_MODIFY_SELF");
   });
 
-  it("nhật ký hoạt động lọc theo nhóm hành động; danh sách nhóm tham quan", async () => {
+  it("nhật ký hoạt động lọc theo nhóm hành động; API nhóm tham quan đã bỏ", async () => {
     const logs = await request(app).get(api("/admin/activity-logs?action=admin.user")).set(admin);
     expect(logs.status).toBe(200);
     expect(logs.body.items.map((l: { action: string }) => l.action)).toEqual(
@@ -168,6 +177,6 @@ describe.skipIf(!runDbTests)("API quản trị trên SQL Server", () => {
     expect(logs.body.items[0].user.email).toBe("admin@demo.vn");
     const place = await request(app).get(api("/admin/activity-logs?action=place&pageSize=100")).set(admin);
     expect(place.body.items.every((l: { action: string }) => l.action.startsWith("place."))).toBe(true);
-    expect((await request(app).get(api("/admin/tours?status=active")).set(admin)).status).toBe(200);
+    expect((await request(app).get(api("/admin/tours?status=active")).set(admin)).status).toBe(404);
   });
 });

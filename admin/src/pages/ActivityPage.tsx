@@ -11,7 +11,6 @@ const GROUPS = [
   ["auth.login_failed", "Đăng nhập thất bại"],
   ["place", "Điểm và bài thuyết minh"],
   ["language", "Ngôn ngữ"],
-  ["tour", "Nhóm tham quan"],
   ["admin.user", "Quản lý người dùng"],
 ] as const;
 

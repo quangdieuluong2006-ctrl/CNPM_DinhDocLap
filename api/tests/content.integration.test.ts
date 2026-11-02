@@ -97,7 +97,7 @@ describe.skipIf(!runDbTests)("Nội dung công khai và lượt ghé trên SQL S
   });
 
   it("POST /visits/batch (đồng bộ sau offline) + GET /me/visits", async () => {
-    const token = await loginAs(app, "user6@demo.vn");
+    const token = await loginAs(app, "user6@test.vn");
     const at = (minAgo: number) => new Date(Date.now() - minAgo * 60_000).toISOString();
     const dupId = randomUUID();
     const visits = [
@@ -119,7 +119,7 @@ describe.skipIf(!runDbTests)("Nội dung công khai và lượt ghé trên SQL S
   });
 
   it("PATCH /me: đổi ngôn ngữ thuyết minh; ngôn ngữ chưa có → 400", async () => {
-    const token = await loginAs(app, "user5@demo.vn");
+    const token = await loginAs(app, "user5@test.vn");
     const ok = await request(app).patch(api("/me")).set(bearer(token)).send({ narrationLang: "ko", uiLocale: "en" });
     expect(ok.status).toBe(200);
     expect(ok.body).toMatchObject({ narrationLang: "ko", uiLocale: "en" });

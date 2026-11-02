@@ -7,7 +7,6 @@ import { adminRouter } from "../src/modules/admin/admin.routes.js";
 import { adminManagementRouter } from "../src/modules/admin/management.routes.js";
 import { adminPlacesRouter } from "../src/modules/admin/places.routes.js";
 import { contentRouter } from "../src/modules/content/content.routes.js";
-import { toursRouter } from "../src/modules/tours/tours.routes.js";
 import { visitsRouter } from "../src/modules/visits/visits.routes.js";
 import { authRouter } from "../src/modules/auth/auth.routes.js";
 import { healthRouter } from "../src/modules/health/health.routes.js";
@@ -28,7 +27,7 @@ function routesOf(router: Router, prefix: string): string[] {
 
 const actual = [
   ...routesOf(healthRouter, ""),
-  ...[authRouter(), meRouter, presenceRouter, contentRouter, visitsRouter, toursRouter, adminRouter, adminPlacesRouter, adminManagementRouter].flatMap((r) => routesOf(r, "/api/v1")),
+  ...[authRouter(), meRouter, presenceRouter, contentRouter, visitsRouter, adminRouter, adminPlacesRouter, adminManagementRouter].flatMap((r) => routesOf(r, "/api/v1")),
 ].sort();
 
 const documented = Object.entries(openApiSpec.paths)

@@ -7,3 +7,6 @@ coverage/
 .DS_Store
 .expo/
 storage/
+
+# Visual Studio / SSMS
+.vs/

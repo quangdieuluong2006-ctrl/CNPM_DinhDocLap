@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { env } from "../config/env.js";
 import { dbConfig, sql } from "./pool.js";
 
-// Dữ liệu mẫu cho môi trường dev/demo (PRD v1.0, mục 13.5). Chạy lại nhiều lần vẫn an toàn.
+// Dữ liệu mẫu cho môi trường dev/demo (PRD v2.0, mục 13.4). Chạy lại nhiều lần vẫn an toàn.
 const SEED_DIR = process.env.SEED_DIR ?? path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../db/seed");
 
 // [mã, tên tiếng Việt, tên tiếng Anh, tên bản ngữ, locale giọng đọc]
@@ -22,17 +22,25 @@ export const LANGUAGES: [string, string, string, string, string][] = [
   ["th", "Tiếng Thái", "Thai", "ไทย", "th-TH"],
 ];
 
-export const DEMO_USERS = [
-  { email: "admin@demo.vn", fullName: "Quản trị viên", role: "admin" },
-  { email: "guide1@demo.vn", fullName: "Đặng Quốc Minh", role: "guide" },
-  { email: "guide2@demo.vn", fullName: "Ngô Thanh Tâm", role: "guide" },
-  { email: "user1@demo.vn", fullName: "Nguyễn Văn An", role: "user" },
-  { email: "user2@demo.vn", fullName: "Trần Thị Bình", role: "user" },
-  { email: "user3@demo.vn", fullName: "Lê Hoàng Cường", role: "user" },
-  { email: "user4@demo.vn", fullName: "Phạm Minh Dũng", role: "user" },
-  { email: "user5@demo.vn", fullName: "Hoàng Thu Hà", role: "user" },
-  { email: "user6@demo.vn", fullName: "Vũ Đức Khang", role: "user" },
+// Chỉ quản trị viên có email/mật khẩu (PRD v2.0, mục 2.2). Khách luôn là khách ẩn danh.
+export const DEMO_USERS = [{ email: "admin@demo.vn", fullName: "Quản trị viên", role: "admin" }] as const;
+
+// Khách ẩn danh mẫu (is_guest = 1, không mật khẩu) để Dashboard và trang Người dùng có dữ liệu.
+// Email theo đúng dạng API tự sinh cho khách: guest-…@guest.local.
+export const SAMPLE_GUESTS = [
+  { email: "guest-sample-1@guest.local", fullName: "Khách #7F3A", lang: "en" },
+  { email: "guest-sample-2@guest.local", fullName: "Khách #B21C", lang: "vi" },
+  { email: "guest-sample-3@guest.local", fullName: "Khách #4E9D", lang: "ko" },
+  { email: "guest-sample-4@guest.local", fullName: "Khách #C058", lang: "ja" },
+  { email: "guest-sample-5@guest.local", fullName: "Khách #19F2", lang: "zh" },
+  { email: "guest-sample-6@guest.local", fullName: "Khách #E7A4", lang: "fr" },
 ] as const;
+
+// Tài khoản mẫu của bản trước v2.0 (hướng dẫn viên, người dùng có mật khẩu): seed xóa nếu còn trong CSDL.
+export const LEGACY_DEMO_EMAILS = [
+  "guide1@demo.vn", "guide2@demo.vn",
+  "user1@demo.vn", "user2@demo.vn", "user3@demo.vn", "user4@demo.vn", "user5@demo.vn", "user6@demo.vn",
+];
 
 interface Text {
   title: string;
@@ -87,7 +95,7 @@ export async function seed(log: (msg: string) => void = console.log): Promise<vo
                VALUES (@code, @vi, @en, @native, @tts, @sort);`);
     }
 
-    // Mọi tài khoản mẫu dùng chung SEED_PASSWORD (mặc định Demo@12345); chỉ tạo nếu chưa có.
+    // Quản trị viên mẫu dùng SEED_PASSWORD (mặc định Demo@12345); chỉ tạo nếu chưa có.
     const passwordHash = await bcrypt.hash(env.SEED_PASSWORD, 10);
     for (const u of DEMO_USERS) {
       await req()
@@ -99,6 +107,31 @@ export async function seed(log: (msg: string) => void = console.log): Promise<vo
             INSERT INTO dbo.users (email, password_hash, full_name, role, narration_lang)
             VALUES (@email, @hash, @name, @role, 'vi');`);
     }
+    for (const g of SAMPLE_GUESTS) {
+      await req()
+        .input("email", sql.NVarChar(255), g.email)
+        .input("name", sql.NVarChar(100), g.fullName)
+        .input("lang", sql.VarChar(10), g.lang).query(`
+          IF NOT EXISTS (SELECT 1 FROM dbo.users WHERE email = @email)
+            INSERT INTO dbo.users (email, password_hash, full_name, role, narration_lang, is_guest)
+            VALUES (@email, NULL, @name, 'user', @lang, 1);`);
+    }
+
+    // Xóa tài khoản mẫu cũ. visits, activity_logs, place_contents, content_releases tham chiếu users
+    // mà không có ON DELETE CASCADE, nên gán NULL trước (giữ lại lượt ghé, nhật ký) rồi mới xóa;
+    // refresh_tokens và user_sessions tự xóa theo (ON DELETE CASCADE).
+    const legacy = req();
+    LEGACY_DEMO_EMAILS.forEach((e, i) => legacy.input(`e${i}`, sql.NVarChar(255), e));
+    const removed = await legacy.query<{ n: number }>(`
+      DECLARE @old TABLE (id INT PRIMARY KEY);
+      INSERT INTO @old SELECT id FROM dbo.users WHERE email IN (${LEGACY_DEMO_EMAILS.map((_, i) => `@e${i}`).join(", ")});
+      UPDATE dbo.visits           SET user_id = NULL      WHERE user_id      IN (SELECT id FROM @old);
+      UPDATE dbo.activity_logs    SET user_id = NULL      WHERE user_id      IN (SELECT id FROM @old);
+      UPDATE dbo.place_contents   SET updated_by = NULL   WHERE updated_by   IN (SELECT id FROM @old);
+      UPDATE dbo.content_releases SET published_by = NULL WHERE published_by IN (SELECT id FROM @old);
+      DELETE FROM dbo.users WHERE id IN (SELECT id FROM @old);
+      SELECT COUNT(*) AS n FROM @old;`);
+    const removedLegacy = removed.recordset[0]!.n;
 
     for (const p of places) {
       await req()
@@ -161,7 +194,7 @@ export async function seed(log: (msg: string) => void = console.log): Promise<vo
         const placeId = placeList[Math.floor(rand() * placeList.length)]!;
         const listened = 30 + Math.floor(rand() * 120);
         await req()
-          .input("user", sql.Int, rand() < 0.2 ? null : user.id) // 20% khách không đăng nhập
+          .input("user", sql.Int, rand() < 0.2 ? null : user.id) // 20% lượt ghé không gắn khách (dữ liệu cũ, khách đã xóa)
           .input("place", sql.Int, placeId)
           .input("lang", sql.VarChar(10), langs[Math.floor(rand() * langs.length)])
           .input("trigger", sql.VarChar(10), triggers[Math.floor(rand() * triggers.length)])
@@ -176,7 +209,10 @@ export async function seed(log: (msg: string) => void = console.log): Promise<vo
     }
 
     await tx.commit();
-    log(`Đã nạp dữ liệu mẫu: ${LANGUAGES.length} ngôn ngữ, ${DEMO_USERS.length} tài khoản, ${places.length} điểm thuyết minh.`);
+    log(
+      `Đã nạp dữ liệu mẫu: ${LANGUAGES.length} ngôn ngữ, ${DEMO_USERS.length} quản trị viên, ${SAMPLE_GUESTS.length} khách mẫu, ` +
+        `${places.length} điểm thuyết minh` + (removedLegacy ? `; đã xóa ${removedLegacy} tài khoản mẫu cũ.` : "."),
+    );
   } catch (err) {
     await tx.rollback();
     throw err;

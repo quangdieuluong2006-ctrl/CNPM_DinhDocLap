@@ -58,7 +58,6 @@ export function UsersPage() {
         <select value={role} onChange={filter(setRole)} className="rounded-md border px-2 py-2">
           <option value="">Mọi vai trò</option>
           <option value="user">Khách tham quan</option>
-          <option value="guide">Hướng dẫn viên</option>
           <option value="admin">Quản trị viên</option>
         </select>
         <select value={status} onChange={filter(setStatus)} className="rounded-md border px-2 py-2">
@@ -180,8 +179,7 @@ function UserDetail({ id, onClose }: { id: number; onClose: () => void }) {
                   className="rounded-md border px-2 py-2"
                 >
                   <option value="user">Khách tham quan</option>
-                  <option value="guide">Hướng dẫn viên</option>
-                  <option value="admin">Quản trị viên</option>
+                          <option value="admin">Quản trị viên</option>
                 </select>
               </Field>
               )}

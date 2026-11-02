@@ -1,9 +1,8 @@
 import { getPool, sql } from "../../db/pool.js";
 import { logger } from "../../lib/logger.js";
 
-// Danh sách hành động được ghi: PRD v1.0, mục 13.2.
+// Danh sách hành động được ghi (PRD v2.0, FE-24). Nhật ký cũ có thể còn "auth.register", "tour.*" từ trước v2.0.
 export type ActivityAction =
-  | "auth.register"
   | "auth.guest"
   | "auth.login"
   | "auth.login_failed"
@@ -16,8 +15,6 @@ export type ActivityAction =
   | "place.audio.upload"
   | "content.publish"
   | "language.update"
-  | "tour.create"
-  | "tour.end"
   | "admin.user.lock"
   | "admin.user.unlock"
   | "admin.user.role_change";

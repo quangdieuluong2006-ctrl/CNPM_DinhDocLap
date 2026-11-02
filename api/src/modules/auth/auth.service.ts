@@ -30,19 +30,6 @@ async function issueSession(user: repo.UserRow): Promise<Session> {
   };
 }
 
-export async function register(
-  input: { email: string; password: string; fullName: string; locale: "vi" | "en"; narrationLang?: string; clientType: ClientType },
-  ip?: string,
-): Promise<Session> {
-  const passwordHash = await bcrypt.hash(input.password, BCRYPT_COST);
-  const id = await repo.insertUser({ ...input, passwordHash });
-  if (id === undefined) throw new ApiError(409, "EMAIL_TAKEN", "Email đã được đăng ký");
-  const user = await repo.findUserById(id);
-  if (!user) throw new Error("Không đọc lại được user vừa tạo");
-  await logActivity({ userId: id, action: "auth.register", entityType: "user", entityId: id, ip, detail: { clientType: input.clientType } });
-  return issueSession(user);
-}
-
 // Khách ẩn danh: tạo tài khoản khách cho thiết bị và cấp phiên ngay (PRD: khách quét QR là dùng, không đăng ký).
 export async function guest(
   input: { locale: "vi" | "en"; narrationLang?: string; clientType: "web" | "mobile" },
