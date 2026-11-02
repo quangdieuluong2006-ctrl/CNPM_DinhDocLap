@@ -1,0 +1,112 @@
+@startuml
+!include skin.iuml
+hide empty members
+skinparam classAttributeIconSize 0
+
+class AppStore <<state/store.ts>> {
+  +state : AppState
+  +api : Api
+  +realtime : Realtime
+  +sim : SimulatedLocationProvider
+  +narration : NarrationController
+  -geofence : GeofenceEngine
+  -provider : LocationProvider
+  +init() : Promise<void>
+  +ensureSession() : Promise<boolean>
+  +setLanguage(lang) : Promise<void>
+  +refreshBundle() : Promise<void>
+  +downloadOfflineAudio() : Promise<void>
+  +findPlace(code) : Place
+  +play(place, trigger) : void
+  +startLocation() : Promise<void>
+  +syncVisits() : Promise<void>
+  -onFix(fix : Fix) : void
+  -startGuest() : Promise<boolean>
+  -endSession(notice) : Promise<void>
+}
+
+class GeofenceEngine <<core/geofence.ts>> {
+  +setPlaces(places : GeoPlace[]) : void
+  +process(fix : Fix) : GeofenceResult
+  +isInside(placeId) : boolean
+  +isWeakSignal() : boolean
+  +markAutoPlayed(placeId) : void
+  +reset() : void
+  -filter(fix) : RejectReason
+}
+
+class NarrationController <<core/narration.ts>> {
+  -state : NarrationState
+  -engine : PlaybackEngine
+  +request(item, trigger) : started | suggested | queued | ignored
+  +acceptSuggestion(trigger) : void
+  +pause() : void
+  +resume() : void
+  +restart(item) : void
+  +seekBy(deltaSec) : void
+  +setRate(rate) : void
+  +stop() : void
+  -playNextInQueue() : void
+}
+
+interface PlaybackEngine {
+  +start(item, rate, handlers) : void
+  +pause() : void
+  +resume() : void
+  +stop() : void
+  +setRate(rate) : void
+}
+class AudioFileEngine <<expo-audio>>
+class TtsEngine <<expo-speech>>
+
+interface LocationProvider {
+  +kind : real | simulated
+  +start(onFix, onError) : Promise<void>
+  +stop() : void
+}
+class RealLocationProvider <<expo-location>>
+class SimulatedLocationProvider {
+  +teleport(p : LatLng) : void
+  +playRoute(waypoints, speedup) : void
+  +stopRoute() : void
+}
+
+class Realtime <<socket.io-client>> {
+  +start(baseUrl) : void
+  +stop() : void
+}
+
+class NarrationItem <<dữ liệu>> {
+  placeId : number
+  code : string
+  title : string
+  lang : string
+  audioUri : string
+  text : string
+}
+enum Trigger {
+  gps
+  qr
+  code
+  manual
+  simulated
+}
+
+AppStore *-- GeofenceEngine
+AppStore *-- NarrationController
+AppStore *-- Realtime
+AppStore o-- LocationProvider : vị trí hiện dùng
+AppStore *-- SimulatedLocationProvider
+NarrationController o-- PlaybackEngine
+PlaybackEngine <|.. AudioFileEngine
+PlaybackEngine <|.. TtsEngine
+LocationProvider <|.. RealLocationProvider
+LocationProvider <|.. SimulatedLocationProvider
+NarrationController ..> NarrationItem
+NarrationController ..> Trigger
+note right of AppStore
+  onFix(fix): geofence.process(fix)
+  → điểm vừa vào vùng
+  → narration.request(item, "gps")
+end note
+@enduml

@@ -11,7 +11,7 @@ entity users {
   email : NVARCHAR(255) UQ
   password_hash NULL
   full_name
-  role : user|guide|admin
+  role : user|admin
   status : active|locked
   is_guest : BIT
   locked_reason
@@ -80,24 +80,6 @@ entity content_releases {
   published_by FK
   published_at, note
 }
-entity "tours (không dùng từ v1.1)" as tours {
-  *id
-  --
-  code CHAR(6) UQ
-  name
-  guide_id FK
-  status : active|ended
-  max_members
-  created_at, ended_at
-}
-entity "tour_members (không dùng từ v1.1)" as tour_members {
-  *tour_id FK
-  *user_id FK
-  --
-  joined_at, left_at
-  current_place_id FK NULL
-  current_place_at
-}
 entity visits {
   *id : BIGINT
   --
@@ -115,14 +97,11 @@ languages -[hidden]down- place_contents
 users ||--o{ refresh_tokens
 users ||--o{ user_sessions
 users |o--o{ activity_logs
-users ||--o{ tours : hướng dẫn
-users ||--o{ tour_members
-tours ||--o{ tour_members
-places |o--o{ tour_members : điểm hiện tại
 users |o--o{ visits
 places ||--o{ visits
 places ||--o{ place_contents
 languages ||--o{ place_contents
 languages ||--o{ visits
 users |o--o{ content_releases
+users |o--o{ place_contents : cập nhật
 @enduml
