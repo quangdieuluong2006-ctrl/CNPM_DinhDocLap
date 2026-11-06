@@ -40,6 +40,7 @@ export const ko: Dict = {
   stopRoute: "정지",
   myLocation: "내 위치",
   tts: "합성 음성",
+  aiVoice: "AI 음성",
   noVoice: "이 기기에는 이 언어의 음성이 없습니다 – 글을 읽으실 수 있습니다",
   speed: "속도",
   replay: "다시 듣기",

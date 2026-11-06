@@ -40,6 +40,7 @@ export const es: Dict = {
   stopRoute: "Detener",
   myLocation: "Mi ubicación",
   tts: "Voz sintetizada",
+  aiVoice: "Voz de IA",
   noVoice: "Este dispositivo no tiene voz para este idioma; puede leer el texto",
   speed: "Velocidad",
   replay: "Repetir",

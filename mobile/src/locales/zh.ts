@@ -40,6 +40,7 @@ export const zh: Dict = {
   stopRoute: "停止",
   myLocation: "我的位置",
   tts: "合成语音",
+  aiVoice: "AI 语音",
   noVoice: "本设备没有该语言的语音——您可以阅读文字",
   speed: "语速",
   replay: "重播",

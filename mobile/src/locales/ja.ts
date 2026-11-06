@@ -40,6 +40,7 @@ export const ja: Dict = {
   stopRoute: "停止",
   myLocation: "現在地",
   tts: "合成音声",
+  aiVoice: "AI音声",
   noVoice: "この端末にはこの言語の音声がありません。本文をお読みください",
   speed: "速度",
   replay: "もう一度聴く",

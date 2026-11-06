@@ -1,8 +1,10 @@
-import { readFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import bcrypt from "bcryptjs";
 import { env } from "../config/env.js";
+import { mediaRoot } from "../lib/media.js";
+import { AI_VOICES, audioFile, readManifest, textHash } from "./aiVoice.js";
 import { dbConfig, sql } from "./pool.js";
 
 // Dữ liệu mẫu cho môi trường dev/demo (PRD v2.0, mục 13.4). Chạy lại nhiều lần vẫn an toàn.
@@ -173,6 +175,15 @@ export async function seed(log: (msg: string) => void = console.log): Promise<vo
       }
     }
 
+    // Giọng đọc AI (PRD v2.0, mục 4.10): gắn db/seed/audio/<lang>/<code>.mp3 vào bài tương ứng.
+    const hadRelease = (await req().query<{ n: number }>("SELECT COUNT(*) AS n FROM dbo.content_releases")).recordset[0]!.n > 0;
+    const voice = await attachAiVoices(req);
+    // CSDL đã có từ trước mà giọng đọc thay đổi → tăng phiên bản để ứng dụng tải lại gói nội dung (ETag đổi).
+    if (hadRelease && voice.attached + voice.detached > 0) {
+      await req().input("note", sql.NVarChar(300), `Giọng đọc AI: gắn ${voice.attached}, gỡ ${voice.detached} tệp`)
+        .query("INSERT INTO dbo.content_releases (note) VALUES (@note);");
+    }
+
     await req().query(`
       IF NOT EXISTS (SELECT 1 FROM dbo.content_releases)
         INSERT INTO dbo.content_releases (note) VALUES (N'Dữ liệu mẫu ban đầu');`);
@@ -211,7 +222,10 @@ export async function seed(log: (msg: string) => void = console.log): Promise<vo
     await tx.commit();
     log(
       `Đã nạp dữ liệu mẫu: ${LANGUAGES.length} ngôn ngữ, ${DEMO_USERS.length} quản trị viên, ${SAMPLE_GUESTS.length} khách mẫu, ` +
-        `${places.length} điểm thuyết minh` + (removedLegacy ? `; đã xóa ${removedLegacy} tài khoản mẫu cũ.` : "."),
+        `${places.length} điểm thuyết minh, giọng đọc AI ${voice.ready}/${voice.total} bài` +
+        (voice.attached || voice.detached ? ` (gắn mới ${voice.attached}, gỡ ${voice.detached})` : "") +
+        (voice.skipped ? `, ${voice.skipped} bài đã sửa văn bản nên không gắn` : "") +
+        (removedLegacy ? `; đã xóa ${removedLegacy} tài khoản mẫu cũ.` : "."),
     );
   } catch (err) {
     await tx.rollback();
@@ -219,6 +233,54 @@ export async function seed(log: (msg: string) => void = console.log): Promise<vo
   } finally {
     await pool.close();
   }
+}
+
+// Gắn tệp giọng đọc AI vào place_contents. Chỉ gắn khi văn bản trong CSDL khớp đúng văn bản đã dùng để sinh tệp
+// (so mã băm trong manifest.json) – bài đã được sửa trên Web Admin sẽ không bị gắn giọng đọc cũ.
+// Không đụng tới bài đang dùng tệp do quản trị viên tự tải lên. Tệp được chép vào MEDIA_DIR/audio/<lang>/<code>-ai.mp3.
+async function attachAiVoices(req: () => sql.Request) {
+  const audioDir = path.join(SEED_DIR, "audio");
+  const manifest = readManifest(audioDir);
+  const rows = await req().query<{ code: string; lang: string; title: string; body: string; audio_url: string | null }>(`
+    SELECT p.code, c.language_code AS lang, c.title, c.body, c.audio_url
+    FROM dbo.place_contents c JOIN dbo.places p ON p.id = c.place_id`);
+  const result = { total: rows.recordset.length, ready: 0, attached: 0, detached: 0, skipped: 0 };
+  for (const r of rows.recordset) {
+    const url = `/media/audio/${r.lang}/${r.code}-ai.mp3`;
+    const entry = manifest[`${r.lang}/${r.code}`];
+    const voice = AI_VOICES[r.lang];
+    const src = audioFile(audioDir, r.lang, r.code);
+    const ours = r.audio_url === null || r.audio_url === url; // không ghi đè tệp quản trị viên tải lên
+    if (!ours) continue;
+    const matches = !!entry && !!voice && entry.voice === voice && entry.hash === textHash(voice, r) && existsSync(src);
+    if (matches) {
+      const dest = path.join(mediaRoot, "audio", r.lang, `${r.code}-ai.mp3`);
+      if (!existsSync(dest) || statSync(dest).size !== entry.bytes) {
+        mkdirSync(path.dirname(dest), { recursive: true });
+        copyFileSync(src, dest);
+      }
+      if (r.audio_url !== url) {
+        await req().input("code", sql.Char(3), r.code).input("lang", sql.VarChar(10), r.lang)
+          .input("url", sql.NVarChar(500), url).input("dur", sql.Int, entry.durationSec).input("bytes", sql.Int, entry.bytes).query(`
+            UPDATE c SET audio_url = @url, audio_duration_sec = @dur, audio_bytes = @bytes
+            FROM dbo.place_contents c JOIN dbo.places p ON p.id = c.place_id
+            WHERE p.code = @code AND c.language_code = @lang;`);
+        result.attached++;
+      }
+      result.ready++;
+    } else if (r.audio_url === url) {
+      // Văn bản đã đổi sau khi sinh giọng → gỡ tệp cũ để không đọc sai nội dung (app dùng giọng thiết bị thay thế).
+      await req().input("code", sql.Char(3), r.code).input("lang", sql.VarChar(10), r.lang).query(`
+        UPDATE c SET audio_url = NULL, audio_duration_sec = NULL, audio_bytes = NULL
+        FROM dbo.place_contents c JOIN dbo.places p ON p.id = c.place_id
+        WHERE p.code = @code AND c.language_code = @lang;`);
+      result.detached++;
+      result.skipped++;
+    } else if (entry) {
+      result.skipped++;
+    }
+  }
+  return result;
 }
 
 // Chạy trực tiếp: npm run db:seed

@@ -24,6 +24,7 @@ export const de: Dict = {
   replay: "Von vorne hören",
   speed: "Tempo",
   tts: "Synthetische Stimme",
+  aiVoice: "KI-Stimme",
   noVoice: "Ihr Browser hat keine Stimme für diese Sprache – Sie können den Text unten lesen.",
   audioError: "Audio kann nicht abgespielt werden – Sie können den Text unten lesen.",
   showingIn: "Angezeigt auf",

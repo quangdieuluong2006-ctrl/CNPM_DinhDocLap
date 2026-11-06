@@ -51,6 +51,7 @@ export function Player(props: {
           <p className="flex items-center gap-2 font-semibold">
             {playing ? t("nowPlaying") : state.status === "paused" ? t("resume") : t("listen")}
             {!isAudio && <span className="text-xs font-normal text-amber-700">· {t("tts")}</span>}
+            {isAudio && props.source.audioUrl?.endsWith("-ai.mp3") && <span className="text-xs font-normal text-brand-700">· {t("aiVoice")}</span>}
             <span className="ml-auto">
               <Equalizer active={playing} />
             </span>

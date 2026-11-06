@@ -12,6 +12,7 @@ export interface NarrationItem {
   ttsLocale: string;
   text: string; // tóm tắt + nội dung, dùng cho giọng tổng hợp và hiển thị
   audioUri: string | null; // tệp đã tải về máy hoặc URL trên máy chủ
+  aiVoice?: boolean; // tệp là giọng đọc AI sinh sẵn (PRD v2.0, mục 4.10) – trình phát ghi rõ cho khách
 }
 
 export interface PlaybackHandlers {

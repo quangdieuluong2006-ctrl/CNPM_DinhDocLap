@@ -24,6 +24,7 @@ export const ja: Dict = {
   replay: "最初から聴く",
   speed: "速度",
   tts: "合成音声",
+  aiVoice: "AI音声",
   noVoice: "お使いのブラウザにはこの言語の音声がありません。下の本文をお読みください。",
   audioError: "音声を再生できませんでした。下の本文をお読みください。",
   showingIn: "表示言語",

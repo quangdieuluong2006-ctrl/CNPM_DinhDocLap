@@ -40,6 +40,7 @@ export const fr: Dict = {
   stopRoute: "Arrêter",
   myLocation: "Ma position",
   tts: "Voix de synthèse",
+  aiVoice: "Voix IA",
   noVoice: "Cet appareil n'a pas de voix pour cette langue – vous pouvez lire le texte",
   speed: "Vitesse",
   replay: "Réécouter",

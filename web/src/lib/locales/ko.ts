@@ -24,6 +24,7 @@ export const ko: Dict = {
   replay: "처음부터 다시 듣기",
   speed: "속도",
   tts: "합성 음성",
+  aiVoice: "AI 음성",
   noVoice: "브라우저에 이 언어의 음성이 없습니다 – 아래 글을 읽으실 수 있습니다.",
   audioError: "오디오를 재생할 수 없습니다 – 아래 글을 읽으실 수 있습니다.",
   showingIn: "표시 언어",
