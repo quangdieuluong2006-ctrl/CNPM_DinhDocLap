@@ -42,6 +42,7 @@ PowerShell báo "running scripts is disabled": chạy một lần `Set-Execution
 | `npm run demo` | Như `npm run dev`, chạy xong tự mở Web Admin + các tab khách ảo (mỗi tab một khách) |
 | `npm run dev:api` | Chỉ chạy API, tự tải lại khi sửa code |
 | `npm run db:migrate` · `npm run db:seed` | Chạy migration chưa chạy · nạp dữ liệu mẫu (chạy lại an toàn) |
+| `npm run gen:audio` | Sinh tệp giọng đọc AI cho bài mới / bài đã sửa (cần `pip install edge-tts`) – xem mục "Giọng đọc AI" |
 | `npm run typecheck` · `npm run lint` | Kiểm tra kiểu · kiểm tra mã |
 | `npm test` | Test đơn vị |
 | `RUN_DB_TESTS=1 npm test` | Thêm test tích hợp trên SQL Server (CSDL riêng `DinhDocLapDB_test`) |
@@ -83,6 +84,25 @@ SELECT * FROM dbo.v_active_users;          -- người dùng đang hoạt độn
 SELECT * FROM dbo.v_language_completeness; -- mức hoàn thiện nội dung theo ngôn ngữ
 EXEC dbo.sp_admin_dashboard_stats;         -- 5 số liệu Dashboard
 ```
+
+## Giọng đọc AI (PRD v2.0, mục 4.10)
+
+Mỗi bài thuyết minh (12 điểm × 10 ngôn ngữ = 120 bài) có sẵn một tệp MP3 đọc bằng giọng neural, lưu trong
+`db/seed/audio/<lang>/<code>.mp3` (đã commit, khoảng 25 MB). `npm run db:seed` chép tệp vào `MEDIA_DIR/audio/<lang>/<code>-ai.mp3`
+và gắn vào bài – **không cần cài gì thêm**, không cần mạng.
+
+- Seed chỉ gắn tệp khi văn bản trong CSDL **khớp đúng** văn bản đã dùng để đọc (so mã băm trong `db/seed/audio/manifest.json`).
+  Bài đã sửa trên Web Admin → seed gỡ tệp cũ, app dùng giọng tổng hợp của thiết bị. Tệp quản trị viên tự tải lên không bị đụng tới.
+- Sửa văn bản trong `db/seed/places.*.json` (ví dụ sau khi duyệt bản dịch) → sinh lại tệp:
+  ```bash
+  pip install edge-tts          # một lần (cần Python 3.9+)
+  npm run gen:audio             # chỉ sinh tệp thiếu hoặc bài đã đổi; thêm -- --force để sinh lại tất cả
+  npm run gen:audio -- --only ja,en/201   # chỉ tiếng Nhật và bài 201 tiếng Anh
+  npm run db:seed               # gắn tệp mới; phiên bản nội dung tăng → app tải lại gói
+  ```
+- Giọng theo ngôn ngữ: `AI_VOICES` trong `src/db/aiVoice.ts` (Phụ lục B của PRD).
+- `edge-tts` gọi dịch vụ đọc của trình duyệt Microsoft Edge – **không phải API thương mại chính thức**, chỉ dùng cho học tập.
+  Triển khai thật thì thay hàm `synthesize` trong `src/db/gen-audio.ts` bằng dịch vụ có giấy phép (Azure AI Speech, Google Cloud TTS).
 
 ## Người dùng đang hoạt động (presence)
 
