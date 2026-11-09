@@ -1,0 +1,37 @@
+@startuml
+!include skin.iuml
+title UC-08 Điều khiển trình phát (bộ điều phối + chọn nguồn âm thanh)
+start
+:Nhận yêu cầu phát (gps / simulated / qr / code / manual);
+if (Đang phát bài khác?) then (có)
+  if (Nguồn là gps hoặc simulated?) then (có)
+    :Không cắt ngang: hiện thẻ "Nghe ngay",\nđưa vào hàng đợi;
+    stop
+  else (qr / code / manual)
+    :Dừng bài hiện tại, ghi lượt ghé của bài đó;
+  endif
+endif
+if (Có tệp âm thanh đã tải về máy?) then (có)
+  :Phát tệp cục bộ (expo-audio);
+elseif (Có tệp trên máy chủ và đang có mạng?) then (có)
+  :Phát trực tiếp từ URL (HTTP Range, tua được);
+elseif (Thiết bị có giọng cho ngôn ngữ này?) then (có)
+  :Giọng tổng hợp của thiết bị\n(expo-speech / Web Speech API), nhãn "Giọng tổng hợp";
+else (không)
+  :Chỉ hiện văn bản, báo thiết bị chưa có giọng đọc;
+  stop
+endif
+:Hiện trình phát + mini player\n(nhãn "Giọng đọc AI" nếu là tệp AI);
+repeat
+  :Thao tác: tạm dừng / tiếp tục, tua ±10 s (tệp),\nphát lại, đổi tốc độ 0,75–1,5×, đổi ngôn ngữ;
+  if (Đổi ngôn ngữ?) then (có)
+    :Phát lại từ đầu bằng ngôn ngữ mới;
+  endif
+repeat while (Bài chưa kết thúc và khách chưa bấm Dừng?) is (đang nghe)
+->kết thúc / dừng;
+:Ghi lượt ghé: listenedSec, completed (≥ 90 %), trigger;
+if (Hàng đợi còn điểm GPS và khách vẫn trong vùng?) then (có)
+  :Tự phát điểm tiếp theo trong hàng đợi;
+endif
+stop
+@enduml

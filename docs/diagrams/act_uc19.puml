@@ -1,0 +1,25 @@
+@startuml
+!include skin.iuml
+title UC-19 Xem lịch sử tham quan
+start
+:Mở trang Lịch sử (Web User /me)\nhoặc màn Lịch sử (Mobile, FE-10);
+if (Đã có phiên khách?) then (chưa)
+  :Tạo / khôi phục phiên (UC-01);
+endif
+if (Có mạng?) then (có)
+  :GET /me/visits (mới nhất trước, phân trang);
+  :Lấy lượt ghé của khách kèm tên điểm theo ngôn ngữ;
+  :(Mobile) gộp thêm các lượt còn chờ gửi trên máy;
+else (không)
+  :(Mobile) chỉ hiện lượt ghé trên máy,\nghi chú "Đang ngoại tuyến";
+endif
+if (Có lượt nào?) then (không)
+  :Báo "Bạn chưa nghe điểm nào";
+  stop
+endif
+:Danh sách theo ngày (giờ Việt Nam): giờ, số điểm + tiêu đề,\ncách kích hoạt, thời lượng đã nghe, dấu "nghe hết";
+if (Bấm một dòng?) then (có)
+  :Mở chi tiết điểm (UC-05);
+endif
+stop
+@enduml

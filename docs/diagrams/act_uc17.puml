@@ -1,0 +1,22 @@
+@startuml
+!include skin.iuml
+title UC-17 Quản lý ngôn ngữ
+start
+:Mở trang Ngôn ngữ (mã, tên, locale giọng đọc,\nbật / tắt, mức hoàn thiện);
+if (Thao tác) then (thêm)
+  :Bấm "+ Thêm ngôn ngữ", gõ tìm\n(ví dụ "ý", "italian", "it");
+  :GET /admin/languages/catalog?q= (danh mục ISO 639-1);
+  :Bấm "Thêm" cạnh ngôn ngữ cần thêm;
+  :PUT /admin/languages/{code} → thêm, bật sẵn;\ntăng phiên bản, ghi language.update;
+  :Khách chưa thấy ngôn ngữ mới cho tới khi\ncó ít nhất một bài được xuất bản (UC-16);
+else (bật / tắt)
+  if (Tắt tiếng Việt hoặc tiếng Anh?) then (có)
+    :Báo 409 LANGUAGE_REQUIRED\n(ngôn ngữ dự phòng);
+    stop
+  endif
+  :Đổi is_enabled (dữ liệu bài vẫn giữ);\ntăng phiên bản;
+  :Ứng dụng của khách cập nhật danh sách
+ngôn ngữ ở lần tải sau;
+endif
+stop
+@enduml

@@ -12,7 +12,7 @@ toc-title: "Mục lục"
 | **Trọng tâm** | Frontend Web và Mobile: định vị GPS, bản đồ, trình phát, đa ngôn ngữ, hoạt động offline, realtime; kèm quy trình CI/CD. |
 | **Nhóm** | Lương Diệu Quang · Võ Thị Ngọc Như |
 | **Kho mã nguồn** | github.com/quangdieuluong2006-ctrl/CNPM_DinhDocLap (nhánh develop, main) |
-| **Phiên bản** | 2.0 – 01/11/2026 |
+| **Phiên bản** | 2.1 – 09/11/2026 |
 | **Trạng thái** | **Đã chốt.** Không thêm tính năng ngoài danh sách FE-01 → FE-24. |
 
 ## Lịch sử thay đổi
@@ -22,13 +22,14 @@ toc-title: "Mục lục"
 | 1.0 | 22/10/2026 | Bản đầu tiên cho chủ đề thuyết minh du lịch theo vị trí. |
 | 1.1 | 27/10/2026 | Khách ẩn danh không cần đăng ký; tạm bỏ nhóm tham quan; giao diện theo 10 ngôn ngữ; QR mời tham gia qua Cloudflare Tunnel. |
 | **2.0** | 01/11/2026 | **Bản chính thức sạch.** Viết lại toàn bộ theo sản phẩm thật sau buổi kiểm tra giữa kỳ (28/10): (1) bỏ hẳn nhóm tham quan và vai trò hướng dẫn viên khỏi tài liệu, CSDL (migration 004) và API; chỉ còn 2 vai trò `user` và `admin`. (2) Dùng lại mã trống: **FE-10** = Lịch sử tham quan trên Mobile, **FE-23** = Mời khách tham gia bằng QR; **UC-10** = Mời khách tham gia bằng QR, **UC-11** = Xem tiến độ và điểm gợi ý → 24 tính năng, 20 use case liên tục. (3) **Giọng đọc AI**: 120 tệp MP3 (12 điểm × 10 ngôn ngữ) sinh bằng giọng neural, nạp sẵn khi seed. (4) Bổ sung sơ đồ lớp Mobile, lưu đồ quét QR, ảnh chụp giao diện thật. (5) CD: phát hành bằng tag `v*` (bản build Web, Docker image API, APK). (6) Kế hoạch hoàn thiện 2 tuần trước báo cáo cuối kỳ. |
+| **2.1** | 09/11/2026 | **Bổ sung lược đồ hoạt động cho mọi chức năng** (góp ý của giảng viên ở buổi kiểm tra): thêm 18 lược đồ, cùng 2 lược đồ có sẵn (Hình 5, 6) → đủ **20/20 use case** (mục 8.4, Hình 8–25). Cập nhật hiện trạng: đã xong việc #1–#3 của kế hoạch (PRD v2.0 – PR #29; dọn nhóm tham quan, migration 004 – PR #31; giọng đọc AI 120 tệp – PR #32) và dòng hướng dẫn QR (FE-23). Sửa tên cột `schema_migrations.file_name`. |
 
 ## Cách đọc tài liệu
 
 - **Mục 1–3:** sản phẩm giải quyết vấn đề gì, cho ai, gồm những tính năng nào.
 - **Mục 4:** kiến trúc và các cơ chế cốt lõi (kích hoạt theo vị trí, QR, trình phát, offline, khách ẩn danh, presence, giọng AI) – phần quan trọng nhất khi lập trình.
 - **Mục 5–7:** đặc tả từng tính năng (FE-xx) kèm tiêu chí chấp nhận (AC).
-- **Mục 8–9:** use case, sơ đồ tuần tự, sơ đồ trạng thái.
+- **Mục 8–9:** use case, **lược đồ hoạt động cho cả 20 use case** (mục 8.4), sơ đồ tuần tự, sơ đồ trạng thái.
 - **Mục 10–13:** giao diện, API, realtime, cơ sở dữ liệu – hợp đồng giữa Frontend và Backend.
 - **Mục 14–17:** yêu cầu phi chức năng, bảo mật, CI/CD, kiểm thử.
 - **Mục 18 và phụ lục:** kế hoạch hoàn thiện, phân công, rủi ro, dữ liệu mẫu, hằng số, kịch bản trình diễn.
@@ -38,7 +39,7 @@ toc-title: "Mục lục"
 ## Danh mục hình
 
 | Hình | Nội dung | Tệp nguồn (docs/diagrams) |
-|---------------|-------------------------------------------|-----------------------------------------|
+|---------------|--------------------------------------------------|-----------------------------------------|
 | 1 | Bối cảnh hệ thống và các tác nhân | context.puml |
 | 2 | Sơ đồ thành phần hệ thống | components.puml |
 | 3 | Sơ đồ lớp lõi Mobile | class_mobile.puml |
@@ -46,12 +47,13 @@ toc-title: "Mục lục"
 | 5 | Lưu đồ xử lý mỗi mẫu vị trí | act_geofence.puml |
 | 6 | Lưu đồ quét QR / nhập số điểm | act_qr.puml |
 | 7 | Sơ đồ use case tổng quát | uc.puml |
-| 8–12 | Sơ đồ tuần tự SD-01 → SD-05 | sd01–sd05.puml |
-| 13 | Máy trạng thái bài thuyết minh | st_content.puml |
-| 14–17 | Giao diện thật: Mobile, Web User, Web Admin | ui_*.png (chụp màn hình) |
-| 18 | Sơ đồ quan hệ thực thể (ERD) | erd.puml |
-| 19 | Quy trình CI/CD | cicd.puml |
-| 20 | Vị trí các điểm ngoài trời | map_points.png |
+| 8–25 | Lược đồ hoạt động của 18 use case (UC-01 → UC-20, trừ UC-06, UC-07 ở Hình 5, 6) | act_uc01–act_uc20.puml |
+| 26–30 | Sơ đồ tuần tự SD-01 → SD-05 | sd01–sd05.puml |
+| 31 | Máy trạng thái bài thuyết minh | st_content.puml |
+| 32–35 | Giao diện thật: Mobile, Web User, Web Admin | ui_*.png (chụp màn hình) |
+| 36 | Sơ đồ quan hệ thực thể (ERD) | erd.puml |
+| 37 | Quy trình CI/CD | cicd.puml |
+| 38 | Vị trí các điểm ngoài trời | map_points.png |
 
 Sơ đồ viết bằng PlantUML; sửa tệp `.puml` rồi xuất lại PNG: `java -jar plantuml.jar -charset UTF-8 -tpng docs/diagrams/*.puml`.
 
@@ -223,7 +225,7 @@ Hệ thống có **2 vai trò** (`users.role`): `user` và `admin`. Khách khôn
 | FE-20 | Quản lý điểm thuyết minh | Web Admin | Phải | Thêm/sửa/ẩn/xóa; tọa độ trên bản đồ, bán kính, ảnh, thứ tự. | Đã có |
 | FE-21 | Nội dung đa ngôn ngữ và âm thanh | Web Admin | Phải | Soạn bài từng ngôn ngữ, tải tệp, nghe thử, duyệt, xuất bản. | Đã có |
 | FE-22 | Quản lý ngôn ngữ | Web Admin | Phải | Thêm từ danh mục ISO, bật/tắt, mức hoàn thiện. | Đã có |
-| FE-23 | Mời khách tham gia bằng QR | Web Admin | Phải | Mã QR tới Web User: địa chỉ công khai → tunnel → IP Wi-Fi. | Đã có; *sửa dòng hướng dẫn* |
+| FE-23 | Mời khách tham gia bằng QR | Web Admin | Phải | Mã QR tới Web User: địa chỉ công khai → tunnel → IP Wi-Fi. | Đã có |
 | FE-24 | Nhật ký và in mã QR | Web Admin | Phải | Nhật ký thao tác; trang in QR + số điểm cho các phòng. | Đã có |
 
 > **Lưu ý:** Mobile là phần quan trọng nhất (FE-01 → FE-12). Web User dùng chung API và hệ thiết kế với Mobile; Web Admin là nơi duy nhất sửa nội dung mà Mobile và Web User hiển thị.
@@ -707,7 +709,7 @@ Chỉ tài khoản `admin` đăng nhập được. Bố cục: thanh bên trái 
 
 | | |
 |----------------|------------------------------------------------------------------------------------|
-| **Ưu tiên** | Phải · **Hiện trạng:** Đã có; *cần làm: sửa dòng hướng dẫn theo loại địa chỉ* |
+| **Ưu tiên** | Phải · **Hiện trạng:** Đã có |
 | **Màn hình** | Hộp thoại "Mời tham gia" trên trang Đang hoạt động |
 | **Luồng chính** | 1. `GET /admin/join-link` trả các địa chỉ Web User có thể dùng, theo thứ tự ưu tiên: **địa chỉ công khai** (`WEB_USER_PUBLIC_URL`) → **Cloudflare Tunnel** (khách dùng 4G vẫn vào) → **IP Wi-Fi** của máy chủ. 2. Hiện mã QR lớn + địa chỉ dạng chữ + nút sao chép; chọn được địa chỉ khác. 3. Dòng hướng dẫn đổi theo loại: công khai/tunnel – "Quét bằng camera, dùng 4G hoặc Wi-Fi đều được"; IP Wi-Fi – "Điện thoại phải dùng cùng Wi-Fi với máy chủ". |
 | **Tiêu chí chấp nhận** | AC1. Bốn điện thoại quét QR → bảng Đang hoạt động hiện 4 khách trong ≤ 3 giây. AC2. Không có tunnel → tự dùng IP Wi-Fi, hướng dẫn đúng loại. |
@@ -832,35 +834,135 @@ Quan hệ: UC-06, UC-07 «include» UC-08 (mọi cách kích hoạt đều phát
 | **Hậu điều kiện** | Bài ở trạng thái mới; nhật ký `place.content.update`. |
 | **Liên quan** | FE-21; SD-03 |
 
-Các use case còn lại có luồng đơn giản, được mô tả đủ trong đặc tả tính năng tương ứng (cột Tính năng ở bảng 8.2).
+Các use case còn lại được mô tả trong đặc tả tính năng tương ứng (cột Tính năng ở bảng 8.2) và lược đồ hoạt động ở mục 8.4.
+
+## Lược đồ hoạt động
+
+Mỗi use case của **Khách** và **Quản trị viên** có một lược đồ hoạt động (activity diagram) mô tả luồng chính, các nhánh rẽ và cách xử lý lỗi, đúng theo code hiện tại (mã lỗi API, sự kiện realtime, bảng CSDL ghi trong từng bước). UC-06 và UC-07 là hai cơ chế cốt lõi nên lược đồ đặt ngay trong mục 4 (Hình 5, Hình 6); 18 use case còn lại ở dưới. Nguồn PlantUML: `docs/diagrams/act_ucXX.puml`.
+
+| Use case | Tác nhân | Nhánh rẽ / ngoại lệ thể hiện trong lược đồ | Hình |
+|-------------------------------------------------|-------------------------|--------------------------------------------------|------------|
+| UC-01 Bắt đầu sử dụng (tự tạo khách ẩn danh) | Khách | Có phiên cũ → làm mới; hết hạn → tạo khách mới; bị khóa → dừng; mất mạng → nghe offline | Hình 8 |
+| UC-02 Đăng nhập / đăng xuất Web Admin | Quản trị viên | Quá số lần sai (429), sai mật khẩu, bị khóa, không phải admin | Hình 9 |
+| UC-03 Chọn ngôn ngữ thuyết minh | Khách | Offline dùng danh sách đã lưu; không có kết quả tìm; gói không đổi (304) | Hình 10 |
+| UC-04 Xem bản đồ khuôn viên | Khách | Từ chối quyền vị trí; ở xa > 1 km; GPS yếu | Hình 11 |
+| UC-05 Xem danh sách và chi tiết điểm | Khách | Tìm/lọc không có kết quả; ngôn ngữ dự phòng; bài chờ duyệt | Hình 12 |
+| UC-06 Nghe thuyết minh tự động khi đến gần | Khách (+ Dịch vụ định vị) | Lọc tín hiệu, dwell, hysteresis, cooldown, xung đột – mục 4.3 | Hình 5 |
+| UC-07 Nghe thuyết minh bằng QR / số điểm | Khách | Đã cài / chưa cài ứng dụng, quyền camera, mã sai – mục 4.4 | Hình 6 |
+| UC-08 Điều khiển trình phát | Khách | Ưu tiên nguồn phát; chọn tệp trên máy → URL → giọng thiết bị → chỉ văn bản | Hình 13 |
+| UC-09 Tải nội dung để dùng offline | Khách | Tải gói và âm thanh song song; gửi lượt ghé bù khi có mạng | Hình 14 |
+| UC-10 Mời khách tham gia bằng mã QR | Quản trị viên | Địa chỉ công khai → tunnel → IP Wi-Fi; không có mạng | Hình 15 |
+| UC-11 Xem tiến độ và điểm gợi ý tiếp theo | Khách | Đủ 12/12 → chúc mừng; điểm GPS hay trong nhà | Hình 16 |
+| UC-12 Xem dashboard | Quản trị viên | Cập nhật theo sự kiện realtime hoặc tải lại mỗi 60 giây | Hình 17 |
+| UC-13 Quản lý người dùng, khóa tài khoản | Quản trị viên | Khóa / mở khóa / đổi vai trò; không sửa chính mình; khách không đổi vai trò | Hình 18 |
+| UC-14 Theo dõi khách đang hoạt động | Quản trị viên | Cập nhật realtime song song với tác vụ dọn phiên mất nhịp tim | Hình 19 |
+| UC-15 Quản lý điểm thuyết minh | Quản trị viên | Dữ liệu sai, trùng số điểm, vùng giao nhau, xóa điểm đã có lượt ghé | Hình 20 |
+| UC-16 Soạn nội dung, tải âm thanh, duyệt bản dịch | Quản trị viên | Tệp sai định dạng / quá 20 MB; hiển thị theo trạng thái bài | Hình 21 |
+| UC-17 Quản lý ngôn ngữ | Quản trị viên | Thêm từ danh mục ISO; không tắt được vi / en | Hình 22 |
+| UC-18 In mã QR các phòng | Quản trị viên | Mặc định điểm trong nhà; in khổ A4 | Hình 23 |
+| UC-19 Xem lịch sử tham quan | Khách | Có mạng / offline; chưa có lượt nào | Hình 24 |
+| UC-20 Mô phỏng vị trí | Người kiểm thử | Chạm bản đồ hoặc chạy lộ trình mẫu; lượt ghé ghi simulated | Hình 25 |
+
+### UC-01. Bắt đầu sử dụng (tự tạo khách ẩn danh)
+
+![Hình 8 – Lược đồ hoạt động UC-01 – Bắt đầu sử dụng (tự tạo khách ẩn danh)](diagrams/act_uc01.png)
+
+### UC-02. Đăng nhập / đăng xuất Web Admin
+
+![Hình 9 – Lược đồ hoạt động UC-02 – Đăng nhập / đăng xuất Web Admin](diagrams/act_uc02.png)
+
+### UC-03. Chọn ngôn ngữ thuyết minh
+
+![Hình 10 – Lược đồ hoạt động UC-03 – Chọn ngôn ngữ thuyết minh](diagrams/act_uc03.png)
+
+### UC-04. Xem bản đồ khuôn viên
+
+![Hình 11 – Lược đồ hoạt động UC-04 – Xem bản đồ khuôn viên](diagrams/act_uc04.png)
+
+### UC-05. Xem danh sách và chi tiết điểm
+
+![Hình 12 – Lược đồ hoạt động UC-05 – Xem danh sách và chi tiết điểm](diagrams/act_uc05.png)
+
+### UC-08. Điều khiển trình phát
+
+![Hình 13 – Lược đồ hoạt động UC-08 – Điều khiển trình phát](diagrams/act_uc08.png)
+
+### UC-09. Tải nội dung để dùng offline
+
+![Hình 14 – Lược đồ hoạt động UC-09 – Tải nội dung để dùng offline](diagrams/act_uc09.png)
+
+### UC-10. Mời khách tham gia bằng mã QR
+
+![Hình 15 – Lược đồ hoạt động UC-10 – Mời khách tham gia bằng mã QR](diagrams/act_uc10.png)
+
+### UC-11. Xem tiến độ và điểm gợi ý tiếp theo
+
+![Hình 16 – Lược đồ hoạt động UC-11 – Xem tiến độ và điểm gợi ý tiếp theo](diagrams/act_uc11.png)
+
+### UC-12. Xem dashboard
+
+![Hình 17 – Lược đồ hoạt động UC-12 – Xem dashboard](diagrams/act_uc12.png)
+
+### UC-13. Quản lý người dùng, khóa tài khoản
+
+![Hình 18 – Lược đồ hoạt động UC-13 – Quản lý người dùng, khóa tài khoản](diagrams/act_uc13.png)
+
+### UC-14. Theo dõi khách đang hoạt động
+
+![Hình 19 – Lược đồ hoạt động UC-14 – Theo dõi khách đang hoạt động](diagrams/act_uc14.png)
+
+### UC-15. Quản lý điểm thuyết minh
+
+![Hình 20 – Lược đồ hoạt động UC-15 – Quản lý điểm thuyết minh](diagrams/act_uc15.png)
+
+### UC-16. Soạn nội dung, tải âm thanh, duyệt bản dịch
+
+![Hình 21 – Lược đồ hoạt động UC-16 – Soạn nội dung, tải âm thanh, duyệt bản dịch](diagrams/act_uc16.png)
+
+### UC-17. Quản lý ngôn ngữ
+
+![Hình 22 – Lược đồ hoạt động UC-17 – Quản lý ngôn ngữ](diagrams/act_uc17.png)
+
+### UC-18. In mã QR các phòng
+
+![Hình 23 – Lược đồ hoạt động UC-18 – In mã QR các phòng](diagrams/act_uc18.png)
+
+### UC-19. Xem lịch sử tham quan
+
+![Hình 24 – Lược đồ hoạt động UC-19 – Xem lịch sử tham quan](diagrams/act_uc19.png)
+
+### UC-20. Mô phỏng vị trí
+
+![Hình 25 – Lược đồ hoạt động UC-20 – Mô phỏng vị trí](diagrams/act_uc20.png)
+
 
 # Sơ đồ tuần tự và trạng thái
 
 ## SD-01 – Tự động thuyết minh theo GPS
 
-![Hình 8 – SD-01 Tự động thuyết minh khi vào vùng kích hoạt](diagrams/sd01.png)
+![Hình 26 – SD-01 Tự động thuyết minh khi vào vùng kích hoạt](diagrams/sd01.png)
 
 Mọi quyết định phát diễn ra trên thiết bị; máy chủ chỉ nhận lượt ghé (có thể trễ khi offline).
 
 ## SD-02 – Quét QR trong nhà
 
-![Hình 9 – SD-02 Kích hoạt bằng mã QR](diagrams/sd02.png)
+![Hình 27 – SD-02 Kích hoạt bằng mã QR](diagrams/sd02.png)
 
 ## SD-03 – Xuất bản nội dung và cập nhật trên ứng dụng
 
-![Hình 10 – SD-03 Quản trị viên xuất bản, ứng dụng tải gói mới](diagrams/sd03.png)
+![Hình 28 – SD-03 Quản trị viên xuất bản, ứng dụng tải gói mới](diagrams/sd03.png)
 
 ## SD-04 – Khách ẩn danh: bắt đầu và khôi phục phiên
 
-![Hình 11 – SD-04 Khách ẩn danh và presence](diagrams/sd04.png)
+![Hình 29 – SD-04 Khách ẩn danh và presence](diagrams/sd04.png)
 
 ## SD-05 – Khóa tài khoản đang trực tuyến
 
-![Hình 12 – SD-05 Quản trị viên khóa tài khoản, thiết bị bị đăng xuất](diagrams/sd05.png)
+![Hình 30 – SD-05 Quản trị viên khóa tài khoản, thiết bị bị đăng xuất](diagrams/sd05.png)
 
 ## Trạng thái bài thuyết minh
 
-![Hình 13 – Máy trạng thái của bài thuyết minh](diagrams/st_content.png)
+![Hình 31 – Máy trạng thái của bài thuyết minh](diagrams/st_content.png)
 
 | Trạng thái | Hiển thị cho khách | Ai chuyển |
 |----------------------|--------------------------------------------|--------------------------------------------------|
@@ -884,7 +986,7 @@ Mọi quyết định phát diễn ra trên thiết bị; máy chủ chỉ nhậ
 
 ## Màn hình Mobile
 
-![Hình 14 – Giao diện Mobile (ảnh chụp bản chạy thật)](diagrams/ui_mobile.png)
+![Hình 32 – Giao diện Mobile (ảnh chụp bản chạy thật)](diagrams/ui_mobile.png)
 
 | Màn hình | Thành phần chính |
 |----------------------|--------------------------------------------------|
@@ -900,15 +1002,15 @@ Mọi quyết định phát diễn ra trên thiết bị; máy chủ chỉ nhậ
 
 ## Web User
 
-![Hình 15 – Web User trên máy tính](diagrams/ui_web_user.png)
+![Hình 33 – Web User trên máy tính](diagrams/ui_web_user.png)
 
-Thanh trên cùng: logo, liên kết các trang (Điểm, Bản đồ, Lịch sử), chọn ngôn ngữ. Trang chủ có phần giới thiệu và lưới thẻ điểm; chi tiết điểm hai cột trên máy tính (ảnh + trình phát | văn bản), một cột trên điện thoại (ảnh cuối Hình 14).
+Thanh trên cùng: logo, liên kết các trang (Điểm, Bản đồ, Lịch sử), chọn ngôn ngữ. Trang chủ có phần giới thiệu và lưới thẻ điểm; chi tiết điểm hai cột trên máy tính (ảnh + trình phát | văn bản), một cột trên điện thoại (ảnh cuối Hình 32).
 
 ## Web Admin
 
-![Hình 16 – Web Admin – Dashboard](diagrams/ui_admin_dashboard.png)
+![Hình 34 – Web Admin – Dashboard](diagrams/ui_admin_dashboard.png)
 
-![Hình 17 – Web Admin – Khách đang hoạt động](diagrams/ui_admin_active.png)
+![Hình 35 – Web Admin – Khách đang hoạt động](diagrams/ui_admin_active.png)
 
 Thanh bên trái, thanh trên cùng hiển thị trạng thái realtime; bảng có tìm kiếm, lọc, phân trang; biểu mẫu sửa điểm chia hai cột: thông tin + bản đồ chọn tọa độ; nội dung theo thẻ ngôn ngữ.
 
@@ -963,7 +1065,7 @@ Thanh bên trái, thanh trên cùng hiển thị trạng thái realtime; bảng 
 | | `GET /admin/languages` · `GET /admin/languages/catalog?q=` · `PUT /admin/languages/{code}` | admin | Ngôn ngữ đã thêm · danh mục ISO · thêm/bật/tắt |
 | | `GET /admin/activity-logs` | admin | Nhật ký (lọc) |
 
-**Bỏ ở v2.0 (cần làm, mục 18):** `POST /auth/register`; `GET /me/tour`; toàn bộ `/tours/*`, `GET /admin/tours`; trường `activeTours` của `/admin/stats`; giá trị `guide` trong kiểm tra vai trò.
+**Đã bỏ ở v2.0 (PR #31):** `POST /auth/register`; `GET /me/tour`; toàn bộ `/tours/*`, `GET /admin/tours`; trường `activeTours` của `/admin/stats`; giá trị `guide` trong kiểm tra vai trò.
 
 ## Ví dụ
 
@@ -1031,7 +1133,7 @@ Kết nối: `io(API_URL, { auth: { token }, query: { clientType } })`, `clientT
 
 ## Sơ đồ quan hệ (ERD)
 
-![Hình 18 – Sơ đồ quan hệ thực thể (sau migration 004)](diagrams/erd.png)
+![Hình 36 – Sơ đồ quan hệ thực thể (sau migration 004)](diagrams/erd.png)
 
 ## Các bảng
 
@@ -1048,7 +1150,7 @@ CSDL có **10 bảng**: 9 bảng nghiệp vụ dưới đây và `schema_migrati
 | **place_contents** | Bài thuyết minh theo ngôn ngữ | id, place_id FK CASCADE, language_code FK, title, summary, body NVARCHAR(MAX), audio_url, audio_duration_sec, audio_bytes, status CHECK (draft, pending, approved), source CHECK (human, machine), updated_by FK users NULL, updated_at; UNIQUE (place_id, language_code) |
 | **content_releases** | Phiên bản nội dung | version INT IDENTITY, published_by FK users NULL, published_at, note – mỗi lần xuất bản thêm 1 dòng |
 | **visits** | Lượt ghé | id BIGINT, client_id UNIQUEIDENTIFIER UNIQUE (bỏ trùng), user_id FK NULL, place_id FK, language_code, trigger_type CHECK (gps, qr, code, manual, simulated), listened_sec, completed BIT, started_at, created_at; index (place_id, started_at), (user_id, started_at), (started_at) |
-| **schema_migrations** | Theo dõi migration | name, applied_at |
+| **schema_migrations** | Theo dõi migration | file_name PK, applied_at |
 
 > **Lưu ý:** Chỉ dùng ON DELETE CASCADE ở bảng con thuần túy (refresh_tokens, user_sessions, place_contents) để tránh lỗi "multiple cascade paths" của SQL Server. Muốn xóa một người dùng phải xóa (hoặc gán NULL) ở `visits`, `activity_logs`, `place_contents.updated_by`, `content_releases.published_by` trước. Điểm đã có lượt ghé không được xóa, chỉ được ẩn. Cột `trigger_type` không tên `trigger` vì đó là từ khóa của SQL Server.
 
@@ -1070,7 +1172,7 @@ CSDL có **10 bảng**: 9 bảng nghiệp vụ dưới đây và `schema_migrati
 | `001_init.sql` | Tạo bảng, ràng buộc, chỉ mục |
 | `002_views_procs.sql` | 4 view, 2 stored procedure |
 | `003_guest_visitors.sql` | Thêm `users.is_guest`; cập nhật `v_active_users` |
-| `004_drop_tours.sql` *(cần làm)* | Xóa `tour_members`, `tours`; đổi vai trò `guide` còn sót thành `user`; thay CHECK `role IN ('user','admin')`; sửa `sp_admin_dashboard_stats` bỏ cột `active_tours` |
+| `004_drop_tours.sql` | Xóa `tour_members`, `tours`; đổi vai trò `guide` còn sót thành `user`; thay CHECK `role IN ('user','admin')`; sửa `sp_admin_dashboard_stats` bỏ cột `active_tours` |
 
 - Migration là tệp `.sql` đánh số, tách khối bằng `GO`, mỗi tệp chạy trong một transaction, ghi vào `schema_migrations`; đầu tệp `SET ANSI_NULLS ON; SET QUOTED_IDENTIFIER ON;`. Lệnh: `npm run db:migrate`.
 - Dữ liệu mẫu (`npm run db:seed`, chạy lại an toàn): **1 quản trị viên** (`admin@demo.vn`), 6 khách mẫu (is_guest = 1); 10 ngôn ngữ; 12 điểm (Phụ lục A) × 10 ngôn ngữ (vi, en đã duyệt; 8 ngôn ngữ chờ duyệt đến khi được kiểm tra); **120 tệp giọng đọc AI**; lượt ghé mẫu 7 ngày để Dashboard có dữ liệu.
@@ -1142,7 +1244,7 @@ Thêm bảng `sites` và cột `places.site_id`; gói nội dung lọc theo site
 
 ## Pipeline
 
-![Hình 19 – Quy trình CI/CD](diagrams/cicd.png)
+![Hình 37 – Quy trình CI/CD](diagrams/cicd.png)
 
 | Workflow | Kích hoạt | Các bước | Hiện trạng |
 |----------------------------------|-------------------------|--------------------------------------------------|---------------|
@@ -1219,7 +1321,7 @@ Thêm bảng `sites` và cột `places.site_id`; gói nội dung lọc theo site
 
 # Kế hoạch hoàn thiện
 
-## Hiện trạng (01/11/2026)
+## Hiện trạng (09/11/2026)
 
 - Đã có: toàn bộ FE-01 → FE-24 ở mức chạy được, trừ các mục ghi *Cần làm*; 5 workflow CI; 12 điểm × 10 ngôn ngữ nội dung (vi, en đã duyệt); ảnh 12 điểm; khách ẩn danh; demo nhiều khách qua tunnel.
 - Đã qua buổi kiểm tra giữa kỳ (28/10). Báo cáo cuối kỳ dự kiến **15–20/11/2026**.
@@ -1227,10 +1329,10 @@ Thêm bảng `sites` và cột `places.site_id`; gói nội dung lọc theo site
 ## Kế hoạch 2 tuần
 
 | # | Thời gian | Công việc (nhánh) | Kết quả bàn giao |
-|--------|----------------------|--------------------------------------------------|---------------------------------------------|
-| 1 | 01–02/11 | PRD v2.0 (`docs/prd-v2.0`) | Tài liệu này + sơ đồ |
-| 2 | 02–03/11 | Dọn nhóm tham quan (`chore/remove-tours`): migration 004, xóa module `tours`, `/auth/register`, `/me/tour`, `active_tours`, `guide`; seed 1 admin + 6 khách mẫu; xóa tài khoản thử còn sót; sửa dòng hướng dẫn QR (FE-23) | CI xanh, TC-41 đạt |
-| 3 | 03–05/11 | Nội dung: rà soát bản dịch 8 ngôn ngữ → duyệt; `npm run gen:audio` sinh 120 MP3; seed nạp âm thanh (`feature/ai-voice`) | 120 bài có tệp, Dashboard "Bài chờ duyệt" = 0 |
+|--------|----------------------|--------------------------------------------------|--------------------------------------------------|
+| 1 | 01–02/11 | PRD v2.0 (`docs/prd-v2.0`) | **Xong** – PR #29 |
+| 2 | 02–03/11 | Dọn nhóm tham quan (`chore/remove-tours`): migration 004, xóa module `tours`, `/auth/register`, `/me/tour`, `active_tours`, `guide`; seed 1 admin + 6 khách mẫu; xóa tài khoản thử còn sót; sửa dòng hướng dẫn QR (FE-23) | **Xong** – PR #31 |
+| 3 | 03–05/11 | Nội dung: rà soát bản dịch 8 ngôn ngữ → duyệt; `npm run gen:audio` sinh 120 MP3; seed nạp âm thanh (`feature/ai-voice`) | 120 tệp giọng AI: **xong** – PR #32; duyệt bản dịch: đang làm |
 | 4 | 05–07/11 | Mobile: FE-10 Lịch sử, rung (expo-haptics), cỡ chữ, màn chúc mừng, ẩn mô phỏng ở bản production (`feature/FE-10-history`, `feature/FE-12-settings`) | TC-22 → TC-24 đạt |
 | 5 | 07–09/11 | CD: `release.yml`, `eas.json`, Dockerfile API (`ci/release`); tag `v1.0.0` | GitHub Release có zip web, image API, APK |
 | 6 | 09–11/11 | E2E: `e2e.yml` + 4 kịch bản Playwright (`ci/e2e`) | TC-E1 → TC-E4 xanh |
@@ -1286,7 +1388,7 @@ Tọa độ là **giá trị ước lượng** cho dữ liệu mẫu và mô ph�
 | 401 | Sân thượng – trực thăng | indoor | Sân thượng | 10.777000, 106.695300 | – | Trực thăng UH-1; vòng tròn đỏ đánh dấu bom rơi 8/4/1975 |
 | 901 | Tầng hầm – hầm chỉ huy | indoor | Tầng hầm | 10.777000, 106.695450 | – | Phòng tác chiến, trung tâm viễn thông, bản đồ quân sự |
 
-![Hình 20 – Vị trí ước lượng các điểm ngoài trời và vùng kích hoạt](diagrams/map_points.png)
+![Hình 38 – Vị trí ước lượng các điểm ngoài trời và vùng kích hoạt](diagrams/map_points.png)
 
 # Phụ lục B. Ngôn ngữ và giọng đọc AI
 

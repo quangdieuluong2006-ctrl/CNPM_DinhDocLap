@@ -1,0 +1,34 @@
+@startuml
+!include skin.iuml
+title UC-01 Bắt đầu sử dụng (khách ẩn danh)
+start
+:Mở Mobile ("Bắt đầu tham quan")\nhoặc mở Web User;
+if (Đã lưu refresh token trên máy?) then (có)
+  :POST /auth/refresh;
+  if (Refresh token hợp lệ?) then (có)
+    if (Tài khoản bị khóa?) then (có)
+      :Báo "Tài khoản đã bị khóa"\n(không tự tạo khách mới);
+      stop
+    endif
+    :Xoay vòng token, cấp phiên\n→ đúng khách cũ;
+  else (không / hết hạn)
+    :Xóa token cũ;
+    :POST /auth/guest → tạo khách mới;
+  endif
+else (chưa)
+  if (Có mạng?) then (không)
+    :Vẫn nghe nội dung đã tải;\nthử lại khi có mạng;
+    stop
+  endif
+  :POST /auth/guest:\nINSERT users (is_guest = 1, "Khách #XXXX"),\nghi nhật ký auth.guest;
+endif
+:Lưu refresh token\n(Mobile: expo-secure-store, Web: cookie rt_web);
+:Mở kết nối Socket.IO, gửi presence.ping mỗi 30 giây;
+:Ghi user_sessions → phát presence.update tới Web Admin;
+if (Đã chọn ngôn ngữ?) then (chưa)
+  :Mở màn Chọn ngôn ngữ (UC-03);
+else (rồi)
+  :Vào màn Bản đồ / Trang chủ;
+endif
+stop
+@enduml
