@@ -34,11 +34,13 @@ Chi tiết: [`api/README.md`](api/README.md). App Mobile chạy riêng: xem [`mo
 
 ## Tài liệu
 
-- **PRD v2.0 – bản chính thức** (01/11/2026), căn cứ duy nhất để lập trình và nghiệm thu:
+- **PRD v2.1 – bản chính thức** (09/11/2026), căn cứ duy nhất để lập trình và nghiệm thu:
   [`docs/PRD.md`](docs/PRD.md) (đọc trực tiếp trên GitHub)
-  · PDF: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.0.pdf`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.0.pdf)
-  · Word: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.0.docx`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.0.docx)
-- Bản cũ (lưu lịch sử): [PRD v1.1](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.pdf) · [PRD v1.0](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.0.pdf)
+  · PDF: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.1.pdf`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.1.pdf)
+  · Word: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.1.docx`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.1.docx)
+- Sơ đồ UML trong PRD: use case (mục 8.1), **lược đồ hoạt động cho cả 20 use case** (Hình 5, 6 và mục 8.4),
+  sơ đồ tuần tự SD-01 → SD-05 và máy trạng thái (mục 9), sơ đồ lớp Mobile (mục 4.1), ERD (mục 13), CI/CD (mục 16).
+- Bản cũ (lưu lịch sử; PRD v2.0 xem trong lịch sử git): [PRD v1.1](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.pdf) · [PRD v1.0](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.0.pdf)
 - Sơ đồ UML (nguồn PlantUML): [`docs/diagrams/`](docs/diagrams/)
 
 Sửa PRD: sửa `docs/PRD.md` (và sơ đồ `.puml` nếu cần), rồi xuất lại Word bằng lệnh ghi ở đầu

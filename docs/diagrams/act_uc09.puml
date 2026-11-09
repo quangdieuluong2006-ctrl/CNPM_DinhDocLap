@@ -1,0 +1,35 @@
+@startuml
+!include skin.iuml
+title UC-09 Tải nội dung để dùng offline và gửi lượt ghé bù
+start
+:Mở Cài đặt → Dữ liệu ngoại tuyến;
+fork
+  :Bấm "Cập nhật";
+  :GET /content/bundle?lang= với If-None-Match;
+  if (Kết quả?) then (304)
+    :Giữ gói hiện có;
+  else (200)
+    :Lưu gói JSON mới, cập nhật số phiên bản;
+  endif
+fork again
+  :Bấm "Tải âm thanh";
+  :Lập danh sách URL âm thanh trong gói;
+  repeat
+    :Tải một tệp vào documentDirectory/audio/{lang}/;
+    :Cập nhật thanh tiến trình x/y;
+  repeat while (Còn tệp?) is (còn)
+  ->hết;
+  :Lưu bản đồ URL → tệp cục bộ;
+end fork
+:Từ đây nghe được ở chế độ máy bay;
+:Tham quan khi mất mạng → nghe các điểm;
+:Mỗi lượt ghé có clientId (UUID),\nxếp hàng trong AsyncStorage;
+if (Có mạng trở lại?) then (có)
+  :POST /visits/batch (tối đa 200 lượt / lần);
+  :Bỏ trùng theo client_id, trả { accepted, duplicates };
+  :Xóa các lượt đã gửi khỏi hàng đợi;
+else (chưa)
+  :Giữ hàng đợi, thử lại lần sau;
+endif
+stop
+@enduml

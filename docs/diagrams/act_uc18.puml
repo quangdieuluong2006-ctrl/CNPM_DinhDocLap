@@ -1,0 +1,16 @@
+@startuml
+!include skin.iuml
+title UC-18 In mã QR các phòng
+start
+:Mở trang In mã QR;
+:Tải danh sách điểm (tên tiếng Việt và tiếng Anh);
+:Mặc định chỉ các điểm trong nhà (indoor);
+if (Muốn in cả điểm ngoài trời?) then (có)
+  :Bỏ lọc "chỉ điểm trong nhà";
+endif
+:Mỗi điểm một ô: mã QR https://<web-user>/p/{code},\nsố điểm cỡ lớn, tên vi / en, "Quét để nghe thuyết minh";\nbố cục A4 (6 ô / trang);
+:Bấm "In" → hộp thoại in của trình duyệt;
+:In, cắt và dán biển tại cửa từng phòng;
+:Khách quét biển bằng camera → UC-07;
+stop
+@enduml

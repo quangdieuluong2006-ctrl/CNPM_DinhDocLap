@@ -1,0 +1,24 @@
+@startuml
+!include skin.iuml
+title UC-20 Mô phỏng vị trí
+start
+:Cài đặt → bật "Chế độ mô phỏng"\n(chỉ có ở bản trình diễn);
+:Dừng GPS thật, dùng SimulatedLocationProvider;\nhiện nhãn MÔ PHỎNG;
+if (Cách mô phỏng) then (chạm bản đồ)
+  :Chạm một vị trí trên bản đồ;
+  :teleport(p): phát mẫu vị trí giả (sai số 8 m);
+else (lộ trình mẫu)
+  :Bấm "Chạy lộ trình";
+  :Đặt vị trí ngoài cổng, rồi playRoute:\nđi qua 5 điểm ngoài trời, nhiễu ±3 m, tăng tốc ×4;
+endif
+repeat
+  :Mỗi mẫu vị trí đi qua cùng logic với GPS thật\n(lọc, dwell, hysteresis, cooldown – UC-06);
+  if (Vào vùng một điểm?) then (có)
+    :Tự phát điểm đó (trigger = simulated);
+  endif
+repeat while (Còn mẫu vị trí?) is (còn)
+->dừng lộ trình / tắt mô phỏng;
+:Lượt ghé ghi simulated → không tính vào\n"Lượt tham quan hôm nay" trên Dashboard;
+:Tắt mô phỏng → ứng dụng quay lại GPS thật;
+stop
+@enduml

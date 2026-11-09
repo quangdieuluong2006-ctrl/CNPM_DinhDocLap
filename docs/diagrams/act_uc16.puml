@@ -1,0 +1,33 @@
+@startuml
+!include skin.iuml
+title UC-16 Soạn nội dung, tải âm thanh, duyệt bản dịch
+start
+:Mở một điểm → chọn thẻ ngôn ngữ\n(chấm trạng thái: chưa có / nháp / chờ duyệt / đã duyệt);
+:Nhập tiêu đề (≤ 120), tóm tắt (≤ 300), bài (≤ 5000);
+:Nghe thử bằng giọng trình duyệt (tùy chọn);
+:Chọn trạng thái → Lưu;
+if (Hợp lệ?) then (không)
+  :Báo lỗi tại trường;
+  stop
+endif
+:PUT …/contents/{lang} → lưu bài, tăng phiên bản,\nghi place.content.update;
+if (Tải tệp âm thanh?) then (có)
+  :Chọn tệp MP3 / M4A;
+  if (Đúng định dạng và ≤ 20 MB?) then (không)
+    :Báo 415 / 413 tại trường tải tệp;
+    stop
+  endif
+  :Lưu tệp (tên do máy chủ sinh), xóa tệp cũ,\ntăng phiên bản, ghi place.audio.upload;
+endif
+if (Đang duyệt bản dịch?) then (có)
+  :So với bản tiếng Việt, sửa nếu cần\n→ chuyển "Đã duyệt" → Lưu;
+endif
+if (Khách thấy bài? (theo trạng thái)) then (nháp)
+  :Không hiển thị cho khách;
+elseif () then (chờ duyệt)
+  :Hiển thị kèm nhãn "Bản dịch đang được kiểm duyệt";
+else (đã duyệt)
+  :Hiển thị bình thường;
+endif
+stop
+@enduml

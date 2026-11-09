@@ -1,0 +1,30 @@
+@startuml
+!include skin.iuml
+title UC-04 Xem bản đồ khuôn viên
+start
+:Mở tab Bản đồ (Mobile) hoặc trang /map (Web User);
+:Vẽ bản đồ căn giữa Dinh Độc Lập,\nmarker 12 điểm (màu theo đã nghe / đang phát),\nvòng vùng kích hoạt của 5 điểm GPS;
+if (Đã cấp quyền vị trí?) then (chưa)
+  :Giải thích lý do rồi xin quyền\n"Khi dùng ứng dụng";
+  if (Khách đồng ý?) then (không)
+    :Banner "Bật vị trí để tự động thuyết minh"\n+ nút mở Cài đặt; QR / số điểm vẫn dùng được;
+    :Bản đồ vẫn hiện các điểm;
+    stop
+  endif
+endif
+:Hiện chấm vị trí của khách;
+if (Cách Dinh Độc Lập > 1 km?) then (có)
+  :Banner "Bạn đang ở xa Dinh Độc Lập",\nkhông tự phát;
+endif
+if (10 giây không có mẫu GPS tốt?) then (có)
+  :Nhãn "GPS yếu", gợi ý quét QR;
+endif
+:Bấm một marker;
+:Hiện thẻ nhỏ: tên điểm, khoảng cách, nút Nghe;
+if (Khách bấm) then (Nghe)
+  :Phát ngay (nguồn manual, UC-08);
+else (thẻ)
+  :Mở chi tiết điểm (UC-05);
+endif
+stop
+@enduml

@@ -1,0 +1,32 @@
+@startuml
+!include skin.iuml
+title UC-02 Đăng nhập / đăng xuất Web Admin
+start
+:Mở Web Admin /login;
+:Nhập email, mật khẩu → Đăng nhập;
+:POST /auth/login (clientType = admin);
+if (Quá 10 lần sai / 15 phút / IP?) then (có)
+  :Báo 429, đếm ngược theo Retry-After;
+  stop
+endif
+if (Email tồn tại và mật khẩu đúng (bcrypt)?) then (không)
+  :Ghi nhật ký auth.login_failed;
+  :Báo "Email hoặc mật khẩu không đúng"\n(không lộ email có tồn tại hay không);
+  stop
+endif
+if (Tài khoản bị khóa?) then (có)
+  :Báo "Tài khoản đã bị khóa";
+  stop
+endif
+if (role = admin?) then (không)
+  :Báo "Không có quyền truy cập trang quản trị";
+  stop
+endif
+:Cấp access token (15 phút) + refresh token\n(cookie HttpOnly rt_admin + CSRF), ghi auth.login;
+:Mở Dashboard, kết nối Socket.IO (phòng admins);
+:Làm việc …;
+:Bấm Đăng xuất;
+:POST /auth/logout: thu hồi refresh token, ghi auth.logout;
+:Xóa cookie, đóng Socket.IO, về /login;
+stop
+@enduml
