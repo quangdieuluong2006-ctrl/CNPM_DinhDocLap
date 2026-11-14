@@ -134,8 +134,7 @@ export async function deletePlace(id: number): Promise<"deleted" | "has_visits" 
   const pool = await getPool();
   const r = await pool.request().input("id", sql.Int, id).query<{ result: "deleted" | "has_visits" | "not_found" }>(`
     IF NOT EXISTS (SELECT 1 FROM dbo.places WHERE id = @id) SELECT 'not_found' AS result;
-    ELSE IF EXISTS (SELECT 1 FROM dbo.visits WHERE place_id = @id)
-      OR EXISTS (SELECT 1 FROM dbo.tour_members WHERE current_place_id = @id) SELECT 'has_visits' AS result;
+    ELSE IF EXISTS (SELECT 1 FROM dbo.visits WHERE place_id = @id) SELECT 'has_visits' AS result;
     ELSE BEGIN
       DELETE FROM dbo.places WHERE id = @id;
       SELECT 'deleted' AS result;

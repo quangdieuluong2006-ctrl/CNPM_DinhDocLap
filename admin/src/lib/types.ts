@@ -1,6 +1,6 @@
 // Kiểu dữ liệu trả về từ API (xem Swagger /api/docs).
 export type ClientType = "web" | "mobile" | "admin";
-export type Role = "user" | "guide" | "admin";
+export type Role = "user" | "admin";
 export type Zone = "outdoor" | "ground" | "floor1" | "floor2" | "rooftop" | "basement";
 export type PlaceStatus = "draft" | "published" | "hidden";
 export type ContentStatus = "draft" | "pending" | "approved";
@@ -36,7 +36,6 @@ export interface StatsResponse {
   totalUsers: number;
   activeUsers: number;
   visitsToday: number;
-  activeTours: number;
   publishedPlaces: number;
   pendingContents: number;
   visitsByDay: { day: string; visits: number }[];
@@ -137,7 +136,6 @@ export interface AdminUser {
   online: boolean;
   clientTypes: ClientType[];
   lastSeenAt: string | null;
-  tour: { id: number; code: string; name: string } | null;
   visits: number;
 }
 
@@ -149,18 +147,6 @@ export interface UserSession {
   connectedAt: string;
   lastSeenAt: string;
   disconnectedAt: string | null;
-}
-
-export interface Tour {
-  id: number;
-  code: string;
-  name: string;
-  guide: { id: number; fullName: string };
-  status: "active" | "ended";
-  maxMembers: number;
-  memberCount: number;
-  createdAt: string;
-  endedAt: string | null;
 }
 
 export interface ActivityLog {

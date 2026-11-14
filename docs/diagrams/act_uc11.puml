@@ -1,0 +1,23 @@
+@startuml
+!include skin.iuml
+title UC-11 Xem tiến độ và điểm gợi ý tiếp theo
+start
+:Khách nghe xong một điểm (≥ 90 % thời lượng);
+:Thêm điểm vào danh sách đã nghe (lưu trên máy,\ncập nhật ngay cả khi mất mạng);
+:Mở tab Điểm;
+:Thẻ tiến độ "Đã nghe x/12 điểm" + thanh tiến độ;
+if (Đã nghe đủ 12/12?) then (có)
+  :Hộp thoại chúc mừng, nút "Xem lịch sử" (UC-19);
+  stop
+endif
+:Tìm điểm chưa nghe có thứ tự lộ trình (sortOrder) nhỏ nhất;
+if (Điểm đó kích hoạt bằng GPS và đã có vị trí?) then (có)
+  :Hiện khoảng cách và mũi tên hướng đi;
+else (trong nhà)
+  :Hiện "Quét mã tại phòng" + số điểm;
+endif
+if (Bấm vào điểm gợi ý?) then (có)
+  :Mở chi tiết điểm (UC-05);
+endif
+stop
+@enduml

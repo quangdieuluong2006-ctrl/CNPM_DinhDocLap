@@ -28,8 +28,9 @@ cần sửa `.env`. **Ctrl + C** tắt tất cả. Chưa cài `cloudflared` thì
 (`localhost`, `127.0.0.1`, IP Wi-Fi, link tunnel). Trình duyệt tách cookie theo địa chỉ nên mỗi tab là một khách ẩn danh riêng
 trong "Đang hoạt động" (mở nhiều tab cùng một địa chỉ thì vẫn chỉ là một khách – đúng với thực tế: một trình duyệt = một du khách).
 
-Tài khoản mẫu (mật khẩu `Demo@12345`): `admin@demo.vn` (admin), `guide1@demo.vn`, `guide2@demo.vn` (hướng dẫn viên),
-`user1@demo.vn` … `user6@demo.vn`.
+Tài khoản mẫu: chỉ có quản trị viên `admin@demo.vn` / `Demo@12345` (đăng nhập Web Admin). Khách không có tài khoản –
+mở Web User / Mobile là API tự tạo khách ẩn danh. Seed thêm 6 khách mẫu (`Khách #7F3A`…) để Dashboard có dữ liệu, và tự xóa
+các tài khoản mẫu cũ của bản trước v2.0 (`guide1–2@demo.vn`, `user1–6@demo.vn`), giữ lại lượt ghé và nhật ký của họ.
 
 PowerShell báo "running scripts is disabled": chạy một lần `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
 
@@ -41,6 +42,7 @@ PowerShell báo "running scripts is disabled": chạy một lần `Set-Execution
 | `npm run demo` | Như `npm run dev`, chạy xong tự mở Web Admin + các tab khách ảo (mỗi tab một khách) |
 | `npm run dev:api` | Chỉ chạy API, tự tải lại khi sửa code |
 | `npm run db:migrate` · `npm run db:seed` | Chạy migration chưa chạy · nạp dữ liệu mẫu (chạy lại an toàn) |
+| `npm run gen:audio` | Sinh tệp giọng đọc AI cho bài mới / bài đã sửa (cần `pip install edge-tts`) – xem mục "Giọng đọc AI" |
 | `npm run typecheck` · `npm run lint` | Kiểm tra kiểu · kiểm tra mã |
 | `npm test` | Test đơn vị |
 | `RUN_DB_TESTS=1 npm test` | Thêm test tích hợp trên SQL Server (CSDL riêng `DinhDocLapDB_test`) |
@@ -55,12 +57,12 @@ Thêm/sửa route thì cập nhật `src/docs/openapi.ts` (hoặc `openapi.conte
 
 | Nhóm | Endpoint chính | Quyền |
 |---|---|---|
+| Xác thực | `POST /auth/login` (quản trị viên), `POST /auth/refresh`, `POST /auth/logout`. Không còn `/auth/register` (PRD v2.0) | Công khai |
 | Khách ẩn danh | `POST /auth/guest` – Web User / Mobile gọi khi mở lần đầu: tạo khách `Khách #A1B2` (không email, không mật khẩu, `isGuest: true`) và cấp phiên; sau đó chỉ dùng `/auth/refresh` | Công khai (300 lần / 15 phút / IP) |
 | Nội dung | `GET /languages`, `GET /places?lang=&zone=&q=`, `GET /places/{code}?lang=`, `GET /content/bundle?lang=` (ETag → 304), `GET /content/version` | Công khai |
 | Lượt ghé | `POST /visits`, `POST /visits/batch` (bỏ trùng theo `clientId`), `GET /me/visits` | Khách / đăng nhập |
-| Nhóm tham quan (giao diện đã ẩn – giảng viên không yêu cầu) | `POST /tours`, `GET /me/tour`, `GET /tours/{code}`, `POST /tours/{code}/join`, `POST /tours/{id}/leave`, `GET /tours/{id}/members`, `POST /tours/{id}/end` | Đăng nhập; tạo nhóm: guide/admin |
 | Quản trị nội dung | `/admin/places` (CRUD), `PUT /admin/places/{id}/contents/{lang}`, `POST …/audio` (multipart), `POST /admin/places/{id}/image`, `/admin/languages` + `/catalog` | admin |
-| Quản trị người dùng | `/admin/users` (lọc, khóa/mở, đổi vai trò), `/admin/tours`, `/admin/activity-logs`, `/admin/stats`, `/admin/presence` | admin |
+| Quản trị người dùng | `/admin/users` (lọc, khóa/mở, đổi vai trò user ↔ admin – không áp dụng cho khách ẩn danh), `/admin/activity-logs`, `/admin/stats`, `/admin/presence`, `/admin/join-link` | admin |
 
 - Bài hiển thị cho khách: `approved` và `pending` (kèm nhãn); `draft` ẩn. Thiếu bài ngôn ngữ đã chọn → dự phòng `en` → `vi` (`isFallback: true`).
 - Mọi thay đổi ở API quản trị nội dung tăng phiên bản (`content_releases`) → ETag gói offline đổi → ứng dụng tải lại.
@@ -71,15 +73,36 @@ Thêm/sửa route thì cập nhật `src/docs/openapi.ts` (hoặc `openapi.conte
 - Migration: `db/migrations/00X_mo_ta.sql`, tách khối bằng `GO`, mỗi tệp chạy trong một transaction và được ghi vào `schema_migrations`.
   **Không sửa** migration đã merge – thay đổi mới viết thành tệp mới. Giữ `SET ANSI_NULLS ON; SET QUOTED_IDENTIFIER ON;` đầu tệp.
 - Dữ liệu mẫu: `db/seed/places.vi-en.json` (bài tiếng Việt/Anh, đã duyệt) và `db/seed/places.i18n.json` (8 ngôn ngữ, chờ duyệt).
-  **Nội dung lịch sử và tọa độ là bản nháp – phải đối chiếu nguồn chính thức (PRD mục 18.4).**
+  **Nội dung lịch sử và tọa độ là bản nháp – phải đối chiếu nguồn chính thức (PRD mục 15.4).**
 - Thời gian lưu UTC; "hôm nay" trên Dashboard tính theo giờ Việt Nam.
+- `004_drop_tours.sql` (PRD v2.0) xóa bảng `tours`, `tour_members`, chỉ còn vai trò `user` / `admin` → CSDL có 10 bảng
+  (9 bảng nghiệp vụ + `schema_migrations`). Máy đã có CSDL cũ: chạy `npm run db:migrate` rồi `npm run db:seed`.
 
 ```sql
 USE DinhDocLapDB;
 SELECT * FROM dbo.v_active_users;          -- người dùng đang hoạt động
 SELECT * FROM dbo.v_language_completeness; -- mức hoàn thiện nội dung theo ngôn ngữ
-EXEC dbo.sp_admin_dashboard_stats;         -- 6 số liệu Dashboard
+EXEC dbo.sp_admin_dashboard_stats;         -- 5 số liệu Dashboard
 ```
+
+## Giọng đọc AI (PRD v2.0, mục 4.10)
+
+Mỗi bài thuyết minh (12 điểm × 10 ngôn ngữ = 120 bài) có sẵn một tệp MP3 đọc bằng giọng neural, lưu trong
+`db/seed/audio/<lang>/<code>.mp3` (đã commit, khoảng 25 MB). `npm run db:seed` chép tệp vào `MEDIA_DIR/audio/<lang>/<code>-ai.mp3`
+và gắn vào bài – **không cần cài gì thêm**, không cần mạng.
+
+- Seed chỉ gắn tệp khi văn bản trong CSDL **khớp đúng** văn bản đã dùng để đọc (so mã băm trong `db/seed/audio/manifest.json`).
+  Bài đã sửa trên Web Admin → seed gỡ tệp cũ, app dùng giọng tổng hợp của thiết bị. Tệp quản trị viên tự tải lên không bị đụng tới.
+- Sửa văn bản trong `db/seed/places.*.json` (ví dụ sau khi duyệt bản dịch) → sinh lại tệp:
+  ```bash
+  pip install edge-tts          # một lần (cần Python 3.9+)
+  npm run gen:audio             # chỉ sinh tệp thiếu hoặc bài đã đổi; thêm -- --force để sinh lại tất cả
+  npm run gen:audio -- --only ja,en/201   # chỉ tiếng Nhật và bài 201 tiếng Anh
+  npm run db:seed               # gắn tệp mới; phiên bản nội dung tăng → app tải lại gói
+  ```
+- Giọng theo ngôn ngữ: `AI_VOICES` trong `src/db/aiVoice.ts` (Phụ lục B của PRD).
+- `edge-tts` gọi dịch vụ đọc của trình duyệt Microsoft Edge – **không phải API thương mại chính thức**, chỉ dùng cho học tập.
+  Triển khai thật thì thay hàm `synthesize` trong `src/db/gen-audio.ts` bằng dịch vụ có giấy phép (Azure AI Speech, Google Cloud TTS).
 
 ## Người dùng đang hoạt động (presence)
 

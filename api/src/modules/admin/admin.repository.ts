@@ -4,7 +4,6 @@ export interface DashboardStats {
   total_users: number;
   active_users: number;
   visits_today: number;
-  active_tours: number;
   published_places: number;
   pending_contents: number;
 }

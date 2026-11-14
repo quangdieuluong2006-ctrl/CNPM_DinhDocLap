@@ -1,0 +1,35 @@
+@startuml
+!include skin.iuml
+title UC-15 Quản lý điểm thuyết minh
+start
+:Mở trang Điểm thuyết minh (bảng + bản đồ);
+if (Thao tác) then (thêm / sửa)
+  :Nhập tên nội bộ, số điểm (3 chữ số), khu vực,\nkiểu kích hoạt, ưu tiên, thứ tự, ảnh (≤ 5 MB);
+  if (Kiểu kích hoạt = gps?) then (có)
+    :Nhấp bản đồ hoặc nhập vĩ độ / kinh độ,\nchọn bán kính 15–80 m;
+  endif
+  :Lưu;
+  if (Dữ liệu hợp lệ (zod)?) then (không)
+    :Báo lỗi tại từng trường (400);
+    stop
+  endif
+  if (Trùng số điểm?) then (có)
+    :Báo 409 PLACE_CODE_TAKEN;
+    stop
+  endif
+  :Ghi places; tăng phiên bản nội dung;\nghi nhật ký place.create / place.update;
+  if (Vùng GPS giao nhiều với điểm khác?) then (có)
+    :Hiện cảnh báo (vẫn lưu);
+  endif
+elseif () then (ẩn / xuất bản)
+  :Đổi status hidden / published; tăng phiên bản;
+else (xóa)
+  if (Điểm đã có lượt ghé?) then (có)
+    :Báo 409 PLACE_HAS_VISITS → gợi ý ẩn điểm;
+    stop
+  endif
+  :Xóa điểm (bài thuyết minh xóa theo); tăng phiên bản;
+endif
+:Ứng dụng của khách: lần mở sau thấy phiên bản mới → tải gói mới\n(geofence dùng tọa độ mới);
+stop
+@enduml

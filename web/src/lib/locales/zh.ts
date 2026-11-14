@@ -24,6 +24,7 @@ export const zh: Dict = {
   replay: "从头播放",
   speed: "语速",
   tts: "合成语音",
+  aiVoice: "AI 语音",
   noVoice: "您的浏览器没有该语言的语音——您可以阅读下方文字。",
   audioError: "无法播放音频——您可以阅读下方文字。",
   showingIn: "显示语言",

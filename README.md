@@ -34,40 +34,48 @@ Chi tiết: [`api/README.md`](api/README.md). App Mobile chạy riêng: xem [`mo
 
 ## Tài liệu
 
-- **PRD v1.1** (căn cứ triển khai, 27/10/2026): [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.pdf`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.pdf)
-  · bản Word: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.docx`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.1.docx)
-  · bản trước: [PRD v1.0](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v1.0.pdf)
+- **PRD v2.1 – bản chính thức** (09/11/2026), căn cứ duy nhất để lập trình và nghiệm thu:
+  [`docs/PRD.md`](docs/PRD.md) (đọc trực tiếp trên GitHub)
+  · PDF: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.1.pdf`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.1.pdf)
+  · Word: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.1.docx`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.1.docx)
+- Sơ đồ UML trong PRD: use case (mục 8.1), **lược đồ hoạt động cho cả 20 use case** (Hình 5, 6 và mục 8.4),
+  sơ đồ tuần tự SD-01 → SD-05 và máy trạng thái (mục 9), sơ đồ lớp Mobile (mục 4.1), ERD (mục 13), CI/CD (mục 16).
 - Sơ đồ UML (nguồn PlantUML): [`docs/diagrams/`](docs/diagrams/)
 
-### Thay đổi so với PRD v1.0 (đã cập nhật vào PRD v1.1)
+Sửa PRD: sửa `docs/PRD.md` (và sơ đồ `.puml` nếu cần), rồi xuất lại Word bằng lệnh ghi ở đầu
+[`docs/tools/prd-docx.lua`](docs/tools/prd-docx.lua); mở bản Word, cập nhật mục lục và lưu thành PDF.
 
-| Nội dung | Trước đây | Hiện tại | Lý do |
-|---|---|---|---|
-| Tài khoản của khách | Đăng ký / đăng nhập | Khách ẩn danh, quét QR là dùng | Khách du lịch thường chỉ đến một lần, bắt đăng ký gây phiền |
-| Tham quan theo nhóm | Có | Bỏ | Giảng viên không yêu cầu |
-| Ngôn ngữ giao diện | Tiếng Việt / tiếng Anh | Theo ngôn ngữ thuyết minh (10 ngôn ngữ) | Khách không biết tiếng Anh vẫn dùng được |
-| Truy cập khi demo | Cùng mạng Wi-Fi | Thêm Cloudflare Tunnel | Khách dùng 4G vẫn quét QR được |
+### Những thay đổi lớn đã chốt (chi tiết ở mục "Lịch sử thay đổi" của PRD)
+
+| Nội dung                                    | Trước đây                   | Hiện tại                                   | Lý do                                                       |
+| ------------------------------------------- | --------------------------- | ------------------------------------------ | ----------------------------------------------------------- |
+| Tài khoản của khách                         | Đăng ký / đăng nhập         | Khách ẩn danh, quét QR là dùng             | Khách du lịch thường chỉ đến một lần, bắt đăng ký gây phiền |
+| Tham quan theo nhóm, vai trò hướng dẫn viên | Có                          | Bỏ hẳn (v2.0 xóa cả bảng CSDL, API)        | Giảng viên không yêu cầu; giữ hệ thống gọn                  |
+| Ngôn ngữ giao diện                          | Tiếng Việt / tiếng Anh      | Theo ngôn ngữ thuyết minh (10 ngôn ngữ)    | Khách không biết tiếng Anh vẫn dùng được                    |
+| Giọng đọc                                   | Giọng tổng hợp của thiết bị | Tệp giọng đọc AI cho 12 điểm × 10 ngôn ngữ | Tự nhiên, đồng nhất mọi máy, nghe offline                   |
+| Truy cập khi demo                           | Cùng mạng Wi-Fi             | Thêm Cloudflare Tunnel                     | Khách dùng 4G vẫn quét QR được                              |
 
 ## Thành phần
 
-| Thư mục | Thành phần | Công nghệ |
-|---|---|---|
+| Thư mục   | Thành phần                                | Công nghệ                                                      |
+| --------- | ----------------------------------------- | -------------------------------------------------------------- |
 | `mobile/` | Ứng dụng của khách (phần quan trọng nhất) | React Native, Expo SDK 58, TypeScript (xem `mobile/README.md`) |
-| `web/` | Web User: xem điểm, nghe thuyết minh | React 19, Vite, TypeScript |
-| `admin/` | Web Admin: nội dung, người dùng, thống kê | React 19, Vite, TypeScript |
-| `api/` | Backend REST + Socket.IO | Node.js 22, Express 5, TypeScript |
-| `db/` | Cơ sở dữ liệu | SQL Server 2022 |
+| `web/`    | Web User: xem điểm, nghe thuyết minh      | React 19, Vite, TypeScript                                     |
+| `admin/`  | Web Admin: nội dung, người dùng, thống kê | React 19, Vite, TypeScript                                     |
+| `api/`    | Backend REST + Socket.IO                  | Node.js 22, Express 5, TypeScript                              |
+| `db/`     | Cơ sở dữ liệu                             | SQL Server 2022                                                |
 
 ## CI/CD
 
-GitHub Actions có 4 workflow trong [`.github/workflows/`](.github/workflows/), chạy khi push hoặc tạo Pull Request vào `develop` / `main`:
+GitHub Actions có 5 workflow CI trong [`.github/workflows/`](.github/workflows/), chạy khi push hoặc tạo Pull Request vào `develop` / `main`:
 
-| Workflow | Kiểm tra |
-|---|---|
-| `ci-api.yml` | Typecheck, lint, test (gồm test tích hợp với SQL Server), build |
-| `ci-web.yml` | Typecheck, lint, test, build |
-| `ci-admin.yml` | Typecheck, lint, test, build |
-| `ci-mobile.yml` | Typecheck, test, `expo export` (bản web) |
+| Workflow        | Kiểm tra                                                        |
+| --------------- | --------------------------------------------------------------- |
+| `ci-api.yml`    | Typecheck, lint, test (gồm test tích hợp với SQL Server), build |
+| `ci-web.yml`    | Typecheck, lint, test, build                                    |
+| `ci-admin.yml`  | Typecheck, lint, test, build                                    |
+| `ci-mobile.yml` | Typecheck, test, `expo export` (bản web)                        |
+| `ci-docs.yml`   | Liên kết trong README, mỗi sơ đồ `.puml` có ảnh `.png`          |
 
 Chạy thử trên máy trước khi tạo PR (trong từng thư mục): `npm run typecheck`, `npm run lint`, `npm test`
 (Mobile không có `lint`).

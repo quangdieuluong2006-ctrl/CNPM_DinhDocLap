@@ -14,7 +14,6 @@ import { healthRouter } from "./modules/health/health.routes.js";
 import { presenceRouter } from "./modules/presence/presence.routes.js";
 import { meRouter } from "./modules/users/me.routes.js";
 import { contentRouter } from "./modules/content/content.routes.js";
-import { toursRouter } from "./modules/tours/tours.routes.js";
 import { visitsRouter } from "./modules/visits/visits.routes.js";
 import { mediaRoot } from "./lib/media.js";
 
@@ -54,7 +53,6 @@ export function createApp(opts: AppOptions = {}) {
     presenceRouter,
     contentRouter,
     visitsRouter,
-    toursRouter,
     adminRouter,
   );
 

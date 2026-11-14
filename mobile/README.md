@@ -44,7 +44,7 @@ Xem nhanh trên trình duyệt (không có bản đồ thật, GPS dùng chế �
 - Có phiên khách, app mở **Socket.IO** và gửi nhịp tim 30 giây → khách hiện trong "Đang hoạt động" của Web Admin (nhãn Khách · Mobile);
   app xuống nền quá 60 giây thì đóng kết nối. Phiên hết hạn → lặng lẽ tạo khách mới; Admin khóa khách → app báo, vẫn nghe được nội dung.
 - Thử nhanh: mở app → **Bắt đầu tham quan** → mở Web Admin → **Đang hoạt động** thấy "Khách #…" với nhãn Mobile.
-- Nhóm tham quan đã bỏ khỏi giao diện (giảng viên không yêu cầu); API `/tours` vẫn giữ để có thể bật lại.
+- Nhóm tham quan đã bỏ hẳn từ PRD v2.0 (giao diện, API `/tours` và bảng CSDL).
 
 ## Cấu trúc
 

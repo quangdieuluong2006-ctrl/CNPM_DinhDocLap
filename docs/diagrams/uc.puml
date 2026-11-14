@@ -15,6 +15,8 @@ rectangle "Thuyết minh đa ngôn ngữ – Dinh Độc Lập" {
   usecase "UC-07 Thuyết minh bằng\nQR / số điểm" as UC7
   usecase "UC-08 Điều khiển trình phát" as UC8
   usecase "UC-09 Tải nội dung offline" as UC9
+  usecase "UC-10 Mời khách tham gia\nbằng mã QR" as UC10
+  usecase "UC-11 Xem tiến độ và\nđiểm gợi ý tiếp theo" as UC11
   usecase "UC-19 Xem lịch sử tham quan" as UC19
   usecase "UC-20 Mô phỏng vị trí" as UC20
   usecase "UC-12 Xem dashboard" as UC12
@@ -33,6 +35,7 @@ K --> UC6
 K --> UC7
 K --> UC8
 K --> UC9
+K --> UC11
 K --> UC19
 T --> UC20
 UC6 <-- L
@@ -43,9 +46,11 @@ A --> UC2
 A --> UC12
 A --> UC13
 A --> UC14
+A --> UC10
 A --> UC15
 A --> UC16
 A --> UC17
 A --> UC18
 UC16 ..> UC15 : <<include>>
+UC10 ..> UC14 : <<extend>>
 @enduml

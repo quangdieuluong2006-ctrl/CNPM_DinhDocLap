@@ -3,7 +3,8 @@ import jwt from "jsonwebtoken";
 import { env } from "../../config/env.js";
 import { ApiError } from "../../lib/apiError.js";
 
-export type Role = "user" | "guide" | "admin";
+// Hai vai trò (PRD v2.0, mục 2.2): khách (user, kể cả khách ẩn danh) và quản trị viên.
+export type Role = "user" | "admin";
 export interface AccessTokenPayload {
   sub: number;
   role: Role;
@@ -22,7 +23,7 @@ export function verifyAccessToken(token: string): AccessTokenPayload {
   try {
     const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET, { algorithms: ["HS256"] }) as jwt.JwtPayload;
     const sub = Number(decoded.sub);
-    if (!Number.isInteger(sub) || !["user", "guide", "admin"].includes(decoded.role as string)) throw new Error("payload");
+    if (!Number.isInteger(sub) || !["user", "admin"].includes(decoded.role as string)) throw new Error("payload");
     return { sub, role: decoded.role as Role };
   } catch (err) {
     if (err instanceof jwt.TokenExpiredError) {

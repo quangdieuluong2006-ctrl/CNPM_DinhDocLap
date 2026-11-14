@@ -22,14 +22,17 @@ describe.skipIf(!runDbTests)("SQL Server – lược đồ, dữ liệu mẫu, p
     expect(await migrate(() => {})).toEqual([]);
   });
 
-  it("seed chạy lại vẫn an toàn: 10 ngôn ngữ, 9 tài khoản, 12 điểm × 10 bài, 160 lượt ghé", async () => {
+  it("seed chạy lại vẫn an toàn: 10 ngôn ngữ, 1 admin + 6 khách mẫu (+6 tài khoản thử), 12 điểm × 10 bài, 160 lượt ghé", async () => {
     await seed(() => {});
     const pool = await getPool();
     const r = await pool.request().query(`
       SELECT (SELECT COUNT(*) FROM dbo.languages) AS languages, (SELECT COUNT(*) FROM dbo.users) AS users,
              (SELECT COUNT(*) FROM dbo.places) AS places, (SELECT COUNT(*) FROM dbo.place_contents) AS contents,
              (SELECT COUNT(*) FROM dbo.visits) AS visits, (SELECT COUNT(*) FROM dbo.content_releases) AS releases`);
-    expect(r.recordset[0]).toEqual({ languages: 10, users: 9, places: 12, contents: 120, visits: 160, releases: 1 });
+    expect(r.recordset[0]).toEqual({ languages: 10, users: 13, places: 12, contents: 120, visits: 160, releases: 1 });
+    const kinds = await pool.request().query<{ role: string; is_guest: boolean; n: number }>(
+      "SELECT role, is_guest, COUNT(*) AS n FROM dbo.users WHERE email NOT LIKE '%@test.vn' GROUP BY role, is_guest ORDER BY role");
+    expect(kinds.recordset).toEqual([{ role: "admin", is_guest: false, n: 1 }, { role: "user", is_guest: true, n: 6 }]);
   });
 
   it("5 điểm ngoài trời kích hoạt bằng GPS, 7 điểm trong nhà bằng QR; vi/en đã duyệt, 8 ngôn ngữ chờ duyệt", async () => {
@@ -54,18 +57,73 @@ describe.skipIf(!runDbTests)("SQL Server – lược đồ, dữ liệu mẫu, p
                SELECT id, 'vi', N'trùng', N'trùng', N'trùng' FROM dbo.places WHERE code = '001'`);
   });
 
-  it("một người chỉ ở một nhóm tham quan chưa rời", async () => {
+  it("giọng đọc AI: seed gắn đủ 120 tệp MP3, phát được qua /media với HTTP Range", async () => {
+    const pool = await getPool();
+    const r = await pool.request().query<{ n: number; secs: number }>(`
+      SELECT COUNT(*) AS n, SUM(audio_duration_sec) AS secs FROM dbo.place_contents
+      WHERE audio_url LIKE '/media/audio/%-ai.mp3' AND audio_bytes > 0`);
+    expect(r.recordset[0]!.n).toBe(120);
+    expect(r.recordset[0]!.secs).toBeGreaterThan(120 * 10);
+
+    const app = createApp();
+    const bundle = await request(app).get("/api/v1/content/bundle?lang=ja");
+    const p201 = bundle.body.places.find((p: { code: string }) => p.code === "201");
+    expect(p201.content).toMatchObject({ audioUrl: "/media/audio/ja/201-ai.mp3", audioDurationSec: expect.any(Number) });
+    const head = await request(app).get(p201.content.audioUrl).set("Range", "bytes=0-99");
+    expect(head.status).toBe(206); // tua được
+    expect(head.headers["content-type"]).toMatch(/audio\/mpeg/);
+  });
+
+  it("giọng đọc AI: sửa văn bản → seed gỡ tệp cũ và tăng phiên bản; không ghi đè tệp quản trị viên tự tải", async () => {
+    const pool = await getPool();
+    const version = async () => (await pool.request().query<{ v: number }>("SELECT MAX(version) AS v FROM dbo.content_releases")).recordset[0]!.v;
+    const audioOf = async (code: string, lang: string) => (await pool.request().query<{ audio_url: string | null }>(`
+      SELECT c.audio_url FROM dbo.place_contents c JOIN dbo.places p ON p.id = c.place_id
+      WHERE p.code = '${code}' AND c.language_code = '${lang}'`)).recordset[0]!.audio_url;
+    const v0 = await version();
+    await pool.request().query(`
+      UPDATE c SET body = body + N' (đã sửa)' FROM dbo.place_contents c JOIN dbo.places p ON p.id = c.place_id
+      WHERE p.code = '002' AND c.language_code = 'vi';
+      UPDATE c SET audio_url = '/media/audio/ko/003-tu-thu.mp3' FROM dbo.place_contents c JOIN dbo.places p ON p.id = c.place_id
+      WHERE p.code = '003' AND c.language_code = 'ko';`);
+    await seed(() => {});
+    expect(await audioOf("002", "vi")).toBeNull();
+    expect(await audioOf("003", "ko")).toBe("/media/audio/ko/003-tu-thu.mp3");
+    expect(await audioOf("002", "en")).toBe("/media/audio/en/002-ai.mp3");
+    expect(await version()).toBe(v0 + 1);
+    await seed(() => {}); // chạy lại không đổi gì → không tăng phiên bản
+    expect(await version()).toBe(v0 + 1);
+  });
+
+  it("migration 004: không còn bảng nhóm tham quan; chỉ 2 vai trò user/admin (10 bảng)", async () => {
+    const pool = await getPool();
+    const tables = await pool.request().query<{ name: string }>("SELECT name FROM sys.tables ORDER BY name");
+    expect(tables.recordset.map((t) => t.name)).toEqual([
+      "activity_logs", "content_releases", "languages", "place_contents", "places",
+      "refresh_tokens", "schema_migrations", "user_sessions", "users", "visits",
+    ]);
+    await expect(pool.request().query("UPDATE dbo.users SET role = 'guide' WHERE email = 'user1@test.vn'")).rejects.toThrow(/CK_users_role/);
+    const proc = await pool.request().execute("dbo.sp_admin_dashboard_stats");
+    expect(Object.keys(proc.recordset[0]!)).not.toContain("active_tours");
+  });
+
+  it("seed xóa tài khoản mẫu cũ (v1.x) nhưng giữ lượt ghé và nhật ký của họ", async () => {
     const pool = await getPool();
     await pool.request().query(`
-      DECLARE @guide INT = (SELECT id FROM dbo.users WHERE email = 'guide1@demo.vn');
-      DECLARE @u INT = (SELECT id FROM dbo.users WHERE email = 'user1@demo.vn');
-      INSERT INTO dbo.tours (code, name, guide_id) VALUES ('TEST01', N'Nhóm A', @guide), ('TEST02', N'Nhóm B', @guide);
-      INSERT INTO dbo.tour_members (tour_id, user_id) SELECT id, @u FROM dbo.tours WHERE code = 'TEST01';`);
-    await expect(
-      pool.request().query(`
-        INSERT INTO dbo.tour_members (tour_id, user_id)
-        SELECT t.id, u.id FROM dbo.tours t, dbo.users u WHERE t.code = 'TEST02' AND u.email = 'user1@demo.vn'`),
-    ).rejects.toThrow();
+      INSERT INTO dbo.users (email, password_hash, full_name, role) VALUES ('guide1@demo.vn', 'x', N'HDV cũ', 'user');
+      DECLARE @u INT = SCOPE_IDENTITY();
+      INSERT INTO dbo.visits (client_id, user_id, place_id, language_code, trigger_type, listened_sec, completed, started_at)
+        SELECT NEWID(), @u, MIN(id), 'vi', 'qr', 30, 1, SYSUTCDATETIME() FROM dbo.places;
+      INSERT INTO dbo.activity_logs (user_id, action) VALUES (@u, 'tour.create');
+      INSERT INTO dbo.user_sessions (user_id, client_type) VALUES (@u, 'mobile');`);
+    const before = await pool.request().query<{ v: number; l: number }>(
+      "SELECT (SELECT COUNT(*) FROM dbo.visits) AS v, (SELECT COUNT(*) FROM dbo.activity_logs) AS l");
+    await seed(() => {});
+    const after = await pool.request().query<{ u: number; v: number; l: number; orphan: number }>(`
+      SELECT (SELECT COUNT(*) FROM dbo.users WHERE email = 'guide1@demo.vn') AS u,
+             (SELECT COUNT(*) FROM dbo.visits) AS v, (SELECT COUNT(*) FROM dbo.activity_logs) AS l,
+             (SELECT COUNT(*) FROM dbo.activity_logs WHERE action = 'tour.create' AND user_id IS NULL) AS orphan`);
+    expect(after.recordset[0]).toEqual({ u: 0, v: before.recordset[0]!.v, l: before.recordset[0]!.l, orphan: 1 });
   });
 
   it("đếm đúng 4 người dùng đang hoạt động (TC-30, TC-33)", async () => {
@@ -85,13 +143,13 @@ describe.skipIf(!runDbTests)("SQL Server – lược đồ, dữ liệu mẫu, p
           VALUES (@u, @c, DATEADD(SECOND, -@ago, SYSUTCDATETIME()), CASE WHEN @dc = 1 THEN SYSUTCDATETIME() END);`);
 
     await add("admin@demo.vn", "admin", 0); // admin không tính
-    await add("user1@demo.vn", "mobile", 0);
-    await add("user1@demo.vn", "web", 20); // thiết bị thứ hai: không tính thêm
-    await add("user2@demo.vn", "mobile", 10);
-    await add("guide1@demo.vn", "mobile", 0); // hướng dẫn viên có tính
-    await add("user4@demo.vn", "web", 45);
-    await add("user5@demo.vn", "mobile", 120); // mất mạng: nhịp tim quá 60 giây
-    await add("user6@demo.vn", "mobile", 0, true); // đã thoát
+    await add("user1@test.vn", "mobile", 0);
+    await add("user1@test.vn", "web", 20); // thiết bị thứ hai: không tính thêm
+    await add("user2@test.vn", "mobile", 10);
+    await add("user3@test.vn", "mobile", 0);
+    await add("user4@test.vn", "web", 45);
+    await add("user5@test.vn", "mobile", 120); // mất mạng: nhịp tim quá 60 giây
+    await add("user6@test.vn", "mobile", 0, true); // đã thoát
 
     const active = await pool.request().query<{ n: number }>("SELECT COUNT(*) AS n FROM dbo.v_active_users WHERE role <> 'admin'");
     expect(active.recordset[0]!.n).toBe(4);
@@ -99,12 +157,13 @@ describe.skipIf(!runDbTests)("SQL Server – lược đồ, dữ liệu mẫu, p
     const stats = await pool.request().execute<{ total_users: number; active_users: number; published_places: number; pending_contents: number }>(
       "dbo.sp_admin_dashboard_stats",
     );
-    expect(stats.recordset[0]).toMatchObject({ total_users: 8, active_users: 4, published_places: 12, pending_contents: 96 });
+    // total_users: 6 khách mẫu + 6 tài khoản thử (admin không tính)
+    expect(stats.recordset[0]).toMatchObject({ total_users: 12, active_users: 4, published_places: 12, pending_contents: 96 });
   });
 
-  it("GET /health/ready báo đã kết nối CSDL và 3 migration", async () => {
+  it("GET /health/ready báo đã kết nối CSDL và 4 migration", async () => {
     const res = await request(createApp()).get("/health/ready");
     expect(res.status).toBe(200);
-    expect(res.body).toMatchObject({ status: "ready", database: "ok", migrations: 3 });
+    expect(res.body).toMatchObject({ status: "ready", database: "ok", migrations: 4 });
   });
 });

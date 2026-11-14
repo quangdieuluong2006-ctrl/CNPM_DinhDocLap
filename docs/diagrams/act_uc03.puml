@@ -1,0 +1,30 @@
+@startuml
+!include skin.iuml
+title UC-03 Chọn ngôn ngữ thuyết minh
+start
+:Mở màn Chọn ngôn ngữ\n(lần đầu, từ Cài đặt hoặc nút ngôn ngữ trên trình phát);
+if (Có mạng?) then (có)
+  :GET /languages\n(chỉ ngôn ngữ đang bật và có bài đã xuất bản);
+else (không)
+  :Dùng danh sách đã lưu trên máy;
+endif
+:Hiện danh sách: tên bản ngữ, tên tiếng Việt, mức hoàn thiện;\nngôn ngữ của thiết bị đứng đầu;
+:Gõ vào ô tìm kiếm (ví dụ "nhat", "japanese", "ja");
+:Lọc không phân biệt hoa thường và dấu;
+if (Có kết quả?) then (không)
+  :Báo "Chưa có thuyết minh cho ngôn ngữ này",\ngợi ý tiếng Anh;
+  stop
+endif
+:Chọn một ngôn ngữ;
+:Lưu cài đặt; giao diện đổi sang ngôn ngữ đó;
+:GET /content/bundle?lang= (gửi If-None-Match = ETag cũ);
+if (304 – không đổi?) then (có)
+  :Giữ gói nội dung đã lưu;
+else (200)
+  :Lưu gói mới vào documentDirectory/bundles/{lang}.json;
+endif
+if (Đang phát một bài?) then (có)
+  :Phát lại bài đó từ đầu bằng ngôn ngữ mới;
+endif
+stop
+@enduml

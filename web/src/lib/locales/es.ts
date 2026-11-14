@@ -24,6 +24,7 @@ export const es: Dict = {
   replay: "Escuchar desde el inicio",
   speed: "Velocidad",
   tts: "Voz sintetizada",
+  aiVoice: "Voz de IA",
   noVoice: "Su navegador no tiene voz para este idioma; puede leer el texto de abajo.",
   audioError: "No se pudo reproducir el audio; puede leer el texto de abajo.",
   showingIn: "Mostrado en",

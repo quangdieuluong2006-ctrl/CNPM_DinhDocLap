@@ -1,0 +1,46 @@
+@startuml
+!include skin.iuml
+start
+:Khách đến cửa phòng, thấy biển có mã QR và số điểm;
+if (Đã cài ứng dụng Mobile?) then (có)
+  :Mở màn hình "Quét mã";
+  if (Chọn cách) then (quét QR)
+    if (Đã cấp quyền camera?) then (chưa)
+      :Xin quyền camera;
+      note right: Từ chối → chuyển sang\nbàn phím số
+    endif
+    :Đưa camera vào mã QR;
+    :Đọc số điểm từ nội dung mã\n(https://<web-user>/p/201,\ndinhdoclap://p/201 hoặc "201");
+    if (Mã hợp lệ?) then (không)
+      :Báo "Mã QR không hợp lệ", quét lại;
+      stop
+    endif
+    :Nguồn kích hoạt = qr;
+  else (nhập số)
+    :Nhập 3 chữ số trên bàn phím số (ví dụ 201);
+    :Nguồn kích hoạt = code;
+  endif
+  :Tìm điểm trong gói nội dung trên máy\n(dùng được khi mất mạng);
+  if (Tìm thấy điểm?) then (không)
+    :Báo "Không tìm thấy điểm";
+    stop
+  endif
+  :Dừng bài đang phát (nếu có)\n– khách chủ động nên được ưu tiên;
+  :Mở chi tiết điểm và phát ngay\n(tệp âm thanh hoặc giọng tổng hợp);
+else (không)
+  :Quét bằng camera điện thoại;
+  :Mở Web User https://<web-user>/p/201;
+  if (Trình duyệt đã có phiên khách?) then (chưa)
+    :Tự tạo khách ẩn danh (POST /auth/guest);
+  endif
+  :Tải chi tiết điểm theo ngôn ngữ đã chọn;
+  if (Điểm tồn tại và đang xuất bản?) then (không)
+    :Báo "Không tìm thấy điểm";
+    stop
+  endif
+  :Khách bấm "Nghe"\n(trình duyệt chặn tự phát âm thanh);
+  :Phát tệp âm thanh hoặc giọng tổng hợp;
+endif
+:Nghe xong hoặc rời trang → ghi lượt nghe\n(Web: POST /visits; Mobile: POST /visits/batch,\nmất mạng thì xếp hàng gửi sau);
+stop
+@enduml

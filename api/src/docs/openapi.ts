@@ -46,10 +46,6 @@ Kết nối: \`io(API_URL, { auth: { token: accessToken }, query: { clientType: 
 | Server → Client | \`presence.session\` | \`{ sessionId }\` – đã ghi phiên vào \`user_sessions\` |
 | Client → Server | \`presence.ping\` | \`{}\` mỗi 30 giây; ack \`{ ok, sessionId }\` |
 | Server → phòng \`admins\` | \`presence.update\` | \`{ activeUsers, activeUsersAll, changed: { userId, type }, ts }\` – \`type\` là \`online\` hoặc \`offline\` |
-| Client → Server | \`tour.position\` | \`{ placeId }\` khi bắt đầu nghe một điểm (đang ở nhóm); ack \`{ ok, tourId }\` |
-| Server → phòng \`tour:{id}\` | \`tour.member.joined\` / \`tour.member.left\` | \`{ tourId, member }\` / \`{ tourId, userId }\` |
-| Server → phòng \`tour:{id}\` | \`tour.member.updated\` | \`{ tourId, userId, online, currentPlaceId?, at }\` – chỉ điểm đang nghe, không có tọa độ |
-| Server → phòng \`tour:{id}\` | \`tour.ended\` | \`{ tourId, endedBy }\` |
 | Server → phòng \`admins\` | \`admin.visit.created\` | \`{ placeId, lang, trigger }\` |
 | Server → phòng \`admins\` | \`admin.content.published\` | \`{ version }\` |
 | Server → \`user:{id}\` | \`session.revoked\` | \`{ reason: "ACCOUNT_LOCKED" }\` → client đăng xuất |
@@ -86,7 +82,7 @@ ${SOCKET_DOC}`,
         type: "http",
         scheme: "bearer",
         bearerFormat: "JWT",
-        description: "Access token (15 phút) lấy từ `accessToken` của /auth/login hoặc /auth/register.",
+        description: "Access token (15 phút) lấy từ `accessToken` của /auth/guest (khách), /auth/login (quản trị viên) hoặc /auth/refresh.",
       },
     },
     schemas: {
@@ -114,7 +110,7 @@ ${SOCKET_DOC}`,
           id: { type: "integer" },
           email: { type: "string", format: "email" },
           fullName: { type: "string" },
-          role: { type: "string", enum: ["user", "guide", "admin"] },
+          role: { type: "string", enum: ["user", "admin"] },
           status: { type: "string", enum: ["active", "locked"] },
           uiLocale: { type: "string", enum: ["vi", "en"], description: "Ngôn ngữ giao diện" },
           narrationLang: { type: ["string", "null"], description: "Ngôn ngữ thuyết minh mặc định (ISO 639-1)" },
@@ -132,18 +128,6 @@ ${SOCKET_DOC}`,
           user: { $ref: "#/components/schemas/User" },
           csrfToken: { type: "string", description: "Chỉ có với web/admin – gửi lại qua header X-CSRF-Token" },
           refreshToken: { type: "string", description: "Chỉ có với mobile" },
-        },
-      },
-      RegisterRequest: {
-        type: "object",
-        required: ["email", "password", "fullName"],
-        properties: {
-          email: { type: "string", format: "email", example: "sinhvien@lop.edu.vn" },
-          password: { type: "string", minLength: 8, maxLength: 72, description: "Ít nhất 8 ký tự, có cả chữ và số", example: "Matkhau123" },
-          fullName: { type: "string", maxLength: 100, example: "Nguyễn Minh Anh" },
-          locale: { type: "string", enum: ["vi", "en"], default: "vi", description: "Ngôn ngữ giao diện" },
-          narrationLang: { type: "string", example: "en", description: "Ngôn ngữ thuyết minh mặc định" },
-          clientType: { type: "string", enum: ["web", "mobile"], default: "web" },
         },
       },
       LoginRequest: {
@@ -168,7 +152,7 @@ ${SOCKET_DOC}`,
           userId: { type: "integer" },
           fullName: { type: "string" },
           email: { type: "string" },
-          role: { type: "string", enum: ["user", "guide", "admin"] },
+          role: { type: "string", enum: ["user", "admin"] },
           isGuest: { type: "boolean" },
           clientTypes: { type: "array", items: { $ref: "#/components/schemas/ClientType" } },
           openSessions: { type: "integer", description: "Số tab/thiết bị đang mở" },
@@ -192,7 +176,6 @@ ${SOCKET_DOC}`,
           totalUsers: { type: "integer", description: "Khách tham quan + hướng dẫn viên" },
           activeUsers: { type: "integer", description: "Đang hoạt động (không tính admin)" },
           visitsToday: { type: "integer", description: "Lượt tham quan hôm nay (giờ Việt Nam, không tính mô phỏng)" },
-          activeTours: { type: "integer" },
           publishedPlaces: { type: "integer" },
           pendingContents: { type: "integer", description: "Bài thuyết minh chờ duyệt" },
           visitsByDay: {
@@ -245,20 +228,6 @@ ${SOCKET_DOC}`,
           201: { description: "Đã tạo khách và cấp phiên", content: json("Session") },
           400: E.validation,
           429: errorResponse("Quá nhiều yêu cầu", "RATE_LIMITED", "Quá nhiều yêu cầu, vui lòng thử lại sau"),
-          503: E.dbDown,
-        },
-      },
-    },
-    "/api/v1/auth/register": {
-      post: {
-        tags: ["Xác thực"],
-        summary: "Đăng ký tài khoản",
-        description: "Tạo tài khoản và đăng nhập luôn. Ghi `auth.register` vào `activity_logs`.",
-        requestBody: { required: true, content: json("RegisterRequest") },
-        responses: {
-          201: { description: "Đã tạo tài khoản", content: json("Session") },
-          400: E.validation,
-          409: errorResponse("Email đã được đăng ký", "EMAIL_TAKEN", "Email đã được đăng ký"),
           503: E.dbDown,
         },
       },

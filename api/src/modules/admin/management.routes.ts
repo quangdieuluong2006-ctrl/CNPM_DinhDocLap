@@ -6,13 +6,11 @@ import { currentUser } from "../../middlewares/auth.js";
 import { disconnectUser, emitTo } from "../../realtime/hub.js";
 import { logActivity } from "../activity/activity.service.js";
 import { langSchema } from "../content/content.schemas.js";
-import { listTours } from "../tours/tours.repository.js";
-import { toTourDto } from "../tours/tours.service.js";
 import { catalogEntry, searchCatalog } from "./languageCatalog.js";
 import * as repo from "./management.repository.js";
 import { publishRelease } from "./places.repository.js";
 
-// Quản lý ngôn ngữ, người dùng, nhóm tham quan, nhật ký (PRD v1.0, FE-18, FE-22, FE-23, FE-24).
+// Quản lý ngôn ngữ, người dùng, nhật ký (PRD v2.0, FE-18, FE-22, FE-24).
 // Gắn sau requireAuth + requireRole("admin") của adminRouter.
 export const adminManagementRouter = Router();
 
@@ -101,14 +99,13 @@ function toAdminUserDto(u: repo.AdminUserRow) {
     online: u.online === 1,
     clientTypes: (["web", "mobile", "admin"] as const).filter((c) => u[`on_${c}`] === 1),
     lastSeenAt: u.last_seen_at,
-    tour: u.tour_id ? { id: u.tour_id, code: u.tour_code, name: u.tour_name } : null,
     visits: u.visits,
   };
 }
 
 const usersQuery = pageQuery.extend({
   q: z.string().trim().max(100).optional(),
-  role: z.enum(["user", "guide", "admin"]).optional(),
+  role: z.enum(["user", "admin"]).optional(),
   status: z.enum(["active", "locked"]).optional(),
   online: z.enum(["true", "false"]).transform((v) => v === "true").optional(),
   guest: z.enum(["true", "false"]).transform((v) => v === "true").optional(), // khách ẩn danh / tài khoản thật
@@ -142,7 +139,7 @@ adminManagementRouter.get("/admin/users/:id", async (req, res) => {
 const patchUserSchema = z.union([
   z.object({ status: z.literal("locked"), reason: z.string().trim().min(1).max(300) }).strict(),
   z.object({ status: z.literal("active") }).strict(),
-  z.object({ role: z.enum(["user", "guide", "admin"]) }).strict(),
+  z.object({ role: z.enum(["user", "admin"]) }).strict(),
 ]);
 
 // Khóa/mở khóa ({ status, reason }) hoặc đổi vai trò ({ role }). Admin không tự khóa/đổi vai trò của chính mình.
@@ -155,6 +152,8 @@ adminManagementRouter.patch("/admin/users/:id", async (req, res) => {
   if (!user) throw new ApiError(404, "NOT_FOUND", "Không tìm thấy người dùng");
 
   if ("role" in input) {
+    // Khách ẩn danh không có mật khẩu nên không thể đăng nhập Web Admin: không cho đổi vai trò.
+    if (user.is_guest) throw new ApiError(409, "GUEST_ROLE_FIXED", "Không thể đổi vai trò của khách ẩn danh");
     await repo.setUserRole(id, input.role);
     await logActivity({ userId: sub, action: "admin.user.role_change", entityType: "user", entityId: id, ip: req.ip, detail: { from: user.role, to: input.role } });
   } else if (input.status === "locked") {
@@ -168,11 +167,6 @@ adminManagementRouter.patch("/admin/users/:id", async (req, res) => {
     await logActivity({ userId: sub, action: "admin.user.unlock", entityType: "user", entityId: id, ip: req.ip });
   }
   res.json(toAdminUserDto((await repo.findUser(id))!));
-});
-
-adminManagementRouter.get("/admin/tours", async (req, res) => {
-  const { status } = z.object({ status: z.enum(["active", "ended"]).optional() }).parse(req.query);
-  res.json({ items: (await listTours(status)).map(toTourDto) });
 });
 
 const logsQuery = pageQuery.extend({

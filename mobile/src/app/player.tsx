@@ -58,6 +58,7 @@ export default function PlayerScreen() {
       <View style={{ flexDirection: "row", gap: 6 }}>
         <Pill tone="info" text={cur.lang.toUpperCase()} />
         {!isAudio && <Pill tone="warn" text={t("tts")} />}
+        {isAudio && cur.aiVoice && <Pill tone="info" text={t("aiVoice")} />}
       </View>
 
       <View style={styles.progressWrap}>

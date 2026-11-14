@@ -297,6 +297,7 @@ class AppStore {
       placeId: place.id, code: place.code, title: c.title, lang: c.lang, ttsLocale,
       text: `${c.title}. ${c.body ?? c.summary}`,
       audioUri: local ?? (this.state.online ? remote : null),
+      aiVoice: !!c.audioUrl?.endsWith("-ai.mp3"),
     };
   }
 

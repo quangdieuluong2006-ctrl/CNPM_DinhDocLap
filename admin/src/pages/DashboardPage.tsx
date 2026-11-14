@@ -3,7 +3,6 @@ import {
   Activity,
   BookOpenCheck,
   Footprints,
-  Flag,
   KeyRound,
   Languages,
   LogIn,
@@ -32,10 +31,8 @@ const PIE_COLORS = ["#047857", "#2563eb", "#b45309", "#9333ea", "#db2777", "#089
 const ACTION_ICON: { prefix: string; icon: LucideIcon; cls: string }[] = [
   { prefix: "auth.login_failed", icon: ShieldAlert, cls: "bg-red-100 text-red-600" },
   { prefix: "auth.refresh_reuse", icon: ShieldAlert, cls: "bg-red-100 text-red-600" },
-  { prefix: "auth.register", icon: UserPlus, cls: "bg-sky-100 text-sky-700" },
   { prefix: "auth.guest", icon: UserPlus, cls: "bg-sky-100 text-sky-700" },
   { prefix: "auth.", icon: LogIn, cls: "bg-emerald-100 text-emerald-700" },
-  { prefix: "tour.", icon: Flag, cls: "bg-amber-100 text-amber-700" },
   { prefix: "content.", icon: BookOpenCheck, cls: "bg-violet-100 text-violet-700" },
   { prefix: "place.", icon: Pencil, cls: "bg-teal-100 text-teal-700" },
   { prefix: "language.", icon: Languages, cls: "bg-indigo-100 text-indigo-700" },

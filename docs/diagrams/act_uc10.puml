@@ -1,0 +1,28 @@
+@startuml
+!include skin.iuml
+title UC-10 Mời khách tham gia bằng mã QR
+start
+:Mở trang Đang hoạt động → bấm "Mời tham gia (QR)";
+:GET /admin/join-link;
+if (Có WEB_USER_PUBLIC_URL?) then (có)
+  :Trả địa chỉ công khai (khuyên dùng);
+elseif (Cloudflare Tunnel đang chạy?) then (có)
+  :Trả link https://…trycloudflare.com (khuyên dùng)\n+ các IP Wi-Fi;
+else (không)
+  :Trả các IP nội bộ, xếp Wi-Fi thật trước,\ncard ảo (Docker, VPN) xuống cuối;
+endif
+if (Có địa chỉ nào?) then (không)
+  :Báo "Máy chưa kết nối mạng Wi-Fi / LAN";
+  stop
+endif
+:Sinh mã QR cho địa chỉ được chọn, hiện địa chỉ dạng chữ;
+:Dòng hướng dẫn theo loại địa chỉ:\nhttps → "dùng 4G hay Wi-Fi đều được";\nIP → "phải cùng Wi-Fi với máy này";
+if (Đổi địa chỉ?) then (có)
+  :Chọn địa chỉ khác trong danh sách;
+endif
+:Quản trị viên chiếu mã QR cho khách;
+:Khách quét bằng camera điện thoại → mở Web User;
+:Web User tạo khách ẩn danh (UC-01);
+:Web Admin nhận presence.update → bảng Đang hoạt động\nthêm từng khách trong ≤ 3 giây;
+stop
+@enduml

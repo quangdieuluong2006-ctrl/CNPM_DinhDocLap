@@ -1,0 +1,21 @@
+@startuml
+!include skin.iuml
+title UC-12 Xem dashboard
+start
+:Đăng nhập (UC-02) → trang Tổng quan;
+:GET /admin/stats;
+:EXEC sp_admin_dashboard_stats\n(không tính admin và lượt simulated;\n"hôm nay" theo giờ Việt Nam);
+:Truy vấn lượt tham quan 7 ngày, top 5 điểm 30 ngày,\ntỷ lệ ngôn ngữ, 10 hoạt động gần nhất;
+:Hiện 5 thẻ số liệu + 3 biểu đồ + bảng hoạt động;
+repeat
+  if (Có sự kiện realtime?) then (presence.update)
+    :Cập nhật ngay thẻ "Đang hoạt động";
+  elseif () then (admin.visit.created)
+    :Tăng "Lượt tham quan hôm nay";
+  else (60 giây trôi qua)
+    :Tải lại /admin/stats;
+  endif
+repeat while (Còn mở trang Tổng quan?) is (có)
+->rời trang;
+stop
+@enduml

@@ -1,0 +1,28 @@
+@startuml
+!include skin.iuml
+title UC-05 Xem danh sách và chi tiết điểm
+start
+:Mở tab Điểm (Mobile) hoặc trang chủ / /places (Web User);
+:Lấy danh sách điểm theo ngôn ngữ đã chọn\n(Mobile: gói trên máy; Web: GET /places?lang=);
+:Nhóm theo khu vực: Ngoài trời, Tầng trệt, Lầu 1, …;\nmỗi dòng có số điểm, tiêu đề, khoảng cách, dấu đã nghe;
+if (Tìm / lọc?) then (có)
+  :Gõ tên hoặc số điểm, chọn khu vực;
+  :Lọc danh sách (Web giữ tham số trên URL để chia sẻ);
+  if (Có kết quả?) then (không)
+    :Báo "Không tìm thấy điểm";
+    stop
+  endif
+endif
+:Chọn một điểm;
+:Mở chi tiết: ảnh, số điểm, tiêu đề, tóm tắt, văn bản đầy đủ,\nkiểu kích hoạt (tự động khi đến gần / quét mã tại phòng);
+if (Thiếu bài ở ngôn ngữ đã chọn?) then (có)
+  :Dùng tiếng Anh → tiếng Việt,\nghi chú "Đang hiển thị bằng …";
+endif
+if (Bài đang chờ duyệt?) then (có)
+  :Nhãn "Bản dịch đang được kiểm duyệt";
+endif
+if (Bấm Nghe thuyết minh?) then (có)
+  :Phát (nguồn manual) → UC-08;
+endif
+stop
+@enduml

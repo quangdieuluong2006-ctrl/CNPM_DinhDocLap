@@ -1,0 +1,22 @@
+@startuml
+!include skin.iuml
+title UC-14 Theo dõi khách đang hoạt động
+start
+:Mở trang Đang hoạt động;
+:GET /admin/presence (lọc: chỉ khách / tất cả, loại thiết bị);
+:Đọc view v_active_users: phiên chưa đóng,\nnhịp tim ≤ 60 giây, gộp theo người;
+:Hiện số "Đang hoạt động: N" và bảng:\ntên, thiết bị, số phiên, trực tuyến từ, hoạt động cuối;
+fork
+  repeat
+    :Khách mở / đóng ứng dụng;\nứng dụng gửi presence.ping mỗi 30 giây;
+    :Ghi / đóng user_sessions → phát presence.update;
+    :Web Admin tải lại danh sách ngay;
+  repeat while (Còn mở trang?) is (có)
+fork again
+  :Tác vụ dọn phiên: phiên mất nhịp tim > 60 giây → đóng\n(khách mất mạng đột ngột rời danh sách ≤ 90 giây);
+end fork
+if (Bấm "Mời tham gia (QR)"?) then (có)
+  :→ UC-10;
+endif
+stop
+@enduml

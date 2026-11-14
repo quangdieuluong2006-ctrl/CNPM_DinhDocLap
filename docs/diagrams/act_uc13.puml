@@ -1,0 +1,27 @@
+@startuml
+!include skin.iuml
+title UC-13 Quản lý người dùng, khóa tài khoản
+start
+:Mở trang Người dùng; tìm theo tên / email,\nlọc loại (khách / có email), vai trò, online, bị khóa;
+:Mở chi tiết một người dùng\n(thông tin, lượt ghé, lịch sử phiên);
+if (Là chính mình?) then (có)
+  :Ẩn nút khóa / đổi vai trò\n(API cũng trả 409 CANNOT_MODIFY_SELF);
+  stop
+endif
+if (Thao tác) then (khóa)
+  :Nhập lý do → "Khóa tài khoản";
+  :status = locked, thu hồi mọi refresh token;
+  :Gửi session.revoked tới phòng user:{id},\nngắt mọi socket; ghi admin.user.lock;
+  :Ứng dụng của khách đăng xuất ngay, báo "Tài khoản đã bị khóa",\nkhông tự tạo khách mới;
+elseif () then (mở khóa)
+  :status = active, xóa lý do; ghi admin.user.unlock;
+else (đổi vai trò)
+  if (Là khách ẩn danh?) then (có)
+    :409 GUEST_ROLE_FIXED\n(khách không có mật khẩu);
+    stop
+  endif
+  :role = user ↔ admin; ghi admin.user.role_change;
+endif
+:Cập nhật danh sách và chi tiết;
+stop
+@enduml
