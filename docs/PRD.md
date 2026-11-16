@@ -212,7 +212,7 @@ Hệ thống có **2 vai trò** (`users.role`): `user` và `admin`. Khách khôn
 | FE-07 | Trình phát thuyết minh | Mobile | Phải | Phát/tạm dừng, phát lại, tua ±10 s, tốc độ, đổi ngôn ngữ, văn bản kèm. | Đã có |
 | FE-08 | Tải trước nội dung (offline) | Mobile | Phải | Gói nội dung + tệp âm thanh; kiểm tra phiên bản; gửi lượt ghé bù. | Đã có |
 | FE-09 | Tiến độ và điểm gợi ý | Mobile | Nên | "Đã nghe x/12", điểm tiếp theo kèm khoảng cách và hướng. | Đã có; *màn chúc mừng: cần làm* |
-| FE-10 | Lịch sử tham quan (Mobile) | Mobile | Nên | Danh sách điểm đã nghe theo thời gian, cách kích hoạt. | *Cần làm* |
+| FE-10 | Lịch sử tham quan (Mobile) | Mobile | Nên | Danh sách điểm đã nghe theo thời gian, cách kích hoạt. | *Đã có* |
 | FE-11 | Chế độ mô phỏng vị trí | Mobile | Phải | Chạm bản đồ hoặc chạy lộ trình mẫu. | Đã có |
 | FE-12 | Cài đặt | Mobile | Phải | Ngôn ngữ, tự động phát, rung, cỡ chữ, dữ liệu offline, máy chủ API. | Đã có; *rung, cỡ chữ: cần làm* |
 | FE-13 | Trang chủ và danh sách điểm | Web User | Phải | Giới thiệu, chọn ngôn ngữ, danh sách, tìm kiếm, lọc khu vực. | Đã có |
@@ -559,7 +559,7 @@ Các tệp MP3 được commit vào kho (khoảng 120 × 0,5 MB) để máy khô
 
 | | |
 |----------------|------------------------------------------------------------------------------------|
-| **Ưu tiên** | Nên · **Hiện trạng:** *Cần làm* |
+| **Ưu tiên** | Nên · **Hiện trạng:** *Đã có* – `mobile/src/app/history.tsx`, logic ghép và chia ngày trong `mobile/src/core/history.ts` (test `mobile/tests/history.test.ts`) |
 | **Màn hình** | `history` – mở từ Cài đặt và từ thẻ tiến độ |
 | **Luồng chính** | 1. Có mạng: `GET /me/visits`; gộp với lượt ghé chưa gửi trên máy. 2. Danh sách theo ngày (giờ Việt Nam): giờ, số điểm + tiêu đề, cách kích hoạt (GPS / QR / Số điểm / Chọn tay / Mô phỏng), thời lượng đã nghe, dấu "đã nghe hết". 3. Bấm dòng → chi tiết điểm. |
 | **Ngoại lệ** | Offline → chỉ hiện lượt ghé trên máy, ghi chú "Đang ngoại tuyến". Chưa có lượt nào → "Bạn chưa nghe điểm nào". |

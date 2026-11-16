@@ -90,6 +90,19 @@ const vi = {
   photoCollected: "Sưu tầm",
   nowPlaying: "Đang phát",
   stop: "Dừng",
+  historyTitle: "Lịch sử tham quan",
+  historyOpen: "Xem lịch sử",
+  historyEmpty: "Bạn chưa nghe điểm nào",
+  historyOffline: "Đang ngoại tuyến – chỉ hiện lượt nghe trên máy này",
+  historyPending: "Chờ gửi",
+  historyCompleted: "Đã nghe hết",
+  today: "Hôm nay",
+  yesterday: "Hôm qua",
+  triggerGps: "GPS",
+  triggerQr: "Quét QR",
+  triggerCode: "Nhập số điểm",
+  triggerManual: "Chọn tay",
+  triggerSimulated: "Mô phỏng",
 };
 
 export type Dict = typeof vi;
@@ -175,6 +188,19 @@ const en: Dict = {
   photoCollected: "Collected online",
   nowPlaying: "Now playing",
   stop: "Stop",
+  historyTitle: "Visit history",
+  historyOpen: "View history",
+  historyEmpty: "You haven't listened to any stop yet",
+  historyOffline: "Offline – showing listens on this device only",
+  historyPending: "Waiting to sync",
+  historyCompleted: "Listened in full",
+  today: "Today",
+  yesterday: "Yesterday",
+  triggerGps: "GPS",
+  triggerQr: "QR scan",
+  triggerCode: "Stop number",
+  triggerManual: "Selected",
+  triggerSimulated: "Simulated",
 };
 
 export type TKey = keyof Dict;

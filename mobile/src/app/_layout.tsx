@@ -38,6 +38,7 @@ export default function RootLayout() {
         <Stack.Screen name="place/[code]" options={{ title: "" }} />
         <Stack.Screen name="player" options={{ title: "", presentation: "modal" }} />
         <Stack.Screen name="scan" options={{ title: "", presentation: "modal" }} />
+        <Stack.Screen name="history" options={{ title: "" }} />
         <Stack.Screen name="p/[code]" options={{ headerShown: false }} />
         <Stack.Screen name="welcome" options={{ headerShown: false }} />
       </Stack>
