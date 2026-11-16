@@ -1,0 +1,28 @@
+// DFD mức 0 (sơ đồ ngữ cảnh) – ký hiệu Gane–Sarson. Xuất ảnh: dot -Tpng -Gdpi=160 dfd0.dot -o dfd0.png
+digraph DFD0 {
+  graph [rankdir=LR, fontname="DejaVu Sans", fontsize=16, nodesep=0.4, ranksep=1.1, pad=0.3,
+         label="DFD mức 0 – Sơ đồ ngữ cảnh: Hệ thống thuyết minh đa ngôn ngữ theo vị trí – Dinh Độc Lập", labelloc=t];
+  node  [fontname="DejaVu Sans", fontsize=15];
+  edge  [fontname="DejaVu Sans", fontsize=13, color="#333333"];
+
+  // Tác nhân ngoài = 4 actor của sơ đồ use case
+  E1 [shape=box, style="filled", fillcolor="#DCE8F7", color="#1F3864", label="E1\nKhách (ẩn danh)"];
+  E3 [shape=box, style="filled", fillcolor="#DCE8F7", color="#1F3864", label="E3\nNgười kiểm thử"];
+  E4 [shape=box, style="filled", fillcolor="#DCE8F7", color="#1F3864", label="E4\nDịch vụ định vị\n(GPS của thiết bị)"];
+  E2 [shape=box, style="filled", fillcolor="#DCE8F7", color="#1F3864", label="E2\nQuản trị viên"];
+
+  P0 [shape=plain, label=<
+    <TABLE STYLE="ROUNDED" BORDER="1" CELLBORDER="0" CELLPADDING="8" COLOR="#1E88E5" BGCOLOR="#EAF3FD">
+      <TR><TD><B>0</B></TD></TR><HR/>
+      <TR><TD>Hệ thống thuyết minh<BR/>đa ngôn ngữ theo vị trí</TD></TR>
+    </TABLE>>];
+
+  {rank=same; E1; E3; E4;}
+
+  E1 -> P0 [label="yêu cầu bắt đầu, ngôn ngữ chọn,\nmã QR / số điểm, lệnh điều khiển phát,\nnhịp tim, yêu cầu lịch sử"];
+  P0 -> E1 [label="phiên khách, danh sách ngôn ngữ và điểm,\nbài thuyết minh (âm thanh + văn bản),\ntiến độ, lịch sử, thông báo khóa"];
+  E3 -> P0 [label="vị trí mô phỏng,\nlộ trình mẫu"];
+  E4 -> P0 [label="tọa độ, độ chính xác,\nthời điểm"];
+  E2 -> P0 [dir=back, label="phiên quản trị, thống kê, nhật ký,\nkhách đang hoạt động, mã QR mời / in"];
+  P0 -> E2 [dir=back, label="thông tin đăng nhập, dữ liệu điểm / bài / âm thanh / ngôn ngữ,\nlệnh khóa / mở, yêu cầu thống kê, yêu cầu mã mời"];
+}

@@ -12,7 +12,7 @@ toc-title: "Mục lục"
 | **Trọng tâm** | Frontend Web và Mobile: định vị GPS, bản đồ, trình phát, đa ngôn ngữ, hoạt động offline, realtime; kèm quy trình CI/CD. |
 | **Nhóm** | Lương Diệu Quang · Võ Thị Ngọc Như |
 | **Kho mã nguồn** | github.com/quangdieuluong2006-ctrl/CNPM_DinhDocLap (nhánh develop, main) |
-| **Phiên bản** | 2.1 – 09/11/2026 |
+| **Phiên bản** | 2.2 – 16/11/2026 |
 | **Trạng thái** | **Đã chốt.** Không thêm tính năng ngoài danh sách FE-01 → FE-24. |
 
 ## Lịch sử thay đổi
@@ -23,6 +23,7 @@ toc-title: "Mục lục"
 | 1.1 | 27/10/2026 | Khách ẩn danh không cần đăng ký; tạm bỏ nhóm tham quan; giao diện theo 10 ngôn ngữ; QR mời tham gia qua Cloudflare Tunnel. |
 | **2.0** | 01/11/2026 | **Bản chính thức sạch.** Viết lại toàn bộ theo sản phẩm thật sau buổi kiểm tra giữa kỳ (28/10): (1) bỏ hẳn nhóm tham quan và vai trò hướng dẫn viên khỏi tài liệu, CSDL (migration 004) và API; chỉ còn 2 vai trò `user` và `admin`. (2) Dùng lại mã trống: **FE-10** = Lịch sử tham quan trên Mobile, **FE-23** = Mời khách tham gia bằng QR; **UC-10** = Mời khách tham gia bằng QR, **UC-11** = Xem tiến độ và điểm gợi ý → 24 tính năng, 20 use case liên tục. (3) **Giọng đọc AI**: 120 tệp MP3 (12 điểm × 10 ngôn ngữ) sinh bằng giọng neural, nạp sẵn khi seed. (4) Bổ sung sơ đồ lớp Mobile, lưu đồ quét QR, ảnh chụp giao diện thật. (5) CD: phát hành bằng tag `v*` (bản build Web, Docker image API, APK). (6) Kế hoạch hoàn thiện 2 tuần trước báo cáo cuối kỳ. |
 | **2.1** | 09/11/2026 | **Bổ sung lược đồ hoạt động cho mọi chức năng** (góp ý của giảng viên ở buổi kiểm tra): thêm 18 lược đồ, cùng 2 lược đồ có sẵn (Hình 5, 6) → đủ **20/20 use case** (mục 8.4, Hình 8–25). Cập nhật hiện trạng: đã xong việc #1–#3 của kế hoạch (PRD v2.0 – PR #29; dọn nhóm tham quan, migration 004 – PR #31; giọng đọc AI 120 tệp – PR #32) và dòng hướng dẫn QR (FE-23). Sửa tên cột `schema_migrations.file_name`. |
+| **2.2** | 16/11/2026 | **Bổ sung sơ đồ luồng dữ liệu (DFD)** theo nội dung lý thuyết mới của môn học: DFD mức 0 (sơ đồ ngữ cảnh) và DFD mức 1 gồm 8 tiến trình (mục 13.2, Hình 37, 38). Kiểm tra hai quy tắc: 4 tác nhân ngoài = 4 tác nhân của sơ đồ use case; 9 kho dữ liệu ≤ 10 bảng của ERD (mỗi kho ứng với đúng một bảng nghiệp vụ). Đánh số lại Hình 39, 40. Lập lại kế hoạch hoàn thiện (mục 18) theo lịch báo cáo cuối kỳ 25/11; CD phát hành APK chuyển sang giai đoạn 2. |
 
 ## Cách đọc tài liệu
 
@@ -30,7 +31,7 @@ toc-title: "Mục lục"
 - **Mục 4:** kiến trúc và các cơ chế cốt lõi (kích hoạt theo vị trí, QR, trình phát, offline, khách ẩn danh, presence, giọng AI) – phần quan trọng nhất khi lập trình.
 - **Mục 5–7:** đặc tả từng tính năng (FE-xx) kèm tiêu chí chấp nhận (AC).
 - **Mục 8–9:** use case, **lược đồ hoạt động cho cả 20 use case** (mục 8.4), sơ đồ tuần tự, sơ đồ trạng thái.
-- **Mục 10–13:** giao diện, API, realtime, cơ sở dữ liệu – hợp đồng giữa Frontend và Backend.
+- **Mục 10–13:** giao diện, API, realtime, cơ sở dữ liệu và **sơ đồ luồng dữ liệu DFD mức 0, mức 1** (mục 13.2) – hợp đồng giữa Frontend và Backend.
 - **Mục 14–17:** yêu cầu phi chức năng, bảo mật, CI/CD, kiểm thử.
 - **Mục 18 và phụ lục:** kế hoạch hoàn thiện, phân công, rủi ro, dữ liệu mẫu, hằng số, kịch bản trình diễn.
 
@@ -52,10 +53,12 @@ toc-title: "Mục lục"
 | 31 | Máy trạng thái bài thuyết minh | st_content.puml |
 | 32–35 | Giao diện thật: Mobile, Web User, Web Admin | ui_*.png (chụp màn hình) |
 | 36 | Sơ đồ quan hệ thực thể (ERD) | erd.puml |
-| 37 | Quy trình CI/CD | cicd.puml |
-| 38 | Vị trí các điểm ngoài trời | map_points.png |
+| 37 | DFD mức 0 – sơ đồ ngữ cảnh | dfd0.dot |
+| 38 | DFD mức 1 – 8 tiến trình, 9 kho dữ liệu | dfd1.dot |
+| 39 | Quy trình CI/CD | cicd.puml |
+| 40 | Vị trí các điểm ngoài trời | map_points.png |
 
-Sơ đồ viết bằng PlantUML; sửa tệp `.puml` rồi xuất lại PNG: `java -jar plantuml.jar -charset UTF-8 -tpng docs/diagrams/*.puml`.
+Sơ đồ viết bằng PlantUML; sửa tệp `.puml` rồi xuất lại PNG: `java -jar plantuml.jar -charset UTF-8 -tpng docs/diagrams/*.puml`. Hai sơ đồ DFD viết bằng Graphviz (ký hiệu Gane–Sarson): `dot -Tpng -Gdpi=300 docs/diagrams/dfd1.dot -o docs/diagrams/dfd1.png`.
 
 # Tổng quan sản phẩm
 
@@ -114,7 +117,7 @@ Dinh Độc Lập (135 Nam Kỳ Khởi Nghĩa, phường Bến Thành, TP. Hồ 
 - Nhóm tham quan có hướng dẫn viên (đã thiết kế ở v1.0, bỏ hẳn từ v2.0).
 - Tài khoản khách có email/mật khẩu; mua vé, đặt lịch, thanh toán.
 - Dịch máy và sinh giọng đọc **ngay trong Web Admin** (v2.0 sinh giọng bằng script ngoài, mục 4.10).
-- Nhiều di tích (mô hình dữ liệu cho phép mở rộng, mục 13.5); thông báo đẩy; bản đồ trong nhà theo tầng.
+- Nhiều di tích (mô hình dữ liệu cho phép mở rộng, mục 13.6); thông báo đẩy; bản đồ trong nhà theo tầng.
 
 ## Thuật ngữ
 
@@ -1135,6 +1138,60 @@ Kết nối: `io(API_URL, { auth: { token }, query: { clientType } })`, `clientT
 
 ![Hình 36 – Sơ đồ quan hệ thực thể (sau migration 004)](diagrams/erd.png)
 
+## Sơ đồ luồng dữ liệu (DFD)
+
+Sơ đồ luồng dữ liệu (Data Flow Diagram – DFD) mô tả **dữ liệu đi từ đâu, qua xử lý nào, được lưu ở đâu**, không mô tả thứ tự thời gian (thứ tự xem ở lược đồ hoạt động mục 8.4 và sơ đồ tuần tự mục 9). Ký hiệu Gane–Sarson:
+
+| Ký hiệu | Ý nghĩa | Trong sơ đồ |
+|-----------------------------------------|--------------------------------------------|--------------------------------------------------|
+| Hình chữ nhật (nền xanh nhạt) | **Tác nhân ngoài** (external entity): nguồn hoặc đích của dữ liệu, nằm ngoài hệ thống | E1–E4 |
+| Hình chữ nhật bo góc có số | **Tiến trình** (process): biến đổi dữ liệu đầu vào thành đầu ra | 0 (mức 0); 1.0–8.0 (mức 1) |
+| Hình chữ nhật hở một đầu (nền vàng) | **Kho dữ liệu** (data store): dữ liệu được lưu lại | D1–D9 |
+| Mũi tên có nhãn | **Luồng dữ liệu** (data flow): tên dữ liệu được chuyển | Nhãn trên mũi tên |
+
+### DFD mức 0 – sơ đồ ngữ cảnh
+
+Toàn bộ hệ thống là **một tiến trình duy nhất (0)**; sơ đồ chỉ cho thấy hệ thống trao đổi dữ liệu gì với 4 tác nhân ngoài, chưa có kho dữ liệu.
+
+![Hình 37 – DFD mức 0: sơ đồ ngữ cảnh](diagrams/dfd0.png)
+
+| Tác nhân | Dữ liệu vào hệ thống | Dữ liệu hệ thống trả ra |
+|-----------------------------------------|--------------------------------------------|--------------------------------------------------|
+| **E1 Khách (ẩn danh)** | Yêu cầu bắt đầu, ngôn ngữ chọn, mã QR / số điểm, lệnh điều khiển phát, nhịp tim, yêu cầu lịch sử | Phiên khách, danh sách ngôn ngữ và điểm, bài thuyết minh (âm thanh + văn bản), tiến độ, lịch sử, thông báo khóa |
+| **E2 Quản trị viên** | Thông tin đăng nhập, dữ liệu điểm / bài / âm thanh / ngôn ngữ, lệnh khóa / mở, yêu cầu thống kê, yêu cầu mã mời | Phiên quản trị, thống kê, nhật ký, khách đang hoạt động, mã QR mời và mã QR in |
+| **E3 Người kiểm thử** | Vị trí mô phỏng, lộ trình mẫu | – |
+| **E4 Dịch vụ định vị** (GPS của thiết bị) | Tọa độ, độ chính xác, thời điểm | – |
+
+### DFD mức 1
+
+Phân rã tiến trình 0 thành **8 tiến trình**, mỗi tiến trình gom một nhóm use case; xuất hiện **9 kho dữ liệu**. Để sơ đồ không có luồng cắt chéo, E1 và E2 được vẽ lặp (đánh dấu E1\*, E2\*) – ký hiệu DFD cho phép lặp tác nhân.
+
+![Hình 38 – DFD mức 1: 8 tiến trình, 9 kho dữ liệu](diagrams/dfd1.png)
+
+| Tiến trình | Use case / tính năng | Tác nhân | Đọc kho | Ghi kho |
+|---------------|-----------------------------------------|---------------|---------------------------|---------------------------|
+| **1.0** Xác thực và quản lý phiên | UC-01, UC-02 (FE-01) | E1, E2 | D1 | D1 (khách mới), D2, D4 |
+| **2.0** Cung cấp nội dung thuyết minh | UC-03, UC-04, UC-05, UC-09 (FE-02→04, FE-08, FE-13→15) | E1 | D5, D6, D7, D8 | – |
+| **3.0** Kích hoạt và phát thuyết minh | UC-06, UC-07, UC-08, UC-20 (FE-05→07, FE-11) | E1, E3, E4 | (gói nội dung từ 2.0) | – (gửi lượt ghé sang 4.0) |
+| **4.0** Ghi nhận lượt tham quan và lịch sử | UC-09, UC-11, UC-19 (FE-09, FE-10, FE-16) | E1 | D9 | D9 (bỏ trùng theo clientId) |
+| **5.0** Theo dõi trực tuyến và mời tham gia | UC-10, UC-14 (FE-19, FE-23) | E1, E2 | D3 | D3 |
+| **6.0** Quản lý người dùng | UC-13 (FE-18) | E2, E1 (thông báo khóa) | D1, D3 | D1, D2 (thu hồi token), D4 |
+| **7.0** Quản lý nội dung | UC-15 → UC-18 (FE-20→22, FE-24) | E2 | D5, D6, D7, D8 | D5, D6, D7, D8, D4 |
+| **8.0** Thống kê và nhật ký | UC-12 (FE-17, FE-24) | E2 | D1, D3, D4, D9 | – |
+
+Tiến trình 3.0 chạy **trên thiết bị** (geofence, bộ điều phối phát), nên tọa độ của khách đi vào 3.0 nhưng **không đi vào kho nào** – đúng yêu cầu quyền riêng tư vị trí (mục 15.3).
+
+### Đối chiếu DFD với use case và ERD
+
+| Quy tắc | Kiểm tra | Kết quả |
+|-----------------------------------------|--------------------------------------------|---------------|
+| Số tác nhân ngoài = số tác nhân của sơ đồ use case | DFD: E1 Khách, E2 Quản trị viên, E3 Người kiểm thử, E4 Dịch vụ định vị. Use case (Hình 7): Khách (ẩn danh), Quản trị viên, Người kiểm thử, Dịch vụ định vị | **4 = 4** – đạt |
+| Số kho dữ liệu ≤ số bảng của ERD | 9 kho D1–D9; CSDL có 10 bảng (9 bảng nghiệp vụ + `schema_migrations`) | **9 ≤ 10** – đạt |
+| Mỗi kho ứng với bảng có thật | D1 `users` · D2 `refresh_tokens` · D3 `user_sessions` · D4 `activity_logs` · D5 `languages` · D6 `places` · D7 `place_contents` · D8 `content_releases` · D9 `visits` | Đạt |
+| Cân bằng giữa hai mức (balancing) | Mọi luồng vào/ra của tiến trình 0 ở mức 0 đều xuất hiện ở các tiến trình 1.0–8.0 của mức 1, cùng tác nhân | Đạt |
+
+`schema_migrations` không có kho tương ứng vì chỉ phục vụ kỹ thuật (theo dõi migration), không chứa dữ liệu nghiệp vụ.
+
 ## Các bảng
 
 CSDL có **10 bảng**: 9 bảng nghiệp vụ dưới đây và `schema_migrations` (theo dõi migration).
@@ -1244,7 +1301,7 @@ Thêm bảng `sites` và cột `places.site_id`; gói nội dung lọc theo site
 
 ## Pipeline
 
-![Hình 37 – Quy trình CI/CD](diagrams/cicd.png)
+![Hình 39 – Quy trình CI/CD](diagrams/cicd.png)
 
 | Workflow | Kích hoạt | Các bước | Hiện trạng |
 |----------------------------------|-------------------------|--------------------------------------------------|---------------|
@@ -1254,7 +1311,7 @@ Thêm bảng `sites` và cột `places.site_id`; gói nội dung lọc theo site
 | `ci-mobile.yml` | đổi `mobile/**` | npm ci → typecheck → test (geofence, narration, qr, i18n, auth) → `expo export` | Đã có |
 | `ci-docs.yml` | đổi `docs/**`, `*.md` | Kiểm tra liên kết tương đối trong README; mỗi `.puml` có `.png` | Đã có |
 | `e2e.yml` | PR vào `develop`, `main` | SQL Server + API + Web User + Web Admin → Playwright: TC-E1 → TC-E4 (mục 17.2) | *Cần làm* |
-| `release.yml` | Gắn tag `v*` trên `main` | Build Web User, Web Admin → `.zip`; build Docker image API → GHCR; EAS Build APK (profile `preview`); tạo GitHub Release đính kèm tất cả | *Cần làm* |
+| `release.yml` | Gắn tag `v*` trên `main` | Build Web User, Web Admin → `.zip`; build Docker image API → GHCR; EAS Build APK (profile `preview`); tạo GitHub Release đính kèm tất cả | *Giai đoạn 2* |
 
 ## Bí mật và môi trường
 
@@ -1321,24 +1378,28 @@ Thêm bảng `sites` và cột `places.site_id`; gói nội dung lọc theo site
 
 # Kế hoạch hoàn thiện
 
-## Hiện trạng (09/11/2026)
+## Hiện trạng (16/11/2026)
 
-- Đã có: toàn bộ FE-01 → FE-24 ở mức chạy được, trừ các mục ghi *Cần làm*; 5 workflow CI; 12 điểm × 10 ngôn ngữ nội dung (vi, en đã duyệt); ảnh 12 điểm; khách ẩn danh; demo nhiều khách qua tunnel.
-- Đã qua buổi kiểm tra giữa kỳ (28/10). Báo cáo cuối kỳ dự kiến **15–20/11/2026**.
+- Đã có: toàn bộ FE-01 → FE-24 ở mức chạy được, trừ các mục ghi *Cần làm*; 5 workflow CI; 12 điểm × 10 ngôn ngữ nội dung (vi, en đã duyệt); 120 tệp giọng đọc AI; ảnh 12 điểm; khách ẩn danh; demo nhiều khách qua tunnel; `main` đã gộp `develop` (PR #36).
+- Đã qua buổi kiểm tra giữa kỳ (28/10). Báo cáo cuối kỳ: **thứ Tư 25/11/2026**.
+- Kế hoạch cũ (01–13/11) đã xong việc 1–3; việc 4–7 chưa làm kịp nên lập lại lịch dưới đây. Việc phát hành APK (CD) chuyển sang giai đoạn 2.
 
-## Kế hoạch 2 tuần
+## Kế hoạch đến buổi báo cáo
 
 | # | Thời gian | Công việc (nhánh) | Kết quả bàn giao |
 |--------|----------------------|--------------------------------------------------|--------------------------------------------------|
 | 1 | 01–02/11 | PRD v2.0 (`docs/prd-v2.0`) | **Xong** – PR #29 |
-| 2 | 02–03/11 | Dọn nhóm tham quan (`chore/remove-tours`): migration 004, xóa module `tours`, `/auth/register`, `/me/tour`, `active_tours`, `guide`; seed 1 admin + 6 khách mẫu; xóa tài khoản thử còn sót; sửa dòng hướng dẫn QR (FE-23) | **Xong** – PR #31 |
-| 3 | 03–05/11 | Nội dung: rà soát bản dịch 8 ngôn ngữ → duyệt; `npm run gen:audio` sinh 120 MP3; seed nạp âm thanh (`feature/ai-voice`) | 120 tệp giọng AI: **xong** – PR #32; duyệt bản dịch: đang làm |
-| 4 | 05–07/11 | Mobile: FE-10 Lịch sử, rung (expo-haptics), cỡ chữ, màn chúc mừng, ẩn mô phỏng ở bản production (`feature/FE-10-history`, `feature/FE-12-settings`) | TC-22 → TC-24 đạt |
-| 5 | 07–09/11 | CD: `release.yml`, `eas.json`, Dockerfile API (`ci/release`); tag `v1.0.0` | GitHub Release có zip web, image API, APK |
-| 6 | 09–11/11 | E2E: `e2e.yml` + 4 kịch bản Playwright (`ci/e2e`) | TC-E1 → TC-E4 xanh |
-| 7 | 11–13/11 | Kiểm thử trên điện thoại thật, sửa lỗi; cập nhật ảnh giao diện trong PRD | Danh sách lỗi = 0 mức cao |
-| 8 | 13/11 | **Đóng băng code** (chỉ sửa lỗi nghiêm trọng); gộp develop → main, tag `v1.0.x` | Bản trình diễn cuối |
-| 9 | 13–báo cáo | Báo cáo Word, slide, tập dượt theo Phụ lục D | Hồ sơ nộp |
+| 2 | 02–03/11 | Dọn nhóm tham quan (`chore/remove-tours`): migration 004, xóa module `tours`, `/auth/register`, vai trò `guide`; seed 1 admin + 6 khách mẫu | **Xong** – PR #31 |
+| 3 | 03–06/11 | Giọng đọc AI: `npm run gen:audio` sinh 120 MP3; seed nạp âm thanh (`feature/ai-voice`) | **Xong** – PR #32 |
+| 3b | 09–13/11 | PRD v2.1 – lược đồ hoạt động 20/20 use case; README chỉ giữ bản mới; gộp develop → main | **Xong** – PR #33, #35, #36 |
+| A | 16–17/11 | PRD v2.2 – DFD mức 0, mức 1; lập lại kế hoạch (`docs/prd-v2.2`) | PR vào `develop` |
+| B | 17–18/11 | Mobile FE-10 Lịch sử tham quan (`feature/FE-10-history`) | Màn lịch sử + test |
+| C | 19/11 | Mobile FE-12: cỡ chữ, rung khi bắt đầu phát, ẩn mô phỏng ở bản production (`feature/FE-12-settings`) | TC-22 → TC-24 đạt |
+| D | 20/11 | E2E: `e2e.yml` + 4 kịch bản Playwright (`ci/e2e`) | TC-E1 → TC-E4 xanh |
+| E | 21/11 | Kiểm thử trên điện thoại thật, sửa lỗi; cập nhật ảnh giao diện trong PRD | Danh sách lỗi = 0 mức cao |
+| F | 22/11 | **Đóng băng code** (chỉ sửa lỗi nghiêm trọng); PRD bản cuối; gộp develop → main, tag `v1.0.0` | Bản trình diễn cuối |
+| G | 23–24/11 | Tập dượt theo Phụ lục D; sao lưu CSDL; ôn vấn đáp theo lịch sử commit | Sẵn sàng báo cáo 25/11 |
+| – | Giai đoạn 2 | CD: `release.yml`, EAS Build APK, image API trên GHCR | Cần tài khoản Expo và khóa Google Maps; trình diễn bằng Expo Go thay thế |
 
 ## Phân công
 
@@ -1361,7 +1422,7 @@ Thêm bảng `sites` và cột `places.site_id`; gói nội dung lọc theo site
 | Bản dịch 8 ngôn ngữ chưa chính xác | Trung bình | Để "chờ duyệt" có nhãn cho tới khi kiểm tra; ưu tiên vi/en khi trình diễn |
 | EAS Build cần tài khoản Expo, khóa Google Maps | Trung bình | Tạo tài khoản Expo trước 07/11; dự phòng trình diễn bằng Expo Go |
 | Máy chạy SQL Server hết dung lượng / dịch vụ tắt | Trung bình | Sao lưu `BACKUP DATABASE` trước ngày báo cáo; kiểm tra dịch vụ SQLEXPRESS, TCP 1433 |
-| Thiếu thời gian | Cao | Làm theo thứ tự bảng 18.2; việc "Nên" làm sau cùng; đóng băng code 13/11 |
+| Thiếu thời gian | Cao | Làm theo thứ tự bảng 18.2; việc "Nên" làm sau cùng; đóng băng code 22/11 |
 
 ## Câu hỏi mở (giai đoạn 2)
 
@@ -1388,7 +1449,7 @@ Tọa độ là **giá trị ước lượng** cho dữ liệu mẫu và mô ph�
 | 401 | Sân thượng – trực thăng | indoor | Sân thượng | 10.777000, 106.695300 | – | Trực thăng UH-1; vòng tròn đỏ đánh dấu bom rơi 8/4/1975 |
 | 901 | Tầng hầm – hầm chỉ huy | indoor | Tầng hầm | 10.777000, 106.695450 | – | Phòng tác chiến, trung tâm viễn thông, bản đồ quân sự |
 
-![Hình 38 – Vị trí ước lượng các điểm ngoài trời và vùng kích hoạt](diagrams/map_points.png)
+![Hình 40 – Vị trí ước lượng các điểm ngoài trời và vùng kích hoạt](diagrams/map_points.png)
 
 # Phụ lục B. Ngôn ngữ và giọng đọc AI
 
