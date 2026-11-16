@@ -57,6 +57,11 @@ export default function SettingsScreen() {
         <Row label={t("settingsAutoPlay")}>
           <Switch value={s.autoPlay} onValueChange={(v) => void store.updateSettings({ autoPlay: v })} />
         </Row>
+        <Row label={t("historyTitle")}>
+          <Pressable onPress={() => router.push("/history")} accessibilityRole="button">
+            <Text style={{ color: c.primary, fontWeight: "700" }}>{t("historyOpen")} ›</Text>
+          </Pressable>
+        </Row>
         <Row label={t("settingsSimulate")}>
           <Switch value={s.simulate} onValueChange={(v) => void store.updateSettings({ simulate: v })} trackColor={{ true: c.warn }} />
         </Row>

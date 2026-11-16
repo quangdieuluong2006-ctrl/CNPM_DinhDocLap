@@ -45,9 +45,14 @@ export default function PlacesScreen() {
       ListHeaderComponent={
         <View style={{ gap: 12, marginBottom: 4 }}>
           <View style={[styles.progressCard, { backgroundColor: c.card, borderColor: c.border }]}>
-            <Text style={{ color: c.text, fontWeight: "700", fontSize: 16 }}>
-              {t("progress")} {done}/{places.length}
-            </Text>
+            <View style={styles.progressHead}>
+              <Text style={{ color: c.text, fontWeight: "700", fontSize: 16 }}>
+                {t("progress")} {done}/{places.length}
+              </Text>
+              <Pressable onPress={() => router.push("/history")} hitSlop={8} accessibilityRole="button">
+                <Text style={{ color: c.primary, fontWeight: "600" }}>{t("historyOpen")} ›</Text>
+              </Pressable>
+            </View>
             <View style={[styles.bar, { backgroundColor: c.border }]}>
               <View style={[styles.barFill, { width: `${places.length ? (done * 100) / places.length : 0}%`, backgroundColor: c.done }]} />
             </View>
@@ -113,6 +118,7 @@ export default function PlacesScreen() {
 }
 
 const styles = StyleSheet.create({
+  progressHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },
   progressCard: { borderWidth: 1, borderRadius: 16, padding: 14, gap: 10 },
   bar: { height: 8, borderRadius: 4, overflow: "hidden" },
   barFill: { height: 8, borderRadius: 4 },

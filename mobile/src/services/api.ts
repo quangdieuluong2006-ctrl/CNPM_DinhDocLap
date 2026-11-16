@@ -1,4 +1,5 @@
 // Gọi API Backend (PRD v1.0, mục 11). Lỗi trả về dạng { error: { code, message } } → ném ApiError.
+import type { ServerVisit } from "../core/history";
 export class ApiError extends Error {
   constructor(public readonly status: number, public readonly code: string, message: string, public readonly details?: unknown) {
     super(message);
@@ -140,6 +141,8 @@ export function createApi(
     refresh: async (refreshToken: string) =>
       (await postJson<MobileSession>("/auth/refresh", { clientType: "mobile", refreshToken })).body,
     me: async () => (await request<User>("/me")).body,
+    // Lịch sử lượt nghe của khách này (FE-10): 100 lượt gần nhất là đủ cho một buổi tham quan
+    myVisits: async () => (await request<{ items: ServerVisit[] }>("/me/visits?page=1&pageSize=100")).body.items,
     sendVisits: async (visits: VisitPayload[]) =>
       (await request<{ accepted: number; duplicates: number; rejected: number }>("/visits/batch", {
         method: "POST",

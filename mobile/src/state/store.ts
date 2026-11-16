@@ -11,7 +11,8 @@ import { configureAudio, createEngine } from "../services/playback";
 import { downloadAudio, getJson, loadBundle, saveBundle, setJson, type StoredBundle } from "../services/storage";
 import { Realtime } from "../services/realtime";
 import { clearRefreshToken, readRefreshToken, saveRefreshToken } from "../services/session";
-import { enqueueVisit, flushVisits, pendingVisits } from "../services/visits";
+import { enqueueVisit, flushVisits, localHistory, pendingVisits } from "../services/visits";
+import type { LocalVisit, ServerVisit } from "../core/history";
 import { uiLocaleFor, type UiLocale } from "../i18n";
 
 export interface Settings {
@@ -37,6 +38,8 @@ export interface AppState {
   weakGps: boolean;
   completed: number[]; // id điểm đã nghe hết (tiến độ FE-09)
   pendingVisits: number;
+  localVisits: LocalVisit[]; // lượt nghe ghi trên máy, mới nhất cuối (FE-10)
+  pendingVisitIds: string[]; // clientId còn trong hàng đợi chưa gửi
   download: { done: number; total: number } | null;
   authStatus: AuthStatus;
   user: User | null;
@@ -62,7 +65,7 @@ export function uiLocaleOf(settings: Pick<Settings, "narrationLang">): UiLocale 
 class AppStore {
   state: AppState = {
     ready: false, settings: DEFAULT_SETTINGS, languages: [], stored: null, loadingBundle: false, online: true,
-    error: null, fix: null, locationError: null, weakGps: false, completed: [], pendingVisits: 0, download: null,
+    error: null, fix: null, locationError: null, weakGps: false, completed: [], pendingVisits: 0, localVisits: [], pendingVisitIds: [], download: null,
     authStatus: "loading", user: null, realtimeConnected: false, authNotice: null,
   };
   private listeners = new Set<() => void>();
@@ -108,7 +111,8 @@ class AppStore {
     const completed = await getJson<number[]>("progress.completed", []);
     this.narration.autoPlay = settings.autoPlay;
     const stored = settings.narrationLang ? await loadBundle(settings.narrationLang) : null;
-    this.set({ settings, completed, stored, pendingVisits: await pendingVisits() });
+    const history = await localHistory();
+    this.set({ settings, completed, stored, pendingVisits: await pendingVisits(), localVisits: history.visits, pendingVisitIds: history.pendingIds });
     this.applyBundle();
     this.set({ ready: true });
     void configureAudio().catch(() => undefined);
@@ -355,8 +359,23 @@ class AppStore {
       this.set({ completed });
       await setJson("progress.completed", completed);
     }
-    await enqueueVisit(v);
+    const entry = await enqueueVisit(v);
+    // Hiện ngay trên màn Lịch sử, kể cả khi chưa gửi được lên máy chủ (FE-10 AC1)
+    this.set({ localVisits: [...this.state.localVisits, entry], pendingVisitIds: [...this.state.pendingVisitIds, entry.clientId] });
     await this.syncVisits();
+  }
+
+  // Lịch sử trên máy chủ của khách này (FE-10). Mất mạng / chưa có phiên → null, màn hình chỉ hiện lượt trên máy.
+  async fetchServerHistory(): Promise<ServerVisit[] | null> {
+    try {
+      if (!(await this.ensureSession())) return null;
+      const items = await this.api.myVisits();
+      this.set({ online: true });
+      return items;
+    } catch {
+      this.set({ online: false });
+      return null;
+    }
   }
 
   async syncVisits(): Promise<void> {
@@ -364,7 +383,8 @@ class AppStore {
     // để lượt nghe không bị ghi thành của khách.
     if (this.refreshToken && !this.accessToken && !(await this.refreshAccess())) return;
     await flushVisits(this.api);
-    this.set({ pendingVisits: await pendingVisits() });
+    const history = await localHistory();
+    this.set({ pendingVisits: history.pendingIds.length, pendingVisitIds: history.pendingIds });
   }
 }
 
