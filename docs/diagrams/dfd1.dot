@@ -1,0 +1,121 @@
+// DFD mức 1 – phân rã tiến trình 0 thành 8 tiến trình (ký hiệu Gane–Sarson).
+// Tác nhân ngoài = 4 actor của sơ đồ use case; kho D1–D9 = 9 bảng nghiệp vụ của ERD (mỗi kho đúng một bảng).
+// Xuất ảnh: dot -Tpng -Gdpi=150 dfd1.dot -o dfd1.png
+digraph DFD1 {
+  graph [rankdir=LR, fontname="DejaVu Sans", fontsize=20, nodesep=0.25, ranksep=1.5, pad=0.3, newrank=true,
+         label="DFD mức 1 – Hệ thống thuyết minh đa ngôn ngữ theo vị trí – Dinh Độc Lập", labelloc=t];
+  node  [fontname="DejaVu Sans", fontsize=15];
+  edge  [fontname="DejaVu Sans", fontsize=13, color="#444444", arrowsize=0.9];
+
+  // ---------- Tác nhân ngoài ----------
+  node [shape=box, style="filled", fillcolor="#DCE8F7", color="#1F3864", margin="0.15,0.08"];
+  E1  [label="E1\nKhách (ẩn danh)"];
+  E3  [label="E3\nNgười kiểm thử"];
+  E4  [label="E4\nDịch vụ định vị"];
+  E2  [label="E2\nQuản trị viên"];
+  E2b [label="E2*\nQuản trị viên"];   // bản sao (ký hiệu DFD cho phép lặp tác nhân để tránh luồng cắt chéo)
+  E1b [label="E1*\nKhách (ẩn danh)"];
+
+  // ---------- Tiến trình ----------
+  node [shape=plain, style="", margin=0];
+  P1 [label=<<TABLE STYLE="ROUNDED" BORDER="1" CELLBORDER="0" CELLPADDING="5" COLOR="#1E88E5" BGCOLOR="#EAF3FD"><TR><TD><B>1.0</B></TD></TR><HR/><TR><TD>Xác thực và<BR/>quản lý phiên</TD></TR></TABLE>>];
+  P2 [label=<<TABLE STYLE="ROUNDED" BORDER="1" CELLBORDER="0" CELLPADDING="5" COLOR="#1E88E5" BGCOLOR="#EAF3FD"><TR><TD><B>2.0</B></TD></TR><HR/><TR><TD>Cung cấp nội dung<BR/>thuyết minh</TD></TR></TABLE>>];
+  P3 [label=<<TABLE STYLE="ROUNDED" BORDER="1" CELLBORDER="0" CELLPADDING="5" COLOR="#1E88E5" BGCOLOR="#EAF3FD"><TR><TD><B>3.0</B></TD></TR><HR/><TR><TD>Kích hoạt và<BR/>phát thuyết minh</TD></TR></TABLE>>];
+  P4 [label=<<TABLE STYLE="ROUNDED" BORDER="1" CELLBORDER="0" CELLPADDING="5" COLOR="#1E88E5" BGCOLOR="#EAF3FD"><TR><TD><B>4.0</B></TD></TR><HR/><TR><TD>Ghi nhận lượt tham quan<BR/>và lịch sử</TD></TR></TABLE>>];
+  P5 [label=<<TABLE STYLE="ROUNDED" BORDER="1" CELLBORDER="0" CELLPADDING="5" COLOR="#1E88E5" BGCOLOR="#EAF3FD"><TR><TD><B>5.0</B></TD></TR><HR/><TR><TD>Theo dõi trực tuyến<BR/>và mời tham gia</TD></TR></TABLE>>];
+  P6 [label=<<TABLE STYLE="ROUNDED" BORDER="1" CELLBORDER="0" CELLPADDING="5" COLOR="#1E88E5" BGCOLOR="#EAF3FD"><TR><TD><B>6.0</B></TD></TR><HR/><TR><TD>Quản lý<BR/>người dùng</TD></TR></TABLE>>];
+  P7 [label=<<TABLE STYLE="ROUNDED" BORDER="1" CELLBORDER="0" CELLPADDING="5" COLOR="#1E88E5" BGCOLOR="#EAF3FD"><TR><TD><B>7.0</B></TD></TR><HR/><TR><TD>Quản lý nội dung<BR/>(điểm, bài, âm thanh,<BR/>ngôn ngữ, mã QR)</TD></TR></TABLE>>];
+  P8 [label=<<TABLE STYLE="ROUNDED" BORDER="1" CELLBORDER="0" CELLPADDING="5" COLOR="#1E88E5" BGCOLOR="#EAF3FD"><TR><TD><B>8.0</B></TD></TR><HR/><TR><TD>Thống kê<BR/>và nhật ký</TD></TR></TABLE>>];
+
+  // ---------- Kho dữ liệu (D1–D9 ↔ bảng ERD) ----------
+  node [shape=plain];
+  D1 [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" COLOR="#5B4A1F" BGCOLOR="#FFF7D6"><TR><TD SIDES="TBR"><B>D1</B></TD><TD SIDES="TB">Người dùng (users)</TD></TR></TABLE>>];
+  D2 [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" COLOR="#5B4A1F" BGCOLOR="#FFF7D6"><TR><TD SIDES="TBR"><B>D2</B></TD><TD SIDES="TB">Phiên đăng nhập (refresh_tokens)</TD></TR></TABLE>>];
+  D3 [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" COLOR="#5B4A1F" BGCOLOR="#FFF7D6"><TR><TD SIDES="TBR"><B>D3</B></TD><TD SIDES="TB">Phiên kết nối (user_sessions)</TD></TR></TABLE>>];
+  D4 [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" COLOR="#5B4A1F" BGCOLOR="#FFF7D6"><TR><TD SIDES="TBR"><B>D4</B></TD><TD SIDES="TB">Nhật ký hoạt động (activity_logs)</TD></TR></TABLE>>];
+  D5 [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" COLOR="#5B4A1F" BGCOLOR="#FFF7D6"><TR><TD SIDES="TBR"><B>D5</B></TD><TD SIDES="TB">Ngôn ngữ (languages)</TD></TR></TABLE>>];
+  D6 [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" COLOR="#5B4A1F" BGCOLOR="#FFF7D6"><TR><TD SIDES="TBR"><B>D6</B></TD><TD SIDES="TB">Điểm thuyết minh (places)</TD></TR></TABLE>>];
+  D7 [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" COLOR="#5B4A1F" BGCOLOR="#FFF7D6"><TR><TD SIDES="TBR"><B>D7</B></TD><TD SIDES="TB">Bài thuyết minh (place_contents)</TD></TR></TABLE>>];
+  D8 [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" COLOR="#5B4A1F" BGCOLOR="#FFF7D6"><TR><TD SIDES="TBR"><B>D8</B></TD><TD SIDES="TB">Phiên bản nội dung (content_releases)</TD></TR></TABLE>>];
+  D9 [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" COLOR="#5B4A1F" BGCOLOR="#FFF7D6"><TR><TD SIDES="TBR"><B>D9</B></TD><TD SIDES="TB">Lượt ghé (visits)</TD></TR></TABLE>>];
+
+  // Bố cục 5 cột (trái → phải): tác nhân phía khách → tiến trình phục vụ khách → kho → tiến trình quản trị → quản trị viên
+  {rank=same; E3; E4; E1; E2b;}
+  {rank=same; P2; P3; P4; P1; P5;}
+  {rank=same; D5; D8; D6; D7; D9; D3; D1; D2; D4;}
+  {rank=same; P7; P8; P6;}
+  {rank=same; E2; E1b;}
+  E3 -> E4 -> E1 -> E2b [style=invis];
+  P2 -> P3 -> P4 -> P1 -> P5 [style=invis];
+  D5 -> D8 -> D6 -> D7 -> D9 -> D3 -> D1 -> D2 -> D4 [style=invis];
+  P7 -> P8 -> P6 [style=invis];
+  E2 -> E1b [style=invis];
+  // Luồng dữ liệu: cạnh luôn vẽ từ cột trái sang phải (dir=back khi dữ liệu đi lên) để giữ bố cục; mũi tên chỉ đúng hướng dữ liệu.
+
+  // ---------- 1.0 Xác thực và quản lý phiên (UC-01, UC-02) ----------
+  E1 -> P1 [label="yêu cầu bắt đầu,\nrefresh token"];
+  E1 -> P1 [dir=back, label="phiên khách"];
+  E2b -> P1 [label="email,\nmật khẩu"];
+  E2b -> P1 [dir=back, label="phiên\nquản trị"];
+  P1 -> D1 [label="khách mới"];
+  P1 -> D1 [dir=back, label="tài khoản,\ntrạng thái"];
+  P1 -> D2 [label="refresh token"];
+  P1 -> D4 [label="sự kiện\nđăng nhập"];
+
+  // ---------- 2.0 Cung cấp nội dung (UC-03, UC-04, UC-05, UC-09) ----------
+  E1 -> P2 [label="ngôn ngữ chọn,\ntừ khóa tìm"];
+  E1 -> P2 [dir=back, label="ngôn ngữ, điểm,\ngói nội dung\n+ âm thanh"];
+  P2 -> D5 [dir=back, label="ngôn ngữ\nđang bật"];
+  P2 -> D6 [dir=back, label="điểm đã\nxuất bản"];
+  P2 -> D7 [dir=back, label="bài thuyết minh"];
+  P2 -> D8 [dir=back, label="phiên bản\n(ETag)"];
+  P2 -> P3 [label="gói nội dung", constraint=false];
+
+  // ---------- 3.0 Kích hoạt và phát (UC-06, UC-07, UC-08, UC-20) ----------
+  E4 -> P3 [label="tọa độ,\nđộ chính xác"];
+  E3 -> P3 [label="vị trí\nmô phỏng"];
+  E1 -> P3 [label="mã QR / số điểm,\nlệnh điều khiển"];
+  E1 -> P3 [dir=back, label="âm thanh +\nvăn bản"];
+  P3 -> P4 [label="lượt ghé", constraint=false];
+
+  // ---------- 4.0 Lượt tham quan và lịch sử (UC-09, UC-11, UC-19) ----------
+  E1 -> P4 [label="yêu cầu\nlịch sử"];
+  E1 -> P4 [dir=back, label="tiến độ,\nlịch sử"];
+  P4 -> D9 [label="lượt ghé\n(bỏ trùng clientId)"];
+  P4 -> D9 [dir=back, label="lịch sử"];
+
+  // ---------- 5.0 Theo dõi trực tuyến và mời tham gia (UC-10, UC-14) ----------
+  E1 -> P5 [label="nhịp tim\n(30 giây)"];
+  E2b -> P5 [label="yêu cầu\nmã mời"];
+  E2b -> P5 [dir=back, label="khách đang hoạt động,\nmã QR mời"];
+  P5 -> D3 [label="mở / cập nhật /\nđóng phiên"];
+  P5 -> D3 [dir=back, label="phiên\nđang mở"];
+
+  // ---------- 6.0 Quản lý người dùng (UC-13) ----------
+  P6 -> E2 [dir=back, label="lệnh khóa / mở,\nđổi vai trò"];
+  P6 -> E2 [label="danh sách\nngười dùng"];
+  P6 -> E1b [label="thông báo khóa\n(session.revoked)"];
+  D1 -> P6 [label="thông tin\nngười dùng"];
+  D1 -> P6 [dir=back, label="trạng thái,\nvai trò"];
+  D2 -> P6 [dir=back, label="thu hồi token"];
+  D3 -> P6 [label="lịch sử phiên"];
+  D4 -> P6 [dir=back, label="thao tác\nquản trị"];
+
+  // ---------- 7.0 Quản lý nội dung (UC-15 → UC-18) ----------
+  P7 -> E2 [dir=back, label="dữ liệu điểm, bài,\ntệp âm thanh, ngôn ngữ"];
+  P7 -> E2 [label="mã QR in,\ncảnh báo"];
+  D5 -> P7 [dir=back, label="ngôn ngữ"];
+  D6 -> P7 [dir=back, label="điểm"];
+  D7 -> P7 [dir=back, label="bài +\nâm thanh"];
+  D8 -> P7 [dir=back, label="phiên bản mới"];
+  D4 -> P7 [dir=back, label="thao tác\nnội dung"];
+
+  // ---------- 8.0 Thống kê và nhật ký (UC-12, FE-24) ----------
+  P8 -> E2 [dir=back, label="bộ lọc,\nyêu cầu thống kê"];
+  P8 -> E2 [label="dashboard,\nnhật ký"];
+  D9 -> P8 [label="lượt ghé"];
+  D3 -> P8 [label="số khách\nđang hoạt động"];
+  D1 -> P8 [label="số khách"];
+  D4 -> P8 [label="nhật ký"];
+  P4 -> P8 [label="lượt ghé mới\n(realtime)", style=dashed];
+}
