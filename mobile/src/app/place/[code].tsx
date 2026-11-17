@@ -6,6 +6,7 @@ import { formatDistance } from "../../core/geo";
 import { useT } from "../../hooks";
 import type { TKey } from "../../i18n";
 import { placePhoto } from "../../photos";
+import { scaledText } from "../../core/prefs";
 import { store, useApp, useNarration } from "../../state/store";
 import { useColors } from "../../theme";
 
@@ -69,8 +70,8 @@ export default function PlaceDetail() {
             }}
           />
         )}
-        <Text style={[styles.summary, { color: c.text }]}>{content?.summary}</Text>
-        <Text style={[styles.text, { color: c.text }]}>{content?.body}</Text>
+        <Text style={[styles.summary, scaledText(app.settings.textSize), { color: c.text }]}>{content?.summary}</Text>
+        <Text style={[styles.text, scaledText(app.settings.textSize), { color: c.text }]}>{content?.body}</Text>
       </FadeIn>
     </ScrollView>
   );

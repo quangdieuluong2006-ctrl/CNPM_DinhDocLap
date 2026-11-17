@@ -1,6 +1,7 @@
-import { Headphones, History, Home, List, Map as MapIcon } from "lucide-react";
+import { Headphones, History, Home, List, Lock, Map as MapIcon } from "lucide-react";
 import { useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router";
+import { useAuth } from "../features/auth";
 import { usePrefs } from "../lib/prefs";
 import { useLanguages } from "../lib/queries";
 import { LanguagePicker } from "./LanguagePicker";
@@ -8,6 +9,7 @@ import { LanguagePicker } from "./LanguagePicker";
 export function Layout() {
   const { lang, t } = usePrefs();
   const languages = useLanguages();
+  const { locked } = useAuth();
   const [picking, setPicking] = useState(false);
   const location = useLocation();
   const current = languages.data?.find((l) => l.code === lang);
@@ -60,6 +62,13 @@ export function Layout() {
           </NavLink>
         </div>
       </header>
+      {/* Quản trị viên khóa khách này: báo rõ, nội dung công khai vẫn nghe được (FE-18, TC-E4) */}
+      {locked && (
+        <div role="alert" className="border-b border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm text-amber-900">
+          <Lock size={14} className="mr-1.5 inline align-[-2px]" />
+          {t("lockedNotice")}
+        </div>
+      )}
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
         {/* key theo đường dẫn → mỗi lần chuyển trang, nội dung hiện dần lên */}
         <div key={location.pathname} className="animate-fade-up">

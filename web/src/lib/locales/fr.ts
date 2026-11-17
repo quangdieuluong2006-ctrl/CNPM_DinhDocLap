@@ -68,4 +68,5 @@ export const fr: Dict = {
   completed: "Terminé",
   online: "En ligne",
   more: "Voir plus",
+  lockedNotice: "Votre compte invité a été verrouillé par un administrateur. Vous pouvez toujours consulter et écouter les commentaires.",
 };

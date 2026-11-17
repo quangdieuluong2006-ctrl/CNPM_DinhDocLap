@@ -68,4 +68,5 @@ export const zh: Dict = {
   completed: "已听完",
   online: "在线",
   more: "加载更多",
+  lockedNotice: "您的访客账号已被管理员锁定。您仍可浏览和收听讲解。",
 };

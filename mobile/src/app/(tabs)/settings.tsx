@@ -4,10 +4,14 @@ import { useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import { Button } from "../../components/ui";
 import { useT } from "../../hooks";
-import { defaultApiUrl } from "../../services/config";
+import { TEXT_SIZES, type TextSize } from "../../core/prefs";
+import type { TKey } from "../../i18n";
+import { DEMO_MODE, defaultApiUrl } from "../../services/config";
 import { deleteLanguageData, listDownloadedLanguages } from "../../services/storage";
 import { store, useApp } from "../../state/store";
 import { useColors } from "../../theme";
+
+const TEXT_SIZE_KEY: Record<TextSize, TKey> = { small: "textSmall", medium: "textMedium", large: "textLarge" };
 
 function formatBytes(b: number): string {
   return b > 1024 * 1024 ? `${(b / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1024))} KB`;
@@ -57,9 +61,38 @@ export default function SettingsScreen() {
         <Row label={t("settingsAutoPlay")}>
           <Switch value={s.autoPlay} onValueChange={(v) => void store.updateSettings({ autoPlay: v })} />
         </Row>
-        <Row label={t("settingsSimulate")}>
-          <Switch value={s.simulate} onValueChange={(v) => void store.updateSettings({ simulate: v })} trackColor={{ true: c.warn }} />
+        <Row label={t("settingsHaptics")}>
+          <Switch value={s.haptics} onValueChange={(v) => void store.updateSettings({ haptics: v })} />
         </Row>
+        <Row label={t("settingsTextSize")}>
+          <View style={[styles.segment, { borderColor: c.border }]}>
+            {TEXT_SIZES.map((size) => {
+              const on = s.textSize === size;
+              return (
+                <Pressable
+                  key={size}
+                  onPress={() => void store.updateSettings({ textSize: size })}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: on }}
+                  style={[styles.segBtn, on && { backgroundColor: c.primary }]}
+                >
+                  <Text style={{ color: on ? c.primaryText : c.text, fontWeight: "600" }}>{t(TEXT_SIZE_KEY[size])}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </Row>
+        <Row label={t("historyTitle")}>
+          <Pressable onPress={() => router.push("/history")} accessibilityRole="button">
+            <Text style={{ color: c.primary, fontWeight: "700" }}>{t("historyOpen")} ›</Text>
+          </Pressable>
+        </Row>
+        {/* Mô phỏng vị trí chỉ có ở bản trình diễn (EXPO_PUBLIC_DEMO khác 0) */}
+        {DEMO_MODE && (
+          <Row label={t("settingsSimulate")}>
+            <Switch value={s.simulate} onValueChange={(v) => void store.updateSettings({ simulate: v })} trackColor={{ true: c.warn }} />
+          </Row>
+        )}
       </View>
 
       <Text style={[styles.h2, { color: c.muted }]}>{t("settingsOffline")}</Text>
@@ -98,47 +131,54 @@ export default function SettingsScreen() {
         </Row>
       </View>
 
-      <Text style={[styles.h2, { color: c.muted }]}>{t("settingsServer")}</Text>
-      <View style={[styles.card, { backgroundColor: c.card, borderColor: c.border, padding: 14, gap: 10 }]}>
-        <TextInput
-          value={apiUrl}
-          onChangeText={setApiUrl}
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="url"
-          style={[styles.input, { color: c.text, borderColor: c.border }]}
-        />
-        <Text style={{ color: app.online ? c.done : c.warn, fontSize: 13 }}>{app.online ? "● Online" : "● Offline"}</Text>
-        <Text style={{ color: c.muted, fontSize: 12 }}>
-          {t("apiAuto")}: {defaultApiUrl()}
-          {s.apiUrl ? "" : ` (${t("inUse")})`}
-        </Text>
-        <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-          <Button
-            title={t("save")}
-            onPress={() => {
-              // Chỉ lưu khi khác địa chỉ tự động: nếu lưu cố định, lần sau máy tính đổi mạng (đổi IP) app sẽ gọi sai địa chỉ
-              const url = apiUrl.trim().replace(/\/$/, "");
-              void store.updateSettings({ apiUrl: url && url !== defaultApiUrl() ? url : null });
-            }}
-          />
-          {s.apiUrl && (
-            <Button
-              title={t("useAuto")}
-              variant="ghost"
-              onPress={() => {
-                setApiUrl(defaultApiUrl());
-                void store.updateSettings({ apiUrl: null });
-              }}
+      {/* Ô Máy chủ API chỉ có ở bản trình diễn; bản cho khách dùng địa chỉ cố định lúc build */}
+      {DEMO_MODE && (
+        <>
+          <Text style={[styles.h2, { color: c.muted }]}>{t("settingsServer")}</Text>
+          <View style={[styles.card, { backgroundColor: c.card, borderColor: c.border, padding: 14, gap: 10 }]}>
+            <TextInput
+              value={apiUrl}
+              onChangeText={setApiUrl}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="url"
+              style={[styles.input, { color: c.text, borderColor: c.border }]}
             />
-          )}
-        </View>
-      </View>
+            <Text style={{ color: app.online ? c.done : c.warn, fontSize: 13 }}>{app.online ? "● Online" : "● Offline"}</Text>
+            <Text style={{ color: c.muted, fontSize: 12 }}>
+              {t("apiAuto")}: {defaultApiUrl()}
+              {s.apiUrl ? "" : ` (${t("inUse")})`}
+            </Text>
+            <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+              <Button
+                title={t("save")}
+                onPress={() => {
+                  // Chỉ lưu khi khác địa chỉ tự động: nếu lưu cố định, lần sau máy tính đổi mạng (đổi IP) app sẽ gọi sai địa chỉ
+                  const url = apiUrl.trim().replace(/\/$/, "");
+                  void store.updateSettings({ apiUrl: url && url !== defaultApiUrl() ? url : null });
+                }}
+              />
+              {s.apiUrl && (
+                <Button
+                  title={t("useAuto")}
+                  variant="ghost"
+                  onPress={() => {
+                    setApiUrl(defaultApiUrl());
+                    void store.updateSettings({ apiUrl: null });
+                  }}
+                />
+              )}
+            </View>
+          </View>
+        </>
+      )}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  segment: { flexDirection: "row", borderWidth: 1, borderRadius: 10, overflow: "hidden" },
+  segBtn: { paddingHorizontal: 12, paddingVertical: 6 },
   root: { padding: 16, gap: 10, paddingBottom: 40 },
   card: { borderWidth: 1, borderRadius: 14, overflow: "hidden" },
   account: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14 },

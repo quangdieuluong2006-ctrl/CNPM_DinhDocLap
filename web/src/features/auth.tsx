@@ -8,7 +8,8 @@ type Status = "loading" | "ready" | "none";
 interface AuthValue {
   status: Status;
   user: api.User | null;
-  endSession: () => void; // bỏ phiên hiện tại, không tạo khách mới (tài khoản bị khóa)
+  locked: boolean; // quản trị viên đã khóa khách này → hiện thông báo (FE-18, TC-E4)
+  endSession: (locked?: boolean) => void; // bỏ phiên hiện tại, không tạo khách mới
 }
 
 const AuthContext = createContext<AuthValue | null>(null);
@@ -24,14 +25,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { lang, ui } = usePrefs();
   const [status, setStatus] = useState<Status>("loading");
   const [user, setUser] = useState<api.User | null>(null);
+  const [locked, setLocked] = useState(false);
   // Ngôn ngữ đang chọn lúc tạo khách (không chạy lại hiệu ứng khi đổi ngôn ngữ)
   const prefs = useRef({ lang, ui });
   prefs.current = { lang, ui };
 
-  const endSession = useCallback(() => {
+  const endSession = useCallback((isLocked = false) => {
     api.clearSession();
     setUser(null);
     setStatus("none");
+    if (isLocked) setLocked(true);
   }, []);
 
   const begin = useCallback(async () => {
@@ -39,7 +42,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         return await api.refreshSession(); // đã có phiên khách từ lần trước (cookie rt_web)
       } catch (err) {
-        if (err instanceof api.ApiError && err.code === "ACCOUNT_LOCKED") return null;
+        if (err instanceof api.ApiError && err.code === "ACCOUNT_LOCKED") {
+          setLocked(true); // mở lại trang khi khách đã bị khóa từ trước
+          return null;
+        }
       }
       try {
         const { lang: narrationLang, ui: locale } = prefs.current;
@@ -63,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => api.setSessionExpiredHandler(null);
   }, [begin]);
 
-  const value = useMemo(() => ({ status, user, endSession }), [status, user, endSession]);
+  const value = useMemo(() => ({ status, user, locked, endSession }), [status, user, locked, endSession]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

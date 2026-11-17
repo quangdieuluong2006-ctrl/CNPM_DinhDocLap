@@ -1,0 +1,94 @@
+name: E2E
+
+# Kiểm thử đầu cuối TC-E1 → TC-E4 (PRD v2.2, mục 17.2): dựng cả hệ thống thật trên máy CI
+# (SQL Server + API + Web User + Web Admin) rồi chạy Playwright trên Chromium.
+on:
+  pull_request:
+    branches: [main, develop]
+    paths: ["api/**", "db/**", "web/**", "admin/**", "e2e/**", ".github/workflows/e2e.yml"]
+  push:
+    branches: [main, develop]
+    paths: ["api/**", "db/**", "web/**", "admin/**", "e2e/**", ".github/workflows/e2e.yml"]
+
+jobs:
+  e2e:
+    # Ghim Ubuntu 24.04: nhãn ubuntu-latest đã chuyển sang Ubuntu 26.04 mà Playwright 1.56 chưa hỗ trợ cài trình duyệt
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          MSSQL_SA_PASSWORD: Ci_Passw0rd_123
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'Ci_Passw0rd_123' -Q 'SELECT 1' -b -o /dev/null"
+          --health-interval 10s --health-timeout 5s --health-retries 15 --health-start-period 30s
+    env:
+      # Cấu hình API cho máy CI (không có tệp .env); mật khẩu chỉ dùng cho SQL Server tạm của lần chạy này
+      DB_SERVER: localhost
+      DB_PORT: "1433"
+      DB_NAME: DinhDocLapDB
+      DB_USER: sa
+      DB_PASSWORD: Ci_Passw0rd_123
+      DB_ENCRYPT: "true"
+      DB_TRUST_SERVER_CERTIFICATE: "true"
+      JWT_ACCESS_SECRET: ci-e2e-only-secret-0123456789abcdef
+      LOG_LEVEL: warn
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            api/package-lock.json
+            web/package-lock.json
+            admin/package-lock.json
+            e2e/package-lock.json
+
+      - name: Cài thư viện
+        run: |
+          for d in api web admin e2e; do (cd "$d" && npm ci); done
+
+      - name: Tạo CSDL và nạp dữ liệu mẫu
+        working-directory: api
+        run: |
+          npm run db:migrate
+          npm run db:seed
+
+      - name: Khởi động API, Web User, Web Admin
+        run: |
+          (cd api && nohup npx tsx src/server.ts > ../api.log 2>&1 &)
+          (cd web && nohup npm run dev > ../web.log 2>&1 &)
+          (cd admin && nohup npm run dev > ../admin.log 2>&1 &)
+          for url in http://localhost:3000/health/ready http://localhost:5173 http://localhost:5174; do
+            for i in $(seq 1 60); do
+              curl -sf -o /dev/null "$url" && echo "Sẵn sàng: $url" && break
+              sleep 2
+            done
+            curl -sf -o /dev/null "$url" || { echo "Không khởi động được $url"; cat api.log web.log admin.log; exit 1; }
+          done
+
+      - name: Cài trình duyệt Chromium cho Playwright
+        working-directory: e2e
+        run: npx playwright install --with-deps chromium
+
+      - name: Chạy TC-E1 → TC-E4
+        working-directory: e2e
+        run: npx playwright test
+
+      - name: Lưu báo cáo và log khi lỗi
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+            api.log
+            web.log
+            admin.log
+          retention-days: 7

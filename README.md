@@ -34,13 +34,13 @@ Chi tiết: [`api/README.md`](api/README.md). App Mobile chạy riêng: xem [`mo
 
 ## Tài liệu
 
-- **PRD v2.1 – bản chính thức** (09/11/2026), căn cứ duy nhất để lập trình và nghiệm thu:
+- **PRD v2.3 – bản chính thức** (17/11/2026), căn cứ duy nhất để lập trình và nghiệm thu:
   [`docs/PRD.md`](docs/PRD.md) (đọc trực tiếp trên GitHub)
-  · PDF: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.1.pdf`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.1.pdf)
-  · Word: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.1.docx`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.1.docx)
+  · PDF: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.3.pdf`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.3.pdf)
+  · Word: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.3.docx`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.3.docx)
 - Sơ đồ UML trong PRD: use case (mục 8.1), **lược đồ hoạt động cho cả 20 use case** (Hình 5, 6 và mục 8.4),
-  sơ đồ tuần tự SD-01 → SD-05 và máy trạng thái (mục 9), sơ đồ lớp Mobile (mục 4.1), ERD (mục 13), CI/CD (mục 16).
-- Sơ đồ UML (nguồn PlantUML): [`docs/diagrams/`](docs/diagrams/)
+  sơ đồ tuần tự SD-01 → SD-05 và máy trạng thái (mục 9), sơ đồ lớp Mobile (mục 4.1), ERD (mục 13.1), **DFD mức 0 và mức 1** (mục 13.2), CI/CD (mục 16).
+- Nguồn sơ đồ: [`docs/diagrams/`](docs/diagrams/) – UML viết bằng PlantUML (`.puml`), DFD viết bằng Graphviz (`dfd0.dot`, `dfd1.dot`)
 
 Sửa PRD: sửa `docs/PRD.md` (và sơ đồ `.puml` nếu cần), rồi xuất lại Word bằng lệnh ghi ở đầu
 [`docs/tools/prd-docx.lua`](docs/tools/prd-docx.lua); mở bản Word, cập nhật mục lục và lưu thành PDF.
@@ -67,7 +67,7 @@ Sửa PRD: sửa `docs/PRD.md` (và sơ đồ `.puml` nếu cần), rồi xuất
 
 ## CI/CD
 
-GitHub Actions có 5 workflow CI trong [`.github/workflows/`](.github/workflows/), chạy khi push hoặc tạo Pull Request vào `develop` / `main`:
+GitHub Actions có 6 workflow trong [`.github/workflows/`](.github/workflows/), chạy khi push hoặc tạo Pull Request vào `develop` / `main`:
 
 | Workflow        | Kiểm tra                                                        |
 | --------------- | --------------------------------------------------------------- |
@@ -76,9 +76,11 @@ GitHub Actions có 5 workflow CI trong [`.github/workflows/`](.github/workflows/
 | `ci-admin.yml`  | Typecheck, lint, test, build                                    |
 | `ci-mobile.yml` | Typecheck, test, `expo export` (bản web)                        |
 | `ci-docs.yml`   | Liên kết trong README, mỗi sơ đồ `.puml` có ảnh `.png`          |
+| `e2e.yml`       | Dựng SQL Server + API + Web User + Web Admin, chạy Playwright TC-E1 → TC-E4 |
 
 Chạy thử trên máy trước khi tạo PR (trong từng thư mục): `npm run typecheck`, `npm run lint`, `npm test`
 (Mobile không có `lint`).
+Kiểm thử đầu cuối trên máy: chạy `npm run dev` trong `api` (hoặc `npm run demo`), rồi trong `e2e`: `npm install`, `npx playwright install chromium`, `npm test` – xem [`e2e/README.md`](e2e/README.md).
 
 ## Quy trình làm việc
 

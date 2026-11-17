@@ -76,6 +76,7 @@ const vi = {
   completed: "Nghe hết",
   online: "Đang trực tuyến",
   more: "Xem thêm",
+  lockedNotice: "Tài khoản khách của bạn đã bị quản trị viên khóa. Bạn vẫn xem và nghe thuyết minh được.",
 };
 
 export type Dict = typeof vi;
@@ -148,6 +149,7 @@ const en: Dict = {
   completed: "Completed",
   online: "Online",
   more: "Load more",
+  lockedNotice: "Your guest account has been locked by an administrator. You can still browse and listen to the narration.",
 };
 
 export const UI_LOCALES = ["vi", "en", "zh", "ko", "ja", "fr", "de", "ru", "es", "th"] as const;
