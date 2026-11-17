@@ -12,7 +12,8 @@ on:
 
 jobs:
   e2e:
-    runs-on: ubuntu-latest
+    # Ghim Ubuntu 24.04: nhãn ubuntu-latest đã chuyển sang Ubuntu 26.04 mà Playwright 1.56 chưa hỗ trợ cài trình duyệt
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     services:
       sqlserver:
