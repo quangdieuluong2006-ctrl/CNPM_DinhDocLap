@@ -34,10 +34,10 @@ Chi tiết: [`api/README.md`](api/README.md). App Mobile chạy riêng: xem [`mo
 
 ## Tài liệu
 
-- **PRD v2.2 – bản chính thức** (16/11/2026), căn cứ duy nhất để lập trình và nghiệm thu:
+- **PRD v2.3 – bản chính thức** (17/11/2026), căn cứ duy nhất để lập trình và nghiệm thu:
   [`docs/PRD.md`](docs/PRD.md) (đọc trực tiếp trên GitHub)
-  · PDF: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.2.pdf`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.2.pdf)
-  · Word: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.2.docx`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.2.docx)
+  · PDF: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.3.pdf`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.3.pdf)
+  · Word: [`docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.3.docx`](docs/PRD_Thuyet_Minh_Dinh_Doc_Lap_v2.3.docx)
 - Sơ đồ UML trong PRD: use case (mục 8.1), **lược đồ hoạt động cho cả 20 use case** (Hình 5, 6 và mục 8.4),
   sơ đồ tuần tự SD-01 → SD-05 và máy trạng thái (mục 9), sơ đồ lớp Mobile (mục 4.1), ERD (mục 13.1), **DFD mức 0 và mức 1** (mục 13.2), CI/CD (mục 16).
 - Nguồn sơ đồ: [`docs/diagrams/`](docs/diagrams/) – UML viết bằng PlantUML (`.puml`), DFD viết bằng Graphviz (`dfd0.dot`, `dfd1.dot`)

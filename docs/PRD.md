@@ -12,7 +12,7 @@ toc-title: "Mục lục"
 | **Trọng tâm** | Frontend Web và Mobile: định vị GPS, bản đồ, trình phát, đa ngôn ngữ, hoạt động offline, realtime; kèm quy trình CI/CD. |
 | **Nhóm** | Lương Diệu Quang · Võ Thị Ngọc Như |
 | **Kho mã nguồn** | github.com/quangdieuluong2006-ctrl/CNPM_DinhDocLap (nhánh develop, main) |
-| **Phiên bản** | 2.2 – 16/11/2026 |
+| **Phiên bản** | 2.3 – 17/11/2026 |
 | **Trạng thái** | **Đã chốt.** Không thêm tính năng ngoài danh sách FE-01 → FE-24. |
 
 ## Lịch sử thay đổi
@@ -24,6 +24,7 @@ toc-title: "Mục lục"
 | **2.0** | 01/11/2026 | **Bản chính thức sạch.** Viết lại toàn bộ theo sản phẩm thật sau buổi kiểm tra giữa kỳ (28/10): (1) bỏ hẳn nhóm tham quan và vai trò hướng dẫn viên khỏi tài liệu, CSDL (migration 004) và API; chỉ còn 2 vai trò `user` và `admin`. (2) Dùng lại mã trống: **FE-10** = Lịch sử tham quan trên Mobile, **FE-23** = Mời khách tham gia bằng QR; **UC-10** = Mời khách tham gia bằng QR, **UC-11** = Xem tiến độ và điểm gợi ý → 24 tính năng, 20 use case liên tục. (3) **Giọng đọc AI**: 120 tệp MP3 (12 điểm × 10 ngôn ngữ) sinh bằng giọng neural, nạp sẵn khi seed. (4) Bổ sung sơ đồ lớp Mobile, lưu đồ quét QR, ảnh chụp giao diện thật. (5) CD: phát hành bằng tag `v*` (bản build Web, Docker image API, APK). (6) Kế hoạch hoàn thiện 2 tuần trước báo cáo cuối kỳ. |
 | **2.1** | 09/11/2026 | **Bổ sung lược đồ hoạt động cho mọi chức năng** (góp ý của giảng viên ở buổi kiểm tra): thêm 18 lược đồ, cùng 2 lược đồ có sẵn (Hình 5, 6) → đủ **20/20 use case** (mục 8.4, Hình 8–25). Cập nhật hiện trạng: đã xong việc #1–#3 của kế hoạch (PRD v2.0 – PR #29; dọn nhóm tham quan, migration 004 – PR #31; giọng đọc AI 120 tệp – PR #32) và dòng hướng dẫn QR (FE-23). Sửa tên cột `schema_migrations.file_name`. |
 | **2.2** | 16/11/2026 | **Bổ sung sơ đồ luồng dữ liệu (DFD)** theo nội dung lý thuyết mới của môn học: DFD mức 0 (sơ đồ ngữ cảnh) và DFD mức 1 gồm 8 tiến trình (mục 13.2, Hình 37, 38). Kiểm tra hai quy tắc: 4 tác nhân ngoài = 4 tác nhân của sơ đồ use case; 9 kho dữ liệu ≤ 10 bảng của ERD (mỗi kho ứng với đúng một bảng nghiệp vụ). Đánh số lại Hình 39, 40. Lập lại kế hoạch hoàn thiện (mục 18) theo lịch báo cáo cuối kỳ 25/11; CD phát hành APK chuyển sang giai đoạn 2. |
+| **2.3** | 17/11/2026 | **Bản cuối trước báo cáo.** Cập nhật hiện trạng sau các việc A–D: FE-10 Lịch sử tham quan trên Mobile (PR #38); FE-12 rung khi đến điểm, cỡ chữ, FE-09 chúc mừng khi nghe đủ, FE-11 ẩn mô phỏng ở bản phát hành (PR #39); kiểm thử đầu cuối Playwright TC-E1 → TC-E4 và workflow `e2e.yml` (PR #40); Web User hiện thông báo khi khách bị khóa (FE-18). **Kiểm thử trên iPhone thật** (việc E) tìm và sửa 3 lỗi: nút quay lại lộ tên nhóm "(tabs)" (PR #41); lượt nghe mô phỏng bị ghi thành GPS khi bấm "Nghe ngay" hoặc phát từ hàng đợi, và dải ngoại tuyến đè thanh trạng thái iOS (PR #42). Hình 32 thay bằng ảnh chụp trên iPhone. Không còn mục *Cần làm* nào trong phạm vi đồ án. |
 
 ## Cách đọc tài liệu
 
@@ -666,7 +667,7 @@ Chỉ tài khoản `admin` đăng nhập được. Bố cục: thanh bên trái 
 | **Danh sách** | Cột: mã, tên hiển thị, loại (Khách / Quản trị viên), **online/offline** (chấm màu, realtime), **hoạt động gần nhất** ("5 phút trước"), trạng thái tài khoản, ngày tạo. Tìm theo tên/email; lọc loại, online, bị khóa; phân trang 20 dòng. |
 | **Chi tiết** | Thông tin, số lượt ghé, **lịch sử phiên** (thiết bị web/mobile/admin, giờ vào, giờ ra, thời lượng), lượt ghé gần đây. |
 | **Thao tác** | Khóa / mở khóa (bắt buộc nhập lý do) → thu hồi mọi refresh token, gửi `session.revoked` → thiết bị bị đăng xuất ngay. Đổi vai trò user ↔ admin (chỉ áp dụng cho tài khoản không phải khách). Không được tự khóa hoặc tự hạ quyền chính mình. |
-| **Tiêu chí chấp nhận** | AC1. Khóa khách đang trực tuyến → ứng dụng của họ báo bị khóa trong ≤ 3 giây và không tự tạo khách mới. AC2. Thao tác khóa/mở được ghi nhật ký. |
+| **Tiêu chí chấp nhận** | AC1. Khóa khách đang trực tuyến → ứng dụng của họ báo bị khóa trong ≤ 3 giây và không tự tạo khách mới (Mobile: hộp thoại; Web User: dải thông báo trên cùng – kiểm bằng TC-E4). AC2. Thao tác khóa/mở được ghi nhật ký. |
 | **Liên quan** | UC-13; SD-05 |
 
 ## FE-19. Người dùng đang hoạt động
@@ -989,7 +990,7 @@ Mọi quyết định phát diễn ra trên thiết bị; máy chủ chỉ nhậ
 
 ## Màn hình Mobile
 
-![Hình 32 – Giao diện Mobile (ảnh chụp bản chạy thật)](diagrams/ui_mobile.png)
+![Hình 32 – Giao diện Mobile chụp trên iPhone (Expo Go, 17/11/2026): bản đồ, trình phát, chi tiết điểm, lịch sử, cài đặt, chế độ máy bay](diagrams/ui_mobile.png)
 
 | Màn hình | Thành phần chính |
 |----------------------|--------------------------------------------------|
@@ -1007,7 +1008,7 @@ Mọi quyết định phát diễn ra trên thiết bị; máy chủ chỉ nhậ
 
 ![Hình 33 – Web User trên máy tính](diagrams/ui_web_user.png)
 
-Thanh trên cùng: logo, liên kết các trang (Điểm, Bản đồ, Lịch sử), chọn ngôn ngữ. Trang chủ có phần giới thiệu và lưới thẻ điểm; chi tiết điểm hai cột trên máy tính (ảnh + trình phát | văn bản), một cột trên điện thoại (ảnh cuối Hình 32).
+Thanh trên cùng: logo, liên kết các trang (Điểm, Bản đồ, Lịch sử), chọn ngôn ngữ. Trang chủ có phần giới thiệu và lưới thẻ điểm; chi tiết điểm hai cột trên máy tính (ảnh + trình phát | văn bản), một cột trên điện thoại.
 
 ## Web Admin
 
@@ -1378,11 +1379,11 @@ Thêm bảng `sites` và cột `places.site_id`; gói nội dung lọc theo site
 
 # Kế hoạch hoàn thiện
 
-## Hiện trạng (16/11/2026)
+## Hiện trạng (17/11/2026)
 
-- Đã có: toàn bộ FE-01 → FE-24 ở mức chạy được, trừ các mục ghi *Cần làm*; 5 workflow CI; 12 điểm × 10 ngôn ngữ nội dung (vi, en đã duyệt); 120 tệp giọng đọc AI; ảnh 12 điểm; khách ẩn danh; demo nhiều khách qua tunnel; `main` đã gộp `develop` (PR #36).
+- Đã có: toàn bộ FE-01 → FE-24; 6 workflow (5 CI + E2E); 48 test Mobile, 26 test Web, 16 test Admin, test tích hợp API trên SQL Server; 4 kịch bản E2E chạy trên mỗi Pull Request; 12 điểm × 10 ngôn ngữ nội dung (vi, en đã duyệt); 120 tệp giọng đọc AI; ảnh 12 điểm; khách ẩn danh; demo nhiều khách qua tunnel.
 - Đã qua buổi kiểm tra giữa kỳ (28/10). Báo cáo cuối kỳ: **thứ Tư 25/11/2026**.
-- Kế hoạch cũ (01–13/11) đã xong việc 1–3; việc 4–7 chưa làm kịp nên lập lại lịch dưới đây. Việc phát hành APK (CD) chuyển sang giai đoạn 2.
+- Kế hoạch cũ (01–13/11) đã xong việc 1–3; việc 4–7 làm lại theo lịch A–G dưới đây và đã xong A–E sớm hơn dự kiến. Việc phát hành APK (CD) chuyển sang giai đoạn 2.
 
 ## Kế hoạch đến buổi báo cáo
 
@@ -1392,12 +1393,12 @@ Thêm bảng `sites` và cột `places.site_id`; gói nội dung lọc theo site
 | 2 | 02–03/11 | Dọn nhóm tham quan (`chore/remove-tours`): migration 004, xóa module `tours`, `/auth/register`, vai trò `guide`; seed 1 admin + 6 khách mẫu | **Xong** – PR #31 |
 | 3 | 03–06/11 | Giọng đọc AI: `npm run gen:audio` sinh 120 MP3; seed nạp âm thanh (`feature/ai-voice`) | **Xong** – PR #32 |
 | 3b | 09–13/11 | PRD v2.1 – lược đồ hoạt động 20/20 use case; README chỉ giữ bản mới; gộp develop → main | **Xong** – PR #33, #35, #36 |
-| A | 16–17/11 | PRD v2.2 – DFD mức 0, mức 1; lập lại kế hoạch (`docs/prd-v2.2`) | PR vào `develop` |
-| B | 17–18/11 | Mobile FE-10 Lịch sử tham quan (`feature/FE-10-history`) | Màn lịch sử + test |
-| C | 19/11 | Mobile FE-12: cỡ chữ, rung khi bắt đầu phát, ẩn mô phỏng ở bản production (`feature/FE-12-settings`) | TC-22 → TC-24 đạt |
-| D | 20/11 | E2E: `e2e.yml` + 4 kịch bản Playwright (`ci/e2e`) | TC-E1 → TC-E4 xanh |
-| E | 21/11 | Kiểm thử trên điện thoại thật, sửa lỗi; cập nhật ảnh giao diện trong PRD | Danh sách lỗi = 0 mức cao |
-| F | 22/11 | **Đóng băng code** (chỉ sửa lỗi nghiêm trọng); PRD bản cuối; gộp develop → main, tag `v1.0.0` | Bản trình diễn cuối |
+| A | 16/11 | PRD v2.2 – DFD mức 0, mức 1; lập lại kế hoạch (`docs/prd-v2.2`) | **Xong** – PR #37 |
+| B | 16/11 | Mobile FE-10 Lịch sử tham quan (`feature/FE-10-history`) | **Xong** – PR #38 |
+| C | 17/11 | Mobile FE-12: cỡ chữ, rung khi đến điểm; FE-09 chúc mừng; ẩn mô phỏng ở bản phát hành (`feature/FE-12-settings`) | **Xong** – PR #39 |
+| D | 17/11 | E2E: `e2e.yml` + 4 kịch bản Playwright (`ci/e2e`); sửa CI chạy trên ubuntu-24.04 | **Xong** – PR #40, TC-E1 → TC-E4 xanh trên GitHub Actions |
+| E | 17/11 | Kiểm thử trên iPhone thật (Expo Go) theo danh sách 12 mục, sửa lỗi; cập nhật ảnh giao diện (Hình 32) | **Xong** – đạt 12/12 mục (kể cả rung khi đến điểm); 3 lỗi tìm được đã sửa (PR #41, #42) |
+| F | 17–22/11 | PRD bản cuối v2.3 (`docs/prd-v2.3`); **đóng băng code** (chỉ sửa lỗi nghiêm trọng); gộp develop → main, tag `v1.0.0` | Bản trình diễn cuối |
 | G | 23–24/11 | Tập dượt theo Phụ lục D; sao lưu CSDL; ôn vấn đáp theo lịch sử commit | Sẵn sàng báo cáo 25/11 |
 | – | Giai đoạn 2 | CD: `release.yml`, EAS Build APK, image API trên GHCR | Cần tài khoản Expo và khóa Google Maps; trình diễn bằng Expo Go thay thế |
 
