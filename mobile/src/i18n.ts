@@ -103,6 +103,13 @@ const vi = {
   triggerCode: "Nhập số điểm",
   triggerManual: "Chọn tay",
   triggerSimulated: "Mô phỏng",
+  settingsHaptics: "Rung khi đến điểm",
+  settingsTextSize: "Cỡ chữ văn bản",
+  textSmall: "Nhỏ",
+  textMedium: "Vừa",
+  textLarge: "Lớn",
+  congratsTitle: "Chúc mừng!",
+  congratsText: "Bạn đã nghe đủ {n} điểm thuyết minh của Dinh Độc Lập. Cảm ơn bạn đã tham quan!",
 };
 
 export type Dict = typeof vi;
@@ -201,6 +208,13 @@ const en: Dict = {
   triggerCode: "Stop number",
   triggerManual: "Selected",
   triggerSimulated: "Simulated",
+  settingsHaptics: "Vibrate on arrival",
+  settingsTextSize: "Text size",
+  textSmall: "Small",
+  textMedium: "Medium",
+  textLarge: "Large",
+  congratsTitle: "Congratulations!",
+  congratsText: "You have listened to all {n} stops of Independence Palace. Thank you for visiting!",
 };
 
 export type TKey = keyof Dict;

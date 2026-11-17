@@ -95,4 +95,11 @@ export const th: Dict = {
   triggerCode: "ใส่หมายเลข",
   triggerManual: "เลือกเอง",
   triggerSimulated: "จำลอง",
+  settingsHaptics: "สั่นเมื่อถึงจุด",
+  settingsTextSize: "ขนาดตัวอักษร",
+  textSmall: "เล็ก",
+  textMedium: "กลาง",
+  textLarge: "ใหญ่",
+  congratsTitle: "ยินดีด้วย!",
+  congratsText: "คุณฟังครบทั้ง {n} จุดของทำเนียบเอกราชแล้ว ขอบคุณที่มาเยี่ยมชม!",
 };

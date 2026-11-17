@@ -95,4 +95,11 @@ export const de: Dict = {
   triggerCode: "Nummer eingegeben",
   triggerManual: "Manuell gewählt",
   triggerSimulated: "Simuliert",
+  settingsHaptics: "Bei Ankunft vibrieren",
+  settingsTextSize: "Textgröße",
+  textSmall: "Klein",
+  textMedium: "Mittel",
+  textLarge: "Groß",
+  congratsTitle: "Glückwunsch!",
+  congratsText: "Sie haben alle {n} Stationen des Unabhängigkeitspalasts gehört. Danke für Ihren Besuch!",
 };

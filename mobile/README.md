@@ -35,6 +35,15 @@ Xem nhanh trên trình duyệt (không có bản đồ thật, GPS dùng chế �
 - **Chạy lộ trình mẫu**: đi từ cổng chính qua 5 điểm ngoài trời (tốc độ đi bộ ×4, nhiễu ±3 m).
   Mỗi điểm phát đúng 1 lần, đúng thứ tự; đang nghe mà đi vào vùng khác thì hiện thẻ "Bạn đang ở gần … – Nghe ngay".
 - Lượt nghe ghi `trigger = simulated`, không tính vào thống kê Dashboard.
+- Bản phát hành cho khách build với `EXPO_PUBLIC_DEMO=0`: ẩn công tắc mô phỏng và ô Máy chủ API, luôn dùng GPS thật.
+  Không đặt biến (mặc định) = bản trình diễn, hiện đủ.
+
+## Lịch sử, tiến độ, cài đặt
+
+- **Lịch sử tham quan** (FE-10): mở từ Cài đặt hoặc nút "Xem lịch sử" trên thẻ tiến độ (tab Điểm). Ghép lượt nghe trên máy chủ
+  (`GET /me/visits`) với nhật ký trên máy, chia theo ngày giờ Việt Nam; mất mạng vẫn xem được, lượt chưa gửi có nhãn "Chờ gửi".
+- **Chúc mừng** (FE-09): nghe đủ mọi điểm → hộp thoại chúc mừng một lần, có nút xem Lịch sử.
+- **Rung khi đến điểm** (`expo-haptics`) và **Cỡ chữ văn bản** Nhỏ / Vừa / Lớn (chi tiết điểm, trình phát) trong Cài đặt (FE-12).
 
 ## Khách dùng ngay – không đăng nhập / đăng ký
 

@@ -214,10 +214,10 @@ Hệ thống có **2 vai trò** (`users.role`): `user` và `admin`. Khách khôn
 | FE-06 | Kích hoạt trong nhà: QR / số điểm | Mobile | Phải | Quét QR hoặc nhập 3 chữ số → mở và phát bài. | Đã có |
 | FE-07 | Trình phát thuyết minh | Mobile | Phải | Phát/tạm dừng, phát lại, tua ±10 s, tốc độ, đổi ngôn ngữ, văn bản kèm. | Đã có |
 | FE-08 | Tải trước nội dung (offline) | Mobile | Phải | Gói nội dung + tệp âm thanh; kiểm tra phiên bản; gửi lượt ghé bù. | Đã có |
-| FE-09 | Tiến độ và điểm gợi ý | Mobile | Nên | "Đã nghe x/12", điểm tiếp theo kèm khoảng cách và hướng. | Đã có; *màn chúc mừng: cần làm* |
+| FE-09 | Tiến độ và điểm gợi ý | Mobile | Nên | "Đã nghe x/12", điểm tiếp theo kèm khoảng cách và hướng; chúc mừng khi nghe đủ. | Đã có |
 | FE-10 | Lịch sử tham quan (Mobile) | Mobile | Nên | Danh sách điểm đã nghe theo thời gian, cách kích hoạt. | *Đã có* |
 | FE-11 | Chế độ mô phỏng vị trí | Mobile | Phải | Chạm bản đồ hoặc chạy lộ trình mẫu. | Đã có |
-| FE-12 | Cài đặt | Mobile | Phải | Ngôn ngữ, tự động phát, rung, cỡ chữ, dữ liệu offline, máy chủ API. | Đã có; *rung, cỡ chữ: cần làm* |
+| FE-12 | Cài đặt | Mobile | Phải | Ngôn ngữ, tự động phát, rung, cỡ chữ, dữ liệu offline, máy chủ API. | Đã có |
 | FE-13 | Trang chủ và danh sách điểm | Web User | Phải | Giới thiệu, chọn ngôn ngữ, danh sách, tìm kiếm, lọc khu vực. | Đã có |
 | FE-14 | Chi tiết điểm và nghe thuyết minh | Web User | Phải | Đọc bài, nghe tệp âm thanh hoặc giọng trình duyệt; đích của QR. | Đã có |
 | FE-15 | Bản đồ khuôn viên (web) | Web User | Nên | Leaflet + OpenStreetMap. | Đã có |
@@ -553,7 +553,7 @@ Các tệp MP3 được commit vào kho (khoảng 120 × 0,5 MB) để máy khô
 
 | | |
 |----------------|------------------------------------------------------------------------------------|
-| **Ưu tiên** | Nên · **Hiện trạng:** Đã có; *cần làm: màn chúc mừng* |
+| **Ưu tiên** | Nên · **Hiện trạng:** Đã có – hộp thoại chúc mừng hiện một lần khi nghe đủ (`shouldCongratulate` trong `mobile/src/core/prefs.ts`) |
 | **Luồng chính** | 1. Thẻ trên tab Điểm: "Đã nghe 5/12 điểm" + thanh tiến độ. 2. "Điểm tiếp theo": điểm chưa nghe có sortOrder nhỏ nhất, kèm khoảng cách và mũi tên hướng (điểm gps). 3. Nghe đủ 12/12 → hộp thoại chúc mừng, nút xem Lịch sử. |
 | **Tiêu chí chấp nhận** | AC1. Tiến độ cập nhật ngay khi nghe xong một điểm, kể cả offline. |
 | **Liên quan** | UC-11 |
@@ -575,7 +575,7 @@ Các tệp MP3 được commit vào kho (khoảng 120 × 0,5 MB) để máy khô
 |----------------|------------------------------------------------------------------------------------|
 | **Ưu tiên** | Phải (kiểm thử, trình diễn) · **Hiện trạng:** Đã có; *cần làm: ẩn ở bản production* |
 | **Luồng chính** | 1. Bật trong Cài đặt → nhãn MÔ PHỎNG. 2. Chạm trên bản đồ để đặt vị trí. 3. Nút chạy lộ trình mẫu: chấm vị trí đi qua lần lượt 5 điểm ngoài trời. |
-| **Quy tắc** | *Cần làm:* bản build production cho khách (`EXPO_PUBLIC_DEMO=0`) ẩn công tắc và ô Máy chủ API; bản trình diễn (`EXPO_PUBLIC_DEMO=1`) hiện đủ. |
+| **Quy tắc** | Bản build cho khách (`EXPO_PUBLIC_DEMO=0`) ẩn công tắc mô phỏng và ô Máy chủ API, luôn dùng GPS thật; bản trình diễn (mặc định, không đặt biến) hiện đủ. |
 | **Tiêu chí chấp nhận** | AC1. Lộ trình mẫu kích hoạt đủ 5 điểm theo thứ tự, mỗi điểm một lần. AC2. Lượt ghé ghi `simulated`, không tính vào "Lượt tham quan hôm nay". |
 | **Liên quan** | UC-20 |
 
@@ -583,7 +583,7 @@ Các tệp MP3 được commit vào kho (khoảng 120 × 0,5 MB) để máy khô
 
 | | |
 |----------------|------------------------------------------------------------------------------------|
-| **Ưu tiên** | Phải · **Hiện trạng:** Đã có; *cần làm: rung, cỡ chữ* |
+| **Ưu tiên** | Phải · **Hiện trạng:** Đã có – rung bằng `expo-haptics` (`mobile/src/services/haptics.ts`), cỡ chữ Nhỏ / Vừa / Lớn (`scaledText` trong `mobile/src/core/prefs.ts`) |
 | **Nội dung** | Ngôn ngữ thuyết minh (= ngôn ngữ giao diện) · Tự động phát khi đến gần · **Rung khi đến điểm** · **Cỡ chữ văn bản** (Nhỏ / Vừa / Lớn, áp dụng cho chi tiết điểm và trình phát) · Chế độ mô phỏng · Dữ liệu ngoại tuyến (FE-08) · Lượt ghé chờ gửi · Lịch sử tham quan (FE-10) · Máy chủ API (bản trình diễn) · Phiên bản ứng dụng. |
 | **Tiêu chí chấp nhận** | AC1. Mọi thiết lập được lưu và giữ sau khi mở lại ứng dụng. |
 

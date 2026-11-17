@@ -4,7 +4,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { CodeBadge, Equalizer, FadeIn, Pill, PlaceThumb, PulseRing } from "../components/ui";
 import { RATES } from "../core/narration";
 import { formatTime, useT } from "../hooks";
-import { store, useNarration } from "../state/store";
+import { scaledText } from "../core/prefs";
+import { store, useApp, useNarration } from "../state/store";
 import { useColors } from "../theme";
 
 // FE-07 trình phát đầy đủ: tiến trình, lùi/tới 10 giây (tệp âm thanh), phát/tạm dừng, phát lại, tốc độ, văn bản.
@@ -12,6 +13,8 @@ export default function PlayerScreen() {
   const n = useNarration();
   const c = useColors();
   const t = useT();
+  const app = useApp();
+  const textStyle = scaledText(app.settings.textSize); // cỡ chữ chọn trong Cài đặt (FE-12)
   const cur = n.current;
   if (!cur) {
     // Không phát được (thiết bị không có giọng đọc, không tải được tệp): vẫn hiện văn bản để khách đọc.
@@ -30,7 +33,7 @@ export default function PlayerScreen() {
             <Text style={{ color: c.text }}>{t("retry")}</Text>
           </Pressable>
         )}
-        {f && <Text style={[styles.text, { color: c.text }]}>{failedPlace?.content?.body ?? f.text}</Text>}
+        {f && <Text style={[styles.text, textStyle, { color: c.text }]}>{failedPlace?.content?.body ?? f.text}</Text>}
         {!f && (
           <Pressable onPress={() => router.back()}>
             <Text style={{ color: c.primary, fontWeight: "700" }}>{t("close")}</Text>
@@ -107,7 +110,7 @@ export default function PlayerScreen() {
         </Pressable>
       </View>
 
-      <Text style={[styles.text, { color: c.text }]}>{place?.content?.body ?? cur.text}</Text>
+      <Text style={[styles.text, textStyle, { color: c.text }]}>{place?.content?.body ?? cur.text}</Text>
     </ScrollView>
   );
 }
