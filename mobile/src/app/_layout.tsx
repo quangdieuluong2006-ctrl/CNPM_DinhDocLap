@@ -40,7 +40,8 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <StatusBar style="auto" />
-      <Stack screenOptions={{ headerTintColor: c.primary, contentStyle: { backgroundColor: c.bg } }}>
+            {/* Nút quay lại chỉ hiện mũi tên: màn trước là nhóm tab có tên kỹ thuật "(tabs)", không được hiện tên đó cho khách */}
+      <Stack screenOptions={{ headerTintColor: c.primary, contentStyle: { backgroundColor: c.bg }, headerBackButtonDisplayMode: "minimal" }}>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="language" options={{ title: "", presentation: "modal" }} />
