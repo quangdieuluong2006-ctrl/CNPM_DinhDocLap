@@ -210,7 +210,7 @@ Hệ thống có **2 vai trò** (`users.role`): `user` và `admin`. Khách khôn
 | FE-02 | Chọn ngôn ngữ thuyết minh | Mobile | Phải | Danh sách có tìm kiếm theo tên Việt, bản ngữ, tiếng Anh, mã ISO; giao diện đổi theo. | Đã có |
 | FE-03 | Bản đồ khuôn viên | Mobile | Phải | Vị trí khách, các điểm, vùng kích hoạt; nút Quét mã. | Đã có |
 | FE-04 | Danh sách và chi tiết điểm | Mobile | Phải | Theo khu vực, tìm kiếm, khoảng cách, dấu đã nghe; chi tiết có ảnh. | Đã có |
-| FE-05 | Tự động thuyết minh theo GPS | Mobile | Phải | Vào vùng điểm ngoài trời → tự phát (ứng dụng đang mở); thêm rung. | Đã có; *rung: cần làm* |
+| FE-05 | Tự động thuyết minh theo GPS | Mobile | Phải | Vào vùng điểm ngoài trời → tự phát (ứng dụng đang mở); rung nhẹ khi đến điểm. | Đã có |
 | FE-06 | Kích hoạt trong nhà: QR / số điểm | Mobile | Phải | Quét QR hoặc nhập 3 chữ số → mở và phát bài. | Đã có |
 | FE-07 | Trình phát thuyết minh | Mobile | Phải | Phát/tạm dừng, phát lại, tua ±10 s, tốc độ, đổi ngôn ngữ, văn bản kèm. | Đã có |
 | FE-08 | Tải trước nội dung (offline) | Mobile | Phải | Gói nội dung + tệp âm thanh; kiểm tra phiên bản; gửi lượt ghé bù. | Đã có |
@@ -463,7 +463,7 @@ Các tệp MP3 được commit vào kho (khoảng 120 × 0,5 MB) để máy khô
 
 # Tính năng Mobile (React Native)
 
-Ứng dụng dùng expo-router (`mobile/src/app/`). Màn hình: `welcome`, `language`, `(tabs)/map`, `(tabs)/places`, `(tabs)/settings`, `place/[code]`, `p/[code]` (deep link QR), `player`, `scan`, và `history` (FE-10, cần làm). Thanh tab dưới: **Bản đồ · Điểm · Cài đặt**; mini player nằm trên thanh tab.
+Ứng dụng dùng expo-router (`mobile/src/app/`). Màn hình: `welcome`, `language`, `(tabs)/map`, `(tabs)/places`, `(tabs)/settings`, `place/[code]`, `p/[code]` (deep link QR), `player`, `scan`, và `history` (FE-10). Thanh tab dưới: **Bản đồ · Điểm · Cài đặt**; mini player nằm trên thanh tab.
 
 ## FE-01. Khách ẩn danh
 
@@ -512,7 +512,7 @@ Các tệp MP3 được commit vào kho (khoảng 120 × 0,5 MB) để máy khô
 
 | | |
 |----------------|------------------------------------------------------------------------------------|
-| **Ưu tiên** | Phải – chức năng cốt lõi · **Hiện trạng:** Đã có; *cần làm: rung khi đến điểm* |
+| **Ưu tiên** | Phải – chức năng cốt lõi · **Hiện trạng:** Đã có (rung khi đến điểm: `mobile/src/services/haptics.ts`) |
 | **Mô tả** | Thuật toán mục 4.3: lọc tín hiệu, Haversine, máy trạng thái có dwell và hysteresis, cooldown, xử lý xung đột, không cắt ngang. |
 | **Luồng chính** | 1. Khách vào vùng điểm gps → sau 3 giây ổn định: **rung nhẹ** (expo-haptics, nếu bật trong Cài đặt), thẻ điểm hiện lên, bài tự phát. 2. Đang phát bài khác → thẻ gợi ý "Nghe ngay". 3. Rời vùng khi đang phát → bài phát tiếp đến hết. |
 | **Quy tắc** | Chỉ khi ứng dụng ở foreground. Bật/tắt trong Cài đặt (mặc định bật). Hằng số ở Phụ lục C. |
@@ -573,7 +573,7 @@ Các tệp MP3 được commit vào kho (khoảng 120 × 0,5 MB) để máy khô
 
 | | |
 |----------------|------------------------------------------------------------------------------------|
-| **Ưu tiên** | Phải (kiểm thử, trình diễn) · **Hiện trạng:** Đã có; *cần làm: ẩn ở bản production* |
+| **Ưu tiên** | Phải (kiểm thử, trình diễn) · **Hiện trạng:** Đã có (ẩn ở bản phát hành: `DEMO_MODE` trong `mobile/src/services/config.ts`) |
 | **Luồng chính** | 1. Bật trong Cài đặt → nhãn MÔ PHỎNG. 2. Chạm trên bản đồ để đặt vị trí. 3. Nút chạy lộ trình mẫu: chấm vị trí đi qua lần lượt 5 điểm ngoài trời. |
 | **Quy tắc** | Bản build cho khách (`EXPO_PUBLIC_DEMO=0`) ẩn công tắc mô phỏng và ô Máy chủ API, luôn dùng GPS thật; bản trình diễn (mặc định, không đặt biến) hiện đủ. |
 | **Tiêu chí chấp nhận** | AC1. Lộ trình mẫu kích hoạt đủ 5 điểm theo thứ tự, mỗi điểm một lần. AC2. Lượt ghé ghi `simulated`, không tính vào "Lượt tham quan hôm nay". |
@@ -1310,7 +1310,7 @@ Thêm bảng `sites` và cột `places.site_id`; gói nội dung lọc theo site
 | `ci-admin.yml` | đổi `admin/**` | npm ci → typecheck → lint → test → build | Đã có |
 | `ci-mobile.yml` | đổi `mobile/**` | npm ci → typecheck → test (geofence, narration, qr, i18n, auth) → `expo export` | Đã có |
 | `ci-docs.yml` | đổi `docs/**`, `*.md` | Kiểm tra liên kết tương đối trong README; mỗi `.puml` có `.png` | Đã có |
-| `e2e.yml` | PR vào `develop`, `main` | SQL Server + API + Web User + Web Admin → Playwright: TC-E1 → TC-E4 (mục 17.2) | *Cần làm* |
+| `e2e.yml` | PR vào `develop`, `main` | SQL Server + API + Web User + Web Admin → Playwright: TC-E1 → TC-E4 (mục 17.2); lỗi thì lưu báo cáo và log | Đã có – `e2e/` |
 | `release.yml` | Gắn tag `v*` trên `main` | Build Web User, Web Admin → `.zip`; build Docker image API → GHCR; EAS Build APK (profile `preview`); tạo GitHub Release đính kèm tất cả | *Giai đoạn 2* |
 
 ## Bí mật và môi trường
@@ -1328,7 +1328,7 @@ Thêm bảng `sites` và cột `places.site_id`; gói nội dung lọc theo site
 | Đơn vị | Haversine, máy trạng thái geofence, bộ điều phối phát, phân tích QR, i18n, single-flight làm mới token, `uuidV4` | Vitest (mobile, web, admin, api) | Mỗi PR |
 | Tích hợp API | Mọi endpoint trên SQL Server thật: khách ẩn danh, xác thực admin, nội dung, gói offline, lượt ghé, presence, admin | Vitest + supertest + SQL Server | Mỗi PR (ci-api) |
 | Giao diện | Thành phần và trang chính | Testing Library | Mỗi PR |
-| Đầu cuối (E2E) | Luồng chính trên trình duyệt | Playwright | PR vào develop/main (*cần làm*) |
+| Đầu cuối (E2E) | Luồng chính trên trình duyệt | Playwright | PR vào develop/main (`e2e.yml`) |
 | Thiết bị thật | APK trên Android; Expo Go; Web User trên điện thoại qua QR | Điện thoại nhóm | Trước báo cáo |
 
 ## Test case chính

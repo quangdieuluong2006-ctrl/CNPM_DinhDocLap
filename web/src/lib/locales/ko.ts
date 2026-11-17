@@ -68,4 +68,5 @@ export const ko: Dict = {
   completed: "끝까지 들음",
   online: "온라인",
   more: "더 보기",
+  lockedNotice: "관리자가 게스트 계정을 잠갔습니다. 해설은 계속 보고 들을 수 있습니다.",
 };

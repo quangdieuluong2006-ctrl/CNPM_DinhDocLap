@@ -37,11 +37,11 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
           .then(() => socket.connect())
           .catch(() => undefined); // refresh thất bại → AuthProvider tự tạo phiên khách mới
       } else if (code === "ACCOUNT_LOCKED" || code === "AUTH_TOKEN_INVALID") {
-        endSession();
+        endSession(code === "ACCOUNT_LOCKED");
       }
     });
     // Admin khóa khách → bỏ phiên ngay (khách vẫn nghe được nội dung công khai)
-    socket.on("session.revoked", endSession);
+    socket.on("session.revoked", (p: { reason?: string } | undefined) => endSession(p?.reason === "ACCOUNT_LOCKED"));
 
     const ping = setInterval(() => {
       if (socket.connected) socket.emit("presence.ping", {});

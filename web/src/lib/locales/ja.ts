@@ -68,4 +68,5 @@ export const ja: Dict = {
   completed: "最後まで聴いた",
   online: "オンライン",
   more: "もっと見る",
+  lockedNotice: "ゲストアカウントは管理者によってロックされました。解説の閲覧・再生は引き続きできます。",
 };

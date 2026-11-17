@@ -68,4 +68,5 @@ export const es: Dict = {
   completed: "Completado",
   online: "En línea",
   more: "Cargar más",
+  lockedNotice: "Un administrador ha bloqueado tu cuenta de invitado. Puedes seguir viendo y escuchando la audioguía.",
 };

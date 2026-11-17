@@ -67,7 +67,7 @@ Sửa PRD: sửa `docs/PRD.md` (và sơ đồ `.puml` nếu cần), rồi xuất
 
 ## CI/CD
 
-GitHub Actions có 5 workflow CI trong [`.github/workflows/`](.github/workflows/), chạy khi push hoặc tạo Pull Request vào `develop` / `main`:
+GitHub Actions có 6 workflow trong [`.github/workflows/`](.github/workflows/), chạy khi push hoặc tạo Pull Request vào `develop` / `main`:
 
 | Workflow        | Kiểm tra                                                        |
 | --------------- | --------------------------------------------------------------- |
@@ -76,9 +76,11 @@ GitHub Actions có 5 workflow CI trong [`.github/workflows/`](.github/workflows/
 | `ci-admin.yml`  | Typecheck, lint, test, build                                    |
 | `ci-mobile.yml` | Typecheck, test, `expo export` (bản web)                        |
 | `ci-docs.yml`   | Liên kết trong README, mỗi sơ đồ `.puml` có ảnh `.png`          |
+| `e2e.yml`       | Dựng SQL Server + API + Web User + Web Admin, chạy Playwright TC-E1 → TC-E4 |
 
 Chạy thử trên máy trước khi tạo PR (trong từng thư mục): `npm run typecheck`, `npm run lint`, `npm test`
 (Mobile không có `lint`).
+Kiểm thử đầu cuối trên máy: chạy `npm run dev` trong `api` (hoặc `npm run demo`), rồi trong `e2e`: `npm install`, `npx playwright install chromium`, `npm test` – xem [`e2e/README.md`](e2e/README.md).
 
 ## Quy trình làm việc
 
