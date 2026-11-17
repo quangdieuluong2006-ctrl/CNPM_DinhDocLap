@@ -95,4 +95,11 @@ export const ko: Dict = {
   triggerCode: "번호 입력",
   triggerManual: "직접 선택",
   triggerSimulated: "시뮬레이션",
+  settingsHaptics: "도착 시 진동",
+  settingsTextSize: "글자 크기",
+  textSmall: "작게",
+  textMedium: "보통",
+  textLarge: "크게",
+  congratsTitle: "축하합니다!",
+  congratsText: "독립궁의 {n}개 해설 지점을 모두 들으셨습니다. 방문해 주셔서 감사합니다!",
 };

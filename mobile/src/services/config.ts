@@ -13,3 +13,7 @@ export function defaultApiUrl(): string {
 // Tâm khuôn viên Dinh Độc Lập (dùng căn bản đồ và kiểm tra "ở xa khuôn viên").
 export const PALACE_CENTER = { lat: 10.7770, lng: 106.6953 };
 export const FAR_FROM_PALACE_M = 1000;
+
+// Bản trình diễn (mặc định) hiện công tắc Mô phỏng vị trí và ô Máy chủ API trong Cài đặt.
+// Bản phát hành cho khách build với EXPO_PUBLIC_DEMO=0: ẩn hai mục này, luôn dùng GPS thật (FE-11, FE-12).
+export const DEMO_MODE = process.env.EXPO_PUBLIC_DEMO !== "0";

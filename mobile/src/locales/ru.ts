@@ -95,4 +95,11 @@ export const ru: Dict = {
   triggerCode: "Ввод номера",
   triggerManual: "Выбрано вручную",
   triggerSimulated: "Симуляция",
+  settingsHaptics: "Вибрация при прибытии",
+  settingsTextSize: "Размер текста",
+  textSmall: "Мелкий",
+  textMedium: "Средний",
+  textLarge: "Крупный",
+  congratsTitle: "Поздравляем!",
+  congratsText: "Вы прослушали все {n} точек Дворца Независимости. Спасибо за посещение!",
 };

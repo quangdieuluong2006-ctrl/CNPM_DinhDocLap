@@ -95,4 +95,11 @@ export const fr: Dict = {
   triggerCode: "Numéro saisi",
   triggerManual: "Choisi",
   triggerSimulated: "Simulé",
+  settingsHaptics: "Vibrer à l'arrivée",
+  settingsTextSize: "Taille du texte",
+  textSmall: "Petite",
+  textMedium: "Moyenne",
+  textLarge: "Grande",
+  congratsTitle: "Félicitations !",
+  congratsText: "Vous avez écouté les {n} points du Palais de l'Indépendance. Merci de votre visite !",
 };

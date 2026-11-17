@@ -95,4 +95,11 @@ export const zh: Dict = {
   triggerCode: "输入编号",
   triggerManual: "手动选择",
   triggerSimulated: "模拟",
+  settingsHaptics: "到达时振动",
+  settingsTextSize: "文字大小",
+  textSmall: "小",
+  textMedium: "中",
+  textLarge: "大",
+  congratsTitle: "恭喜！",
+  congratsText: "您已收听统一宫全部 {n} 个讲解点。感谢您的参观！",
 };

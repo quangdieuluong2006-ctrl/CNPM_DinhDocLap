@@ -95,4 +95,11 @@ export const ja: Dict = {
   triggerCode: "番号入力",
   triggerManual: "手動で選択",
   triggerSimulated: "シミュレーション",
+  settingsHaptics: "到着時に振動",
+  settingsTextSize: "文字サイズ",
+  textSmall: "小",
+  textMedium: "中",
+  textLarge: "大",
+  congratsTitle: "おめでとうございます！",
+  congratsText: "統一会堂の見どころ {n} か所をすべて聴きました。ご来館ありがとうございます！",
 };

@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { ActivityIndicator, Alert, View } from "react-native";
@@ -8,7 +8,7 @@ import { store, uiLocaleOf, useApp } from "../state/store";
 import { useColors } from "../theme";
 
 export default function RootLayout() {
-  const { ready, authNotice, settings } = useApp();
+  const { ready, authNotice, settings, showCongrats } = useApp();
   const c = useColors();
   useEffect(() => {
     void store.init();
@@ -21,6 +21,15 @@ export default function RootLayout() {
       { text: t("ok"), onPress: () => store.clearAuthNotice() },
     ]);
   }, [authNotice, settings]);
+  // Nghe đủ mọi điểm → chúc mừng, mời xem lại lịch sử (FE-09, TC-22)
+  useEffect(() => {
+    if (!showCongrats) return;
+    const t = translator(uiLocaleOf(settings));
+    Alert.alert(t("congratsTitle"), t("congratsText").replace("{n}", String(store.places.length)), [
+      { text: t("close"), style: "cancel", onPress: () => store.dismissCongrats() },
+      { text: t("historyOpen"), onPress: () => { store.dismissCongrats(); router.push("/history"); } },
+    ]);
+  }, [showCongrats, settings]);
   if (!ready) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: c.bg }}>

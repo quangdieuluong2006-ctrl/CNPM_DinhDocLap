@@ -5,7 +5,9 @@ import { type Fix, GeofenceEngine, type GeoPlace } from "../core/geofence";
 import { NarrationController, type NarrationItem, type Trigger } from "../core/narration";
 import { singleFlight } from "../core/singleFlight";
 import { ApiError, createApi, type Language, type MobileSession, type Place, type User } from "../services/api";
-import { defaultApiUrl, FAR_FROM_PALACE_M, PALACE_CENTER } from "../services/config";
+import { DEMO_MODE, defaultApiUrl, FAR_FROM_PALACE_M, PALACE_CENTER } from "../services/config";
+import { arrivalBuzz } from "../services/haptics";
+import { shouldCongratulate, type TextSize } from "../core/prefs";
 import { type LocationProvider, RealLocationProvider, SimulatedLocationProvider } from "../services/location";
 import { configureAudio, createEngine } from "../services/playback";
 import { downloadAudio, getJson, loadBundle, saveBundle, setJson, type StoredBundle } from "../services/storage";
@@ -21,6 +23,8 @@ export interface Settings {
   simulate: boolean;
   apiUrl: string | null; // null = tự suy ra (services/config.ts)
   welcomed: boolean; // đã qua màn Chào mừng (chọn dùng thử hoặc đăng nhập)
+  haptics: boolean; // rung khi đến điểm (FE-12)
+  textSize: TextSize; // cỡ chữ văn bản thuyết minh (FE-12)
 }
 
 export type AuthStatus = "loading" | "guest" | "authenticated";
@@ -40,6 +44,7 @@ export interface AppState {
   pendingVisits: number;
   localVisits: LocalVisit[]; // lượt nghe ghi trên máy, mới nhất cuối (FE-10)
   pendingVisitIds: string[]; // clientId còn trong hàng đợi chưa gửi
+  showCongrats: boolean; // vừa nghe đủ mọi điểm → hộp thoại chúc mừng (FE-09)
   download: { done: number; total: number } | null;
   authStatus: AuthStatus;
   user: User | null;
@@ -54,6 +59,8 @@ const DEFAULT_SETTINGS: Settings = {
   simulate: false,
   apiUrl: null,
   welcomed: false,
+  haptics: true,
+  textSize: "medium",
 };
 
 // Ngôn ngữ giao diện = ngôn ngữ thuyết minh đã chọn; chưa chọn (màn Chào mừng, chọn ngôn ngữ) → ngôn ngữ của máy
@@ -65,7 +72,7 @@ export function uiLocaleOf(settings: Pick<Settings, "narrationLang">): UiLocale 
 class AppStore {
   state: AppState = {
     ready: false, settings: DEFAULT_SETTINGS, languages: [], stored: null, loadingBundle: false, online: true,
-    error: null, fix: null, locationError: null, weakGps: false, completed: [], pendingVisits: 0, localVisits: [], pendingVisitIds: [], download: null,
+    error: null, fix: null, locationError: null, weakGps: false, completed: [], pendingVisits: 0, localVisits: [], pendingVisitIds: [], showCongrats: false, download: null,
     authStatus: "loading", user: null, realtimeConnected: false, authNotice: null,
   };
   private listeners = new Set<() => void>();
@@ -108,6 +115,8 @@ class AppStore {
 
   async init(): Promise<void> {
     const settings = { ...DEFAULT_SETTINGS, ...(await getJson<Partial<Settings>>("settings", {})) };
+    // Bản phát hành cho khách: không có mô phỏng, không đổi máy chủ (kể cả khi máy từng lưu thiết lập của bản trình diễn)
+    if (!DEMO_MODE) Object.assign(settings, { simulate: false, apiUrl: null });
     const completed = await getJson<number[]>("progress.completed", []);
     this.narration.autoPlay = settings.autoPlay;
     const stored = settings.narrationLang ? await loadBundle(settings.narrationLang) : null;
@@ -198,6 +207,10 @@ class AppStore {
   async ensureSession(): Promise<boolean> {
     if (this.accessToken) return true;
     return this.refreshToken ? this.refreshAccess() : this.startGuest();
+  }
+
+  dismissCongrats(): void {
+    this.set({ showCongrats: false });
   }
 
   clearAuthNotice(): void {
@@ -338,6 +351,8 @@ class AppStore {
       this.set({ weakGps: this.geofence.isWeakSignal() });
       return;
     }
+    // Vừa vào vùng một điểm (kể cả khi chỉ gợi ý vì đang phát bài khác) → rung nhẹ nếu khách bật (FE-05, FE-12)
+    if ((r.trigger || r.suppressed.length > 0) && this.state.settings.haptics) arrivalBuzz();
     if (r.trigger) {
       const place = this.places.find((p) => p.id === r.trigger!.id);
       if (place) this.play(place, this.state.settings.simulate ? "simulated" : "gps");
@@ -358,6 +373,12 @@ class AppStore {
       const completed = [...this.state.completed, v.placeId];
       this.set({ completed });
       await setJson("progress.completed", completed);
+      // Nghe đủ mọi điểm lần đầu → chúc mừng một lần (FE-09, TC-22)
+      const shown = await getJson<boolean>("progress.congratulated", false);
+      if (shouldCongratulate(completed, this.places.map((p) => p.id), shown)) {
+        await setJson("progress.congratulated", true);
+        this.set({ showCongrats: true });
+      }
     }
     const entry = await enqueueVisit(v);
     // Hiện ngay trên màn Lịch sử, kể cả khi chưa gửi được lên máy chủ (FE-10 AC1)
