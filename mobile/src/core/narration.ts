@@ -75,6 +75,9 @@ export class NarrationController {
   private startedAt = 0;
   private maxPosition = 0;
   private listeners = new Set<Listener>();
+  // Cách kích hoạt của điểm đang chờ (thẻ gợi ý, hàng đợi): "gps" hay "simulated". Khi khách bấm "Nghe ngay" hoặc
+  // bài trong hàng đợi tự phát, lượt nghe ghi đúng cách kích hoạt gốc – lượt mô phỏng không bị tính vào thống kê thật.
+  private pendingTrigger = new Map<number, Trigger>();
   // Điểm đã nghe hết trong ngày: GPS chỉ gợi ý, không tự phát lại (mục 4.3.5).
   private completedToday = new Map<number, string>();
   autoPlay = true;
@@ -97,6 +100,7 @@ export class NarrationController {
       return "started";
     }
     if (this.state.current?.placeId === item.placeId) return "ignored";
+    this.pendingTrigger.set(item.placeId, trigger);
     const doneToday = this.completedToday.get(item.placeId) === this.today();
     if (!this.autoPlay || doneToday) {
       this.set({ suggestion: item });
@@ -111,9 +115,9 @@ export class NarrationController {
     return "queued";
   }
 
-  acceptSuggestion(trigger: Trigger = "gps"): void {
+  acceptSuggestion(trigger?: Trigger): void {
     const s = this.state.suggestion;
-    if (s) this.play(s, trigger);
+    if (s) this.play(s, trigger ?? this.pendingTrigger.get(s.placeId) ?? "gps");
   }
 
   dismissSuggestion(): void {
@@ -200,7 +204,7 @@ export class NarrationController {
     const queue = this.state.queue.filter((q) => isInside(q.placeId));
     const next = queue[0];
     this.set({ status: "idle", current: null, positionSec: 0, durationSec: 0, queue: queue.slice(1) });
-    if (next) this.play(next, "gps");
+    if (next) this.play(next, this.pendingTrigger.get(next.placeId) ?? "gps");
   }
 
   // Ghi lượt ghé cho bài đang phát (nếu có). ended = phát hết tự nhiên.
