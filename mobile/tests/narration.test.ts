@@ -54,6 +54,19 @@ describe("NarrationController (PRD mục 4.5, FE-07)", () => {
     expect(c.getState().suggestion).toBeNull();
   });
 
+  it("điểm do mô phỏng đề xuất: bấm \"Nghe ngay\" hay tự phát từ hàng đợi đều ghi trigger simulated, không thành gps", () => {
+    const { c, visits, active } = setup();
+    c.request(item(1), "simulated");
+    c.request(item(2), "simulated"); // đang phát bài 1 → bài 2 vào hàng đợi + thẻ gợi ý
+    active().handlers.onEnd(); // bài 2 tự phát từ hàng đợi
+    expect(c.getState().current).toMatchObject({ placeId: 2, trigger: "simulated" });
+    c.autoPlay = false;
+    c.request(item(3), "simulated"); // tắt tự phát → chỉ gợi ý
+    c.acceptSuggestion(); // khách bấm "Nghe ngay"
+    expect(c.getState().current).toMatchObject({ placeId: 3, trigger: "simulated" });
+    expect(visits.map((v) => v.trigger)).toEqual(["simulated", "simulated"]);
+  });
+
   it("hàng đợi chỉ phát điểm khách vẫn còn ở trong vùng", () => {
     const { c, active } = setup({ inside: (id) => id !== 2 });
     c.request(item(1), "gps");

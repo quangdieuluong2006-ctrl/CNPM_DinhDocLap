@@ -75,13 +75,21 @@ export default function HistoryScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
       <Stack.Screen options={{ title: t("historyTitle") }} />
-      {offline && <Banner tone="warn" text={t("historyOffline")} action={{ title: t("retry"), onPress: () => void load() }} />}
       <SectionList
         sections={sections}
         keyExtractor={(e) => e.key}
         renderItem={renderItem}
         renderSectionHeader={({ section }) => <Text style={[styles.day, { color: c.muted }]}>{section.title}</Text>}
         stickySectionHeadersEnabled={false}
+        // Dải "Đang ngoại tuyến" nằm trong danh sách: trên iOS thanh tiêu đề trong suốt, danh sách tự chừa chỗ bên dưới
+        // thanh tiêu đề, còn phần tử đặt ngoài danh sách sẽ bị đè lên giờ / pin của điện thoại.
+        ListHeaderComponent={
+          offline ? (
+            <View style={styles.bannerWrap}>
+              <Banner tone="warn" text={t("historyOffline")} action={{ title: t("retry"), onPress: () => void load() }} />
+            </View>
+          ) : undefined
+        }
         contentContainerStyle={{ padding: 16, gap: 8, flexGrow: 1 }}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={() => void load()} />}
         ListEmptyComponent={
@@ -101,5 +109,6 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderRadius: 14, borderWidth: 1 },
   time: { width: 44, fontVariant: ["tabular-nums"], fontWeight: "600" },
   day: { marginTop: 8, fontSize: 13, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.5 },
+  bannerWrap: { borderRadius: 12, overflow: "hidden" },
   empty: { flex: 1, alignItems: "center", justifyContent: "center", gap: 10, paddingTop: 80 },
 });
