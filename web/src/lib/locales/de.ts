@@ -68,4 +68,5 @@ export const de: Dict = {
   completed: "Vollständig",
   online: "Online",
   more: "Mehr laden",
+  lockedNotice: "Ihr Gastkonto wurde von einem Administrator gesperrt. Sie können die Führung weiterhin lesen und anhören.",
 };

@@ -1,0 +1,17 @@
+{
+  "name": "dinhdoclap-e2e",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Kiểm thử đầu cuối (E2E) bằng Playwright: TC-E1 → TC-E4 (PRD mục 17.2)",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  }
+}
