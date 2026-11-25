@@ -316,7 +316,7 @@ export function PlaceEditPage() {
           )}
           {warnings.length > 0 && (
             <div className="rounded-md bg-amber-50 p-3 text-sm text-amber-800">
-              ⚠ Vùng kích hoạt chồng lấn quá 50% với:{" "}
+              ⚠ Vùng kích hoạt giao nhau với:{" "}
               {warnings
                 .map(
                   (w) =>
