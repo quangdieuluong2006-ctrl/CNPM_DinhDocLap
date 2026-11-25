@@ -16,7 +16,7 @@ export function overlapWarnings(
   return others.flatMap((o) => {
     const d = distanceM(place, { lat: Number(o.lat), lng: Number(o.lng) });
     const overlap = place.radiusM + o.radius_m - d;
-    return overlap > 0.5 * Math.min(place.radiusM, o.radius_m)
+    return overlap > 0
       ? [{ code: o.code, distanceM: Math.round(d), overlapM: Math.round(overlap) }]
       : [];
   });
