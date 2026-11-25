@@ -1,12 +1,14 @@
 import { randomBytes } from "node:crypto";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import multer from "multer";
 import { env } from "../config/env.js";
 import { ApiError } from "./apiError.js";
 
 // Tệp tải lên lưu ở MEDIA_DIR và được phục vụ tại /media/... (express.static hỗ trợ HTTP Range để tua).
-export const mediaRoot = path.resolve(env.MEDIA_DIR);
+// MEDIA_DIR tương đối được tính từ thư mục api ở cả mã nguồn và bản build.
+export const mediaRoot = path.resolve(fileURLToPath(new URL("../../", import.meta.url)), env.MEDIA_DIR);
 
 const AUDIO_TYPES: Record<string, string> = {
   "audio/mpeg": "mp3",
